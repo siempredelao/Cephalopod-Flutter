@@ -1,0 +1,25 @@
+name: cephalopod
+description: >-
+  Cephalopod, the two-player dice game by Mark Steere, built with Flutter.
+version: 0.1.0+1
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+  flutter: ">=3.47.0"
+
+dependencies:
+  cephalopod_engine: ^0.1.0
+  flutter:
+    sdk: flutter
+  go_router: ^18.1.0
+  material_ui: ^1.7.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^10.3.0
+
+flutter:
+  uses-material-design: true
