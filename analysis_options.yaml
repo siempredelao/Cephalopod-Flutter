@@ -1,0 +1,11 @@
+# Shared rules for every package in the workspace.
+# very_good_analysis turns on strict-casts, strict-inference and
+# strict-raw-types plus a strict lint set. It stays on 10.x for now:
+# see docs/adr/0006-lint-baseline.md.
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/build/**"
