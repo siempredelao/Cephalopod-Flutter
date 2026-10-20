@@ -8,7 +8,7 @@ engine moves and renders the result. Every dependency points toward the engine.
 
 | Package | Path | Depends on | Purpose |
 | --- | --- | --- | --- |
-| `cephalopod_engine` | `packages/cephalopod_engine` | Dart SDK only | Game rules, AI agents |
+| `cephalopod_engine` | `packages/cephalopod_engine` | Dart SDK, `meta`, `collection` | Game rules, AI agents |
 | `cephalopod` | `app` | engine, Flutter, go_router, material_ui | The app |
 | `cephalopod_workspace` | repo root | Melos, lints | Workspace, scripts, `tool/` checks |
 
@@ -71,8 +71,10 @@ Classes named above arrive in M1–M4; the table records how they will fit.
   See [ADR 0004](adr/0004-result-for-domain-errors.md).
 - No magic numbers: board size, maximum capture sum and minimum capture size
   live in one config object.
-- Immutable models: `final` fields, `const` constructors, unmodifiable
-  collections.
+- Models are plain immutable data: `final` fields, `const` constructors,
+  unmodifiable collections, no behaviour. Rules live in stateless services
+  ([ADR 0009](adr/0009-plain-data-types.md)). Engine value types write `==`
+  and `hashCode` by hand ([ADR 0008](adr/0008-hand-written-equality.md)).
 - Material widgets come from `package:material_ui`, not
   `package:flutter/material.dart`. See [ADR 0007](adr/0007-material-ui-package.md).
 - Generated files (`*.g.dart`, `*.freezed.dart`) are never committed.
