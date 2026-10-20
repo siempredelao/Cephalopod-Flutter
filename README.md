@@ -81,9 +81,12 @@ Generate them once from `app/`:
 
 ```sh
 cd app
-flutter create --platforms=android,ios,web --org dev.siempredelao --project-name cephalopod .
+flutter create --platforms=android,ios,web --org gc.david --project-name cephalopod .
 rm -f test/widget_test.dart          # sample test from the template; not used here
 ```
+
+`--org gc.david` plus the project name gives the application ID and bundle
+identifier `gc.david.cephalopod`.
 
 Commit the new `android/`, `ios/`, `web/` folders and `.metadata`. CI then also
 runs Android and web smoke builds.
