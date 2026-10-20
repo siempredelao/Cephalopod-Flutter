@@ -1,0 +1,96 @@
+# Architecture
+
+Cephalopod is a pure-Dart rules engine with a Flutter app on top. The engine
+knows nothing about Flutter, storage or time; the app turns user intents into
+engine moves and renders the result. Every dependency points toward the engine.
+
+## Packages
+
+| Package | Path | Depends on | Purpose |
+| --- | --- | --- | --- |
+| `cephalopod_engine` | `packages/cephalopod_engine` | Dart SDK only | Game rules, AI agents |
+| `cephalopod` | `app` | engine, Flutter, go_router, material_ui | The app |
+| `cephalopod_workspace` | repo root | Melos, lints | Workspace, scripts, `tool/` checks |
+
+The packages form a [pub workspace](https://dart.dev/tools/pub/workspaces):
+one `flutter pub get` at the root resolves everything into a single lockfile.
+Why a separate package instead of a folder: [ADR 0001](adr/0001-pure-dart-engine-package.md).
+
+## Layers inside the app
+
+The app follows the MVVM split in Flutter's
+[architecture guide](https://docs.flutter.dev/app-architecture/guide), grouped
+by feature first and by layer second.
+
+| Layer | Folder | Holds | May import |
+| --- | --- | --- | --- |
+| Presentation | `features/<f>/presentation` | Views (widgets), blocs as view models | Own `domain`, `core`, engine, Flutter |
+| Domain | `features/<f>/domain` | Use cases, repository interfaces | `core`, engine. **No Flutter** |
+| Data | `features/<f>/data` | Repository implementations, DTOs, services | Own `domain`, `core`, engine |
+| Core | `core` | Code shared by features: route names, shared widgets, logging | `core`, engine, Flutter |
+| App | `app` | `App` widget, router, theme, composition root | Anything |
+
+`app/bootstrap.dart` is the composition root: the only code that creates
+concrete classes and wires them together. Everything else receives its
+dependencies through constructors.
+
+## The dependency rule and how it is enforced
+
+| Rule | Enforced by |
+| --- | --- |
+| The engine imports no Flutter, `dart:ui` or `dart:io` | Its pubspec has no Flutter dependency; `tool/check_architecture.dart` |
+| Domain code imports no Flutter | `tool/check_architecture.dart` |
+| Domain never imports data or presentation | `tool/check_architecture.dart` |
+| Presentation never imports data, and data never imports presentation | `tool/check_architecture.dart` |
+| A feature never imports another feature or `app/` | `tool/check_architecture.dart` |
+| `core/` never imports `features/` or `app/` | `tool/check_architecture.dart` |
+| Imports inside `lib` use `package:` URIs | `always_use_package_imports` lint |
+
+CI runs the check on every push. Shared code moves to `core/` rather than
+being imported across features; screens navigate by route name
+(`core/navigation/app_route.dart`), so features never import each other's pages.
+
+## SOLID in this codebase
+
+| Principle | Where it shows |
+| --- | --- |
+| Single responsibility | Capture search, move validation, state mapping, storage and rendering each live in their own class |
+| Open/closed | New opponents implement `GameAgent`; new storage implements `GameRepository`. Neither touches the bloc |
+| Liskov substitution | Every `GameRepository` and `GameAgent` runs one shared contract test suite |
+| Interface segregation | Agents depend on a narrow move-generator interface; games and settings have separate repositories |
+| Dependency inversion | Domain owns the interfaces, data implements them, the composition root wires them |
+
+Classes named above arrive in M1–M4; the table records how they will fit.
+
+## Conventions
+
+- Files in `snake_case`, one public type per file, named after the type.
+- `test/` mirrors `lib/`, so every class has an obvious test file.
+- Engine tests are named after the rule they cover (`R5: …`).
+- Expected domain failures are values (`Result`), exceptions are for bugs.
+  See [ADR 0004](adr/0004-result-for-domain-errors.md).
+- No magic numbers: board size, maximum capture sum and minimum capture size
+  live in one config object.
+- Immutable models: `final` fields, `const` constructors, unmodifiable
+  collections.
+- Material widgets come from `package:material_ui`, not
+  `package:flutter/material.dart`. See [ADR 0007](adr/0007-material-ui-package.md).
+- Generated files (`*.g.dart`, `*.freezed.dart`) are never committed.
+
+## Testing
+
+| Level | Proves | Where |
+| --- | --- | --- |
+| Engine unit | Each rule R1–R8 and each illegal move | `packages/cephalopod_engine/test` |
+| Engine property | Seeded random games always end and keep invariants | `packages/cephalopod_engine/test` |
+| Repository contract | Every implementation behaves the same | `app/test/features/*/data` |
+| Bloc | Event to state sequences | `app/test/features/*/presentation` |
+| Widget and golden | Rendering, taps, semantics, light and dark | `app/test` |
+| Integration | A full game, save and resume | `app/integration_test` |
+
+Coverage gates: engine 100% of lines, app 85% of lines, generated files excluded.
+
+## Decisions
+
+Architecture decision records live in [docs/adr](adr/README.md). Add one when
+a decision is hard to reverse or would surprise a new reader.
