@@ -1,0 +1,5 @@
+# The root .gitignore covers Dart tool output, build folders and IDE files.
+# Platform folders (android/, ios/, web/) bring their own .gitignore files.
+.flutter-plugins
+.flutter-plugins-dependencies
+/build/
