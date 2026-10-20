@@ -13,7 +13,10 @@ void main() {
     String location = '/',
   }) async {
     await tester.pumpWidget(
-      App(flavor: flavor, router: createRouter(initialLocation: location)),
+      App(
+        flavor: flavor,
+        router: createRouter(initialLocation: location),
+      ),
     );
     await tester.pumpAndSettle();
   }

@@ -1,5 +1,20 @@
 include: ../analysis_options.yaml
 
+analyzer:
+  # `flutter analyze` (3.47+) adds the platform folders to this list when they
+  # are missing. Generated files are repeated from the root file so the app
+  # does not depend on how exclude lists merge across includes.
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+
 linter:
   rules:
     # The app is not a library with outside callers, so doc comments are
