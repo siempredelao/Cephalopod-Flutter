@@ -1,0 +1,8 @@
+include: ../analysis_options.yaml
+
+linter:
+  rules:
+    # The app is not a library with outside callers, so doc comments are
+    # written where they explain something, not on every public member.
+    # The engine package keeps this rule on.
+    public_member_api_docs: false
