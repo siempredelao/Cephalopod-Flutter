@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  FLUTTER_VERSION: 3.47.1
+
+jobs:
+  verify:
+    name: Format, analyze, architecture, tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Check formatting
+        run: dart run melos run format:check
+
+      - name: Analyze
+        run: dart run melos run analyze
+
+      - name: Check architecture
+        run: dart run melos run check:architecture
+
+      - name: Engine tests (100% line coverage)
+        run: dart run melos run test:engine
+
+      - name: App tests (85% line coverage)
+        run: dart run melos run test:app
+
+  build:
+    name: Smoke build (${{ matrix.platform }})
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: web
+            command: >-
+              flutter build web --release
+              --base-href /${{ github.event.repository.name }}/
+          - platform: android
+            command: flutter build apk --debug
+    steps:
+      - uses: actions/checkout@v6
+
+      # Platform folders come from `flutter create` (see README). Until they
+      # are committed, this job reports a notice instead of failing.
+      - name: Check for the platform folder
+        id: platform
+        run: |
+          if [ -d "app/${{ matrix.platform }}" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::app/${{ matrix.platform }} not found; skipping build."
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - if: steps.platform.outputs.present == 'true' && matrix.platform == 'android'
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - if: steps.platform.outputs.present == 'true'
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - if: steps.platform.outputs.present == 'true'
+        name: Build
+        working-directory: app
+        run: ${{ matrix.command }}
