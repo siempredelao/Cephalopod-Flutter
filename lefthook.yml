@@ -1,0 +1,15 @@
+# Optional local git hooks. Install lefthook (https://lefthook.dev), then run
+# `lefthook install` once in the repository.
+pre-commit:
+  commands:
+    format:
+      glob: "*.dart"
+      run: dart format --output=none --set-exit-if-changed {staged_files}
+    analyze:
+      glob: "*.dart"
+      run: dart run melos run analyze
+
+pre-push:
+  commands:
+    verify:
+      run: dart run melos run verify

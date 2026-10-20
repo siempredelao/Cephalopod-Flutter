@@ -1,0 +1,60 @@
+name: cephalopod_workspace
+description: >-
+  Workspace root for Cephalopod, the dice game by Mark Steere, built with
+  Flutter on top of a pure-Dart rules engine.
+publish_to: none
+
+environment:
+  sdk: ^3.13.0
+
+workspace:
+  - app
+  - packages/cephalopod_engine
+
+dev_dependencies:
+  melos: ^8.9.0
+  very_good_analysis: ^10.3.0
+
+melos:
+  scripts:
+    format:
+      description: Format every Dart file in the workspace.
+      run: dart format .
+
+    "format:check":
+      description: Fail if any Dart file is not formatted.
+      run: dart format --output=none --set-exit-if-changed .
+
+    analyze:
+      description: Static analysis of the whole workspace; infos fail too.
+      run: flutter analyze --fatal-infos
+
+    "check:architecture":
+      description: Fail on imports that break the dependency rule.
+      run: "dart run tool/check_architecture.dart"
+
+    "test:engine":
+      description: Engine tests with coverage, gated at 100% of lines.
+      run: >-
+        cd packages/cephalopod_engine &&
+        dart run coverage:test_with_coverage &&
+        cd ../.. &&
+        dart run tool/check_coverage.dart
+        packages/cephalopod_engine/coverage/lcov.info 100
+
+    "test:app":
+      description: App tests with coverage, gated at 85% of lines.
+      run: >-
+        cd app &&
+        flutter test --coverage &&
+        cd .. &&
+        dart run tool/check_coverage.dart app/coverage/lcov.info 85
+
+    verify:
+      description: Everything CI checks, in the same order.
+      steps:
+        - "melos run format:check"
+        - melos run analyze
+        - "melos run check:architecture"
+        - "melos run test:engine"
+        - "melos run test:app"

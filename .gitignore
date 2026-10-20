@@ -1,0 +1,19 @@
+# Dart and Flutter
+.dart_tool/
+build/
+coverage/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Generated code is never committed; CI rebuilds it once codegen is added
+*.g.dart
+*.freezed.dart
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
