@@ -52,9 +52,11 @@ melos:
 
     verify:
       description: Everything CI checks, in the same order.
+      # Steps name other scripts, so Melos runs them with the same command it
+      # was started with. `melos run x` here would need a global install.
       steps:
-        - "melos run format:check"
-        - melos run analyze
-        - "melos run check:architecture"
-        - "melos run test:engine"
-        - "melos run test:app"
+        - "format:check"
+        - analyze
+        - "check:architecture"
+        - "test:engine"
+        - "test:app"

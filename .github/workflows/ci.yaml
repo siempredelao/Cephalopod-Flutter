@@ -32,20 +32,11 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Check formatting
-        run: dart run melos run format:check
-
-      - name: Analyze
-        run: dart run melos run analyze
-
-      - name: Check architecture
-        run: dart run melos run check:architecture
-
-      - name: Engine tests (100% line coverage)
-        run: dart run melos run test:engine
-
-      - name: App tests (85% line coverage)
-        run: dart run melos run test:app
+      # The exact command developers run locally, so the two cannot drift.
+      # It runs format check, analyze, architecture check, then engine (100%
+      # line coverage) and app (85%) tests, stopping at the first failure.
+      - name: Verify
+        run: dart run melos run verify
 
   build:
     name: Smoke build (${{ matrix.platform }})
