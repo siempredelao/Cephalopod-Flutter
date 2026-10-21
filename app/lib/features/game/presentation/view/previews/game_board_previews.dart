@@ -6,8 +6,6 @@ import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:material_ui/material_ui.dart';
 
-const Size _boardSize = Size(400, 400);
-
 const Position _top = Position(0, 2);
 const Position _left = Position(0, 1);
 const Position _right = Position(0, 3);
@@ -16,7 +14,7 @@ const Position _below = Position(1, 2);
 @Preview(
   group: 'GameBoard',
   name: 'New game',
-  size: _boardSize,
+  size: Size(400, 400),
   wrapper: boardPreviewWrapper,
 )
 Widget newGamePreview() {
@@ -27,7 +25,7 @@ Widget newGamePreview() {
 @Preview(
   group: 'GameBoard',
   name: 'Mid-game, last move marked',
-  size: _boardSize,
+  size: Size(400, 400),
   wrapper: boardPreviewWrapper,
 )
 Widget midGamePreview() {
@@ -49,7 +47,7 @@ Widget midGamePreview() {
 @Preview(
   group: 'GameBoard',
   name: 'Choosing a capture (R5)',
-  size: _boardSize,
+  size: Size(400, 400),
   wrapper: boardPreviewWrapper,
 )
 Widget choosingCapturePreview() {

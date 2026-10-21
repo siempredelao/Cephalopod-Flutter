@@ -4,14 +4,13 @@ import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:material_ui/material_ui.dart';
 
-const Size _rowSize = Size(440, 80);
 const double _dieSide = 60;
 const double _spacing = 8;
 
 @Preview(
   group: 'DieFace',
   name: 'Player 1, 1 to 6',
-  size: _rowSize,
+  size: Size(440, 80),
   wrapper: boardPreviewWrapper,
 )
 Widget player1DicePreview() => _allValuesOf(Player.black);
@@ -19,7 +18,7 @@ Widget player1DicePreview() => _allValuesOf(Player.black);
 @Preview(
   group: 'DieFace',
   name: 'Player 2, 1 to 6',
-  size: _rowSize,
+  size: Size(440, 80),
   wrapper: boardPreviewWrapper,
 )
 Widget player2DicePreview() => _allValuesOf(Player.white);

@@ -5,14 +5,13 @@ import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:material_ui/material_ui.dart';
 
-const Size _rowSize = Size(480, 100);
 const double _squareSide = 88;
 const double _spacing = 4;
 
 @Preview(
   group: 'BoardSquare',
   name: 'Empty, every mark',
-  size: _rowSize,
+  size: Size(480, 100),
   wrapper: boardPreviewWrapper,
 )
 Widget emptySquaresPreview() => _everyMarkOf(null);
@@ -20,7 +19,7 @@ Widget emptySquaresPreview() => _everyMarkOf(null);
 @Preview(
   group: 'BoardSquare',
   name: 'With a die, every mark',
-  size: _rowSize,
+  size: Size(480, 100),
   wrapper: boardPreviewWrapper,
 )
 Widget occupiedSquaresPreview() =>
