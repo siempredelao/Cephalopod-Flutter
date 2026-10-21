@@ -26,4 +26,5 @@ export 'src/rules/board_geometry.dart';
 export 'src/rules/capture_finder.dart';
 export 'src/rules/cephalopod_rules.dart';
 export 'src/rules/illegal_move.dart';
+export 'src/rules/move_validator.dart';
 export 'src/rules/referee.dart';

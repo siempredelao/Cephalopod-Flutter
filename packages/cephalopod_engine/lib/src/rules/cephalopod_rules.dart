@@ -10,8 +10,8 @@ import 'package:cephalopod_engine/src/result.dart';
 import 'package:cephalopod_engine/src/rules/board_geometry.dart';
 import 'package:cephalopod_engine/src/rules/capture_finder.dart';
 import 'package:cephalopod_engine/src/rules/illegal_move.dart';
+import 'package:cephalopod_engine/src/rules/move_validator.dart';
 import 'package:cephalopod_engine/src/rules/referee.dart';
-import 'package:collection/collection.dart';
 
 /// The rules of Cephalopod: how a game starts, which moves are legal and
 /// what a move does.
@@ -21,9 +21,8 @@ import 'package:collection/collection.dart';
 final class CephalopodRules {
   final BoardGeometry _geometry = BoardGeometry();
   final CaptureFinder _captureFinder = CaptureFinder();
+  final MoveValidator _validator = MoveValidator();
   final Referee _referee = Referee();
-
-  static const SetEquality<Position> _sameSquares = SetEquality<Position>();
 
   /// The value a non-capturing die shows (rule R7).
   static const int _nonCapturingPips = 1;
@@ -75,31 +74,22 @@ final class CephalopodRules {
   }
 
   /// Plays [move] in [state]: the next state, or the reason the move is
-  /// illegal. Checks run in a fixed order, and the first failure is returned.
+  /// illegal. A finished game refuses every move (rule R8); otherwise the
+  /// [MoveValidator] reports the first rule the move breaks.
   Result<GameState, IllegalMove> apply(GameState state, Move move) {
     final status = state.status;
     if (status is! InProgress) return Err(GameOver());
+    if (_validator.violationOf(state, move) case final violation?) {
+      return Err(violation);
+    }
+    return Ok(_play(state, move, status.toMove));
+  }
 
-    final board = state.board;
-    final target = move.position;
+  /// Plays a validated [move] by [player]: the captured dice leave the board
+  /// and the new die shows their sum (rule R6), or 1 without a capture (R7).
+  GameState _play(GameState state, Move move, Player player) {
+    final GameState(:board, :config) = state;
     final captures = move.captures;
-    if (!_geometry.contains(target, board.size)) {
-      return Err(OutsideBoard(target));
-    }
-    if (board.dice.containsKey(target)) return Err(SquareOccupied(target));
-
-    final options = _captureFinder.optionsAt(board, target, state.config);
-    if (options.isNotEmpty && captures.isEmpty) {
-      return Err(CaptureRequired(options));
-    }
-    final isAnOption = options.any(
-      (option) => _sameSquares.equals(option, captures),
-    );
-    if (captures.isNotEmpty && !isAnOption) {
-      return Err(InvalidCapture(captures));
-    }
-
-    // R6: a capturing die shows the sum it captured. R7: otherwise a 1.
     final pips = captures.isEmpty
         ? _nonCapturingPips
         : _captureFinder.pipSum(board, captures);
@@ -108,15 +98,13 @@ final class CephalopodRules {
       dice: {
         for (final MapEntry(:key, :value) in board.dice.entries)
           if (!captures.contains(key)) key: value,
-        target: Die(owner: status.toMove, pips: pips),
+        move.position: Die(owner: player, pips: pips),
       },
     );
-    return Ok(
-      GameState(
-        board: next,
-        status: _referee.statusOf(next, opponentOf(status.toMove)),
-        config: state.config,
-      ),
+    return GameState(
+      board: next,
+      status: _referee.statusOf(next, opponentOf(player)),
+      config: config,
     );
   }
 

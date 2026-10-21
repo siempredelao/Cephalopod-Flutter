@@ -144,68 +144,10 @@ void main() {
       });
     });
 
-    test('R5: a capture is mandatory where one is possible', () {
+    test("refuses an illegal move with the validator's reason", () {
       final error = rules.apply(figure4, Move(top)).errorOrFail;
 
-      expect(
-        error,
-        isA<CaptureRequired>().having(
-          (e) => e.options,
-          'options',
-          hasLength(3),
-        ),
-      );
-    });
-
-    test('R4: refuses captures that are not an option', () {
-      final invalid = <Set<Position>>[
-        {const Position(0, 1), const Position(0, 3), const Position(1, 2)},
-        {const Position(0, 1)},
-        {const Position(0, 1), const Position(2, 2)},
-        {const Position(0, 1), const Position(4, 4)},
-      ];
-
-      for (final captures in invalid) {
-        final error = rules
-            .apply(figure4, Move(top, captures: captures))
-            .errorOrFail;
-
-        expect(
-          error,
-          isA<InvalidCapture>().having((e) => e.captures, 'captures', captures),
-          reason: '$captures',
-        );
-      }
-    });
-
-    test('R4: refuses a capture where none is possible', () {
-      final move = Move(center, captures: {const Position(1, 2)});
-
-      final error = rules.apply(rules.newGame(), move).errorOrFail;
-
-      expect(error, isA<InvalidCapture>());
-    });
-
-    test('R2: refuses an occupied square', () {
-      final state = rules.apply(rules.newGame(), Move(center)).valueOrFail;
-
-      final error = rules.apply(state, Move(center)).errorOrFail;
-
-      expect(
-        error,
-        isA<SquareOccupied>().having((e) => e.position, 'at', center),
-      );
-    });
-
-    test('refuses a square outside the board', () {
-      const outside = Position(5, 0);
-
-      final error = rules.apply(rules.newGame(), Move(outside)).errorOrFail;
-
-      expect(
-        error,
-        isA<OutsideBoard>().having((e) => e.position, 'at', outside),
-      );
+      expect(error, isA<CaptureRequired>());
     });
 
     test('R8: filling the last square ends the game', () {
