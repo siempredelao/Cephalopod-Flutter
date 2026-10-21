@@ -8,6 +8,5 @@ import 'package:flutter/widgets.dart';
 /// wires them together. Repositories, use cases and blocs are added here as
 /// later milestones need them, and handed down through constructors.
 void bootstrap(Flavor flavor) {
-  final rules = CephalopodRules();
-  runApp(App(flavor: flavor, router: createRouter(rules: rules)));
+  runApp(App(flavor: flavor, router: createRouter(rules: CephalopodRules())));
 }
