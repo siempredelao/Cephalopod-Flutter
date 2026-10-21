@@ -12,8 +12,12 @@ import 'package:collection/collection.dart';
 /// refused as occupied rather than as a bad capture. Adding a rule means one
 /// more check in the list.
 final class MoveValidator {
-  final BoardGeometry _geometry = BoardGeometry();
-  final CaptureFinder _captureFinder = CaptureFinder();
+  /// A validator that checks squares with `geometry` and capture options
+  /// with `captureFinder`.
+  MoveValidator({required this._geometry, required this._captureFinder});
+
+  final BoardGeometry _geometry;
+  final CaptureFinder _captureFinder;
 
   static const SetEquality<Position> _sameSquares = SetEquality<Position>();
 

@@ -17,7 +17,7 @@ void main() {
   const games = 1000;
   const maxMoves = 300;
   final rules = CephalopodRules();
-  final finder = CaptureFinder();
+  final finder = CaptureFinder(geometry: BoardGeometry());
 
   int totalPips(Board board) => finder.pipSum(board, board.dice.keys);
 

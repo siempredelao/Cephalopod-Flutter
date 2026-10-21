@@ -19,10 +19,41 @@ import 'package:cephalopod_engine/src/rules/referee.dart';
 /// Pure: the same state and move always give the same result, and nothing
 /// outside the returned value changes.
 final class CephalopodRules {
-  final BoardGeometry _geometry = BoardGeometry();
-  final CaptureFinder _captureFinder = CaptureFinder();
-  final MoveValidator _validator = MoveValidator();
-  final Referee _referee = Referee();
+  /// The rules, built from their parts. This is the engine's composition
+  /// root: the only place that creates its services and wires them together.
+  ///
+  /// Any part can be passed in; the rest are created here, sharing one
+  /// [BoardGeometry] and one [CaptureFinder].
+  factory CephalopodRules({
+    BoardGeometry? geometry,
+    CaptureFinder? captureFinder,
+    MoveValidator? validator,
+    Referee? referee,
+  }) {
+    final sharedGeometry = geometry ?? BoardGeometry();
+    final sharedFinder =
+        captureFinder ?? CaptureFinder(geometry: sharedGeometry);
+    return CephalopodRules._(
+      geometry: sharedGeometry,
+      captureFinder: sharedFinder,
+      validator:
+          validator ??
+          MoveValidator(geometry: sharedGeometry, captureFinder: sharedFinder),
+      referee: referee ?? Referee(),
+    );
+  }
+
+  CephalopodRules._({
+    required this._geometry,
+    required this._captureFinder,
+    required this._validator,
+    required this._referee,
+  });
+
+  final BoardGeometry _geometry;
+  final CaptureFinder _captureFinder;
+  final MoveValidator _validator;
+  final Referee _referee;
 
   /// The value a non-capturing die shows (rule R7).
   static const int _nonCapturingPips = 1;

@@ -61,6 +61,22 @@ void main() {
     });
   });
 
+  test('plays with the parts it is given', () {
+    final geometry = BoardGeometry();
+    final captureFinder = CaptureFinder(geometry: geometry);
+    final wired = CephalopodRules(
+      geometry: geometry,
+      captureFinder: captureFinder,
+      validator: MoveValidator(
+        geometry: geometry,
+        captureFinder: captureFinder,
+      ),
+      referee: Referee(),
+    );
+
+    expect(wired.apply(figure4, Move(top)).errorOrFail, isA<CaptureRequired>());
+  });
+
   test('R1: turns alternate between the players', () {
     expect(rules.opponentOf(Player.black), Player.white);
     expect(rules.opponentOf(Player.white), Player.black);

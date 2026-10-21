@@ -3,7 +3,8 @@ import 'package:cephalopod_engine/testing.dart';
 import 'package:test/test.dart';
 
 void main() {
-  final finder = CaptureFinder();
+  final geometry = BoardGeometry();
+  final finder = CaptureFinder(geometry: geometry);
   const center = Position(2, 2);
 
   List<Set<Position>> optionsAt(String grid, Position target) =>
@@ -76,7 +77,7 @@ void main() {
       expect(options, hasLength(11), reason: '6 pairs, 4 triples, 1 quad');
       expect(
         options,
-        anyElement(equals(BoardGeometry().neighbours(center, 5).toSet())),
+        anyElement(equals(geometry.neighbours(center, 5).toSet())),
         reason: 'all four together: 1 + 1 + 1 + 3 = 6',
       );
     });

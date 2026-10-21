@@ -32,7 +32,10 @@ by feature first and by layer second.
 
 `app/bootstrap.dart` is the composition root: the only code that creates
 concrete classes and wires them together. Everything else receives its
-dependencies through constructors.
+dependencies through constructors. The engine follows the same rule on its
+own scale: its services take their collaborators as required constructor
+parameters, and the `CephalopodRules` factory wires them
+([ADR 0010](adr/0010-constructor-injection-in-the-engine.md)).
 
 ## The dependency rule and how it is enforced
 
