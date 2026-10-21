@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:cephalopod/features/game/presentation/view/how_to_play/tutorial_step.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/tutorial_steps.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
@@ -33,12 +31,10 @@ class _HowToPlayPageState extends State<HowToPlayPage> {
   /// Turns to the next page, or leaves the tutorial from the last one.
   void _next() {
     if (_onLastStep) {
-      unawaited(Navigator.of(context).maybePop());
+      Navigator.of(context).maybePop();
       return;
     }
-    unawaited(
-      _pages.nextPage(duration: _turnDuration, curve: Curves.easeInOut),
-    );
+    _pages.nextPage(duration: _turnDuration, curve: Curves.easeInOut);
   }
 
   @override
