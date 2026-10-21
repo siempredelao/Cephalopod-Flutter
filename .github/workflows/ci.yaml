@@ -33,8 +33,9 @@ jobs:
         run: flutter pub get
 
       # The exact command developers run locally, so the two cannot drift.
-      # It runs format check, analyze, architecture check, then engine (100%
-      # line coverage) and app (85%) tests, stopping at the first failure.
+      # It runs format check, code generation, analyze, architecture check,
+      # then engine (100% line coverage) and app (85%) tests, stopping at the
+      # first failure.
       - name: Verify
         run: dart run melos run verify
 
@@ -80,6 +81,11 @@ jobs:
           channel: stable
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
+
+      # Generated code is not committed (docs/adr/0011), so create it first.
+      - if: steps.platform.outputs.present == 'true'
+        name: Generate code
+        run: flutter pub get && dart run melos run generate
 
       - if: steps.platform.outputs.present == 'true'
         name: Build

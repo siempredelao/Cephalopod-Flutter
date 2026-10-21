@@ -17,6 +17,8 @@ dev_dependencies:
 
 melos:
   scripts:
+    # Generated files (*.freezed.dart) start with `// dart format off`, so
+    # both format scripts leave them alone.
     format:
       description: Format every Dart file in the workspace.
       run: dart format .
@@ -24,6 +26,16 @@ melos:
     "format:check":
       description: Fail if any Dart file is not formatted.
       run: dart format --output=none --set-exit-if-changed .
+
+    generate:
+      description: >-
+        Generate code (freezed) in the app. Run after `flutter pub get` and
+        after changing an annotated class; `generate:watch` does it on save.
+      run: cd app && dart run build_runner build
+
+    "generate:watch":
+      description: Regenerate code in the app whenever a source file changes.
+      run: cd app && dart run build_runner watch
 
     analyze:
       description: Static analysis of the whole workspace; infos fail too.
@@ -56,6 +68,7 @@ melos:
       # was started with. `melos run x` here would need a global install.
       steps:
         - "format:check"
+        - generate
         - analyze
         - "check:architecture"
         - "test:engine"
