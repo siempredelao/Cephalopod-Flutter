@@ -26,14 +26,11 @@ final class MoveValidator {
 
   /// Why [move] cannot be played in [state], or `null` when it can.
   ///
+  /// Checks after the first failure do not run, because `map` is lazy.
   /// Whether the game is already over is checked by `CephalopodRules.apply`,
   /// because that depends on the state, not on the move.
-  IllegalMove? violationOf(GameState state, Move move) {
-    for (final check in _checks) {
-      if (check(state, move) case final violation?) return violation;
-    }
-    return null;
-  }
+  IllegalMove? violationOf(GameState state, Move move) =>
+      _checks.map((check) => check(state, move)).nonNulls.firstOrNull;
 
   IllegalMove? _isOnTheBoard(GameState state, Move move) {
     if (_geometry.contains(move.position, state.board.size)) return null;
