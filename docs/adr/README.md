@@ -18,3 +18,4 @@ supersedes an earlier one instead. Start new records from
 | [0009](0009-plain-data-types.md) | Engine data types hold no behaviour | Accepted |
 | [0010](0010-constructor-injection-in-the-engine.md) | Constructor injection in the engine | Accepted |
 | [0011](0011-freezed-for-ui-states.md) | `freezed` for the app's UI states; generated code not committed | Accepted |
+| [0012](0012-shared-preferences-for-local-storage.md) | Local storage with `shared_preferences` | Accepted |
