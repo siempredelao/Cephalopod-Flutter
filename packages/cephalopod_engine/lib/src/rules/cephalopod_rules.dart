@@ -28,38 +28,30 @@ final class CephalopodRules {
   /// The value a non-capturing die shows (rule R7).
   static const int _nonCapturingPips = 1;
 
-  /// The highest value a die can show.
-  static const int _maxPips = 6;
-
   /// A new game under [config]: an empty board, [GameConfig.firstPlayer] to
   /// move.
   ///
   /// Throws an [ArgumentError] when [config] breaks the rules: an even board
-  /// size (a draw would become possible), a capture sum above 6 (no die could
-  /// show it) or captures of fewer than 2 dice.
+  /// size, which would allow a draw; captures of fewer than 2 or more than 4
+  /// dice; or a capture sum outside 2 to 6, which no die could show.
   GameState newGame([GameConfig config = GameConfig.standard]) {
-    if (config.boardSize < 1 || config.boardSize.isEven) {
-      throw ArgumentError.value(config.boardSize, 'boardSize', 'must be odd');
-    }
-    if (config.maxCaptureSum > _maxPips) {
-      throw ArgumentError.value(
-        config.maxCaptureSum,
-        'maxCaptureSum',
-        'must be at most $_maxPips',
-      );
-    }
-    if (config.minCaptureDice < 2) {
-      throw ArgumentError.value(
-        config.minCaptureDice,
-        'minCaptureDice',
-        'must be at least 2',
-      );
-    }
+    _checkRules(config);
     return GameState(
       board: Board(size: config.boardSize),
       status: InProgress(config.firstPlayer),
       config: config,
     );
+  }
+
+  void _checkRules(GameConfig config) {
+    final GameConfig(:boardSize, :minCaptureDice, :maxCaptureSum) = config;
+    if (boardSize < 1 || boardSize.isEven) {
+      throw ArgumentError.value(boardSize, 'boardSize', 'must be odd');
+    }
+    // A capture takes 2 to 4 dice (a square has at most 4 neighbours), and
+    // the capturing die shows their sum, so that sum lies between 2 and 6.
+    RangeError.checkValueInInterval(minCaptureDice, 2, 4, 'minCaptureDice');
+    RangeError.checkValueInInterval(maxCaptureSum, 2, 6, 'maxCaptureSum');
   }
 
   /// The player who moves after [player]: turns alternate (rule R1).

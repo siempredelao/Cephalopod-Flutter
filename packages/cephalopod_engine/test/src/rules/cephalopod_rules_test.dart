@@ -46,14 +46,18 @@ void main() {
     });
 
     test('rejects capture limits no die or rule allows', () {
-      expect(
-        () => rules.newGame(const GameConfig(maxCaptureSum: 7)),
-        throwsArgumentError,
-      );
-      expect(
-        () => rules.newGame(const GameConfig(minCaptureDice: 1)),
-        throwsArgumentError,
-      );
+      for (final config in [
+        const GameConfig(minCaptureDice: 1),
+        const GameConfig(minCaptureDice: 5),
+        const GameConfig(maxCaptureSum: 1),
+        const GameConfig(maxCaptureSum: 7),
+      ]) {
+        expect(
+          () => rules.newGame(config),
+          throwsArgumentError,
+          reason: '$config',
+        );
+      }
     });
   });
 
