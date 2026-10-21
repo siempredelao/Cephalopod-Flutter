@@ -13,9 +13,9 @@ import 'package:material_ui/material_ui.dart';
 /// rendering fails CI instead of the IDE panel.
 void main() {
   Future<void> pumpPreview(WidgetTester tester, Widget preview) {
-    return tester.pumpWidget(
-      MaterialApp(home: Center(child: boardPreviewWrapper(preview))),
-    );
+    final wrapped = boardPreviewWrapper(preview);
+    final app = MaterialApp(home: Center(child: wrapped));
+    return tester.pumpWidget(app);
   }
 
   group('Board previews', () {

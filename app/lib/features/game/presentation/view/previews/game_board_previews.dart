@@ -19,7 +19,10 @@ const Position _below = Position(1, 2);
   size: _boardSize,
   wrapper: boardPreviewWrapper,
 )
-Widget newGamePreview() => _boardOf(_placing(CephalopodRules().newGame()));
+Widget newGamePreview() {
+  final game = CephalopodRules().newGame();
+  return _boardOf(_placing(game));
+}
 
 @Preview(
   group: 'GameBoard',
@@ -37,7 +40,8 @@ Widget midGamePreview() {
     const Position(3, 2): const Die(owner: Player.black, pips: 4),
     const Position(4, 1): const Die(owner: Player.white, pips: 5),
   });
-  return _boardOf(_placing(game, lastMove: Move(const Position(2, 2))));
+  final lastMove = Move(const Position(2, 2));
+  return _boardOf(_placing(game, lastMove: lastMove));
 }
 
 /// Rule sheet Fig. 4: a die on the top centre square can capture three ways.
