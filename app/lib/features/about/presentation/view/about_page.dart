@@ -1,5 +1,7 @@
-import 'package:cephalopod/core/navigation/external_links.dart';
 import 'package:material_ui/material_ui.dart';
+
+const String _ruleSheetUrl =
+    'https://www.marksteeregames.com/Cephalopod_rules.pdf';
 
 /// Credits the game's inventor, as his rule sheet asks of anyone who
 /// programs the game, and links to the official rules.
@@ -23,7 +25,7 @@ class AboutPage extends StatelessWidget {
           const SizedBox(height: 24),
           Text('Official rules', style: textTheme.titleMedium),
           const SizedBox(height: 4),
-          const SelectableText(ruleSheetUrl),
+          const SelectableText(_ruleSheetUrl),
         ],
       ),
     );

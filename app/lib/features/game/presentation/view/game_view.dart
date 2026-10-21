@@ -33,7 +33,7 @@ class GameView extends StatelessWidget {
           IconButton(
             tooltip: 'How to play',
             icon: const Icon(Icons.help_outline),
-            onPressed: () => context.pushNamed(AppRoute.rules.name),
+            onPressed: () => context.pushNamed(AppRoute.howToPlay.name),
           ),
           IconButton(
             tooltip: 'New game',

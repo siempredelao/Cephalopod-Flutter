@@ -31,7 +31,7 @@ class HomePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 OutlinedButton(
-                  onPressed: () => context.goNamed(AppRoute.rules.name),
+                  onPressed: () => context.goNamed(AppRoute.howToPlay.name),
                   child: const Text('How to play'),
                 ),
                 const SizedBox(height: 12),

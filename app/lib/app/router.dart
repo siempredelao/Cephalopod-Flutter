@@ -1,8 +1,8 @@
 import 'package:cephalopod/core/navigation/app_route.dart';
 import 'package:cephalopod/features/about/presentation/view/about_page.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
+import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
 import 'package:cephalopod/features/home/presentation/view/home_page.dart';
-import 'package:cephalopod/features/rules/presentation/view/rules_page.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:go_router/go_router.dart';
 
@@ -28,9 +28,9 @@ GoRouter createRouter({
             builder: (_, _) => GamePage(rules: rules),
           ),
           GoRoute(
-            path: 'rules',
-            name: AppRoute.rules.name,
-            builder: (_, _) => const RulesPage(),
+            path: 'how-to-play',
+            name: AppRoute.howToPlay.name,
+            builder: (_, _) => const HowToPlayPage(),
           ),
           GoRoute(
             path: 'about',
