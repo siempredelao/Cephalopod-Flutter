@@ -10,11 +10,17 @@ sealed class GameEvent {
   const GameEvent();
 }
 
-/// Start a new game under [config], dropping the current one.
+/// Start a new game under [config], replacing the current one and the
+/// saved game.
 final class GameStarted extends GameEvent {
   const GameStarted([this.config = GameConfig.standard]);
 
   final GameConfig config;
+}
+
+/// Pick up the saved game, or start a new one when there is none.
+final class GameResumed extends GameEvent {
+  const GameResumed();
 }
 
 /// The player tapped the square at [position].
@@ -32,4 +38,14 @@ final class CaptureConfirmed extends GameEvent {
 /// The player backed out of choosing a capture.
 final class CaptureCancelled extends GameEvent {
   const CaptureCancelled();
+}
+
+/// The player took back the last move.
+final class UndoRequested extends GameEvent {
+  const UndoRequested();
+}
+
+/// The player played again the last move they took back.
+final class RedoRequested extends GameEvent {
+  const RedoRequested();
 }

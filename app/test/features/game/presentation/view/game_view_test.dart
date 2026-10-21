@@ -1,5 +1,4 @@
 import 'package:cephalopod/core/theme/board_colors.dart';
-import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/view/game_view.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/capture_controls.dart';
@@ -9,14 +8,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
-void main() {
-  final rules = CephalopodRules();
+import '../../../../helpers/game_bloc_factory.dart';
 
+void main() {
   Future<void> pumpGame(
     WidgetTester tester, {
     GameConfig config = GameConfig.standard,
   }) async {
-    final bloc = GameBloc(rules: rules, config: config);
+    final bloc = createTestGameBloc(config: config);
     addTearDown(bloc.close);
     await tester.pumpWidget(
       MaterialApp(
@@ -55,6 +54,30 @@ void main() {
 
       expect(find.byType(DieFace), findsOne);
       expect(find.text('Player 2 to move'), findsOne);
+    });
+
+    testWidgets('takes back a move and plays it again', (tester) async {
+      await pumpGame(tester);
+      await tapSquare(tester, const Position(2, 2));
+
+      await tester.tap(find.byTooltip('Undo'));
+      await tester.pumpAndSettle();
+      expect(find.byType(DieFace), findsNothing);
+      expect(find.text('Player 1 to move'), findsOne);
+
+      await tester.tap(find.byTooltip('Redo'));
+      await tester.pumpAndSettle();
+      expect(find.byType(DieFace), findsOne);
+      expect(find.text('Player 2 to move'), findsOne);
+    });
+
+    testWidgets('has nothing to undo or redo in a new game', (tester) async {
+      await pumpGame(tester);
+
+      final undo = find.widgetWithIcon(IconButton, Icons.undo);
+      final redo = find.widgetWithIcon(IconButton, Icons.redo);
+      expect(tester.widget<IconButton>(undo).onPressed, isNull);
+      expect(tester.widget<IconButton>(redo).onPressed, isNull);
     });
 
     testWidgets('R8: names the winner of a full board', (tester) async {

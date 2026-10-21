@@ -1,17 +1,18 @@
 import 'package:cephalopod/core/navigation/app_route.dart';
 import 'package:cephalopod/features/about/presentation/view/about_page.dart';
+import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
 import 'package:cephalopod/features/home/presentation/view/home_page.dart';
-import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:go_router/go_router.dart';
 
 /// Builds the app's router. Routes are nested, so a deep link to `/about`
 /// still has the home page underneath it and a working back button.
 ///
-/// Every game on the game route is played under [rules].
+/// Each visit to the game route gets its own bloc from [createGameBloc]. The
+/// route starts a new game, or picks up the saved one with `?resume=true`.
 GoRouter createRouter({
-  required CephalopodRules rules,
+  required GameBloc Function() createGameBloc,
   String initialLocation = '/',
 }) {
   return GoRouter(
@@ -25,7 +26,10 @@ GoRouter createRouter({
           GoRoute(
             path: 'game',
             name: AppRoute.game.name,
-            builder: (_, _) => GamePage(rules: rules),
+            builder: (_, state) => GamePage(
+              createBloc: createGameBloc,
+              resume: state.uri.queryParameters['resume'] == 'true',
+            ),
           ),
           GoRoute(
             path: 'how-to-play',
