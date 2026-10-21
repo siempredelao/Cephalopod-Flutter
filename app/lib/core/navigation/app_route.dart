@@ -7,6 +7,9 @@ enum AppRoute {
   /// A game between two players taking turns on one device.
   game,
 
+  /// How to play, one rule per page with a board that shows it.
+  howToPlay,
+
   /// Credits and a link to the official rule sheet.
   about,
 }

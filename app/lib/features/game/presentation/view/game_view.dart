@@ -1,3 +1,4 @@
+import 'package:cephalopod/core/navigation/app_route.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_view_state.dart';
@@ -7,6 +8,7 @@ import 'package:cephalopod/features/game/presentation/view/widgets/capture_contr
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// The game screen: whose turn it is, the board, and the controls for
@@ -27,6 +29,12 @@ class GameView extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Cephalopod'),
         actions: [
+          // Pushed on top, so the game is still here on the way back.
+          IconButton(
+            tooltip: 'How to play',
+            icon: const Icon(Icons.help_outline),
+            onPressed: () => context.pushNamed(AppRoute.howToPlay.name),
+          ),
           IconButton(
             tooltip: 'New game',
             icon: const Icon(Icons.refresh),

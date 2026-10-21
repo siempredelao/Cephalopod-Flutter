@@ -3,6 +3,9 @@ import 'package:cephalopod/app/flavor.dart';
 import 'package:cephalopod/app/router.dart';
 import 'package:cephalopod/features/about/presentation/view/about_page.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
+import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
+import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
+import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
 import 'package:cephalopod/features/home/presentation/view/home_page.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -50,6 +53,32 @@ void main() {
 
       expect(find.byType(GamePage), findsNothing);
       expect(find.byType(HomePage), findsOneWidget);
+    });
+
+    testWidgets('opens how to play from home', (tester) async {
+      await pumpApp(tester);
+
+      await tester.tap(find.widgetWithText(OutlinedButton, 'How to play'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(HowToPlayPage), findsOneWidget);
+    });
+
+    testWidgets('opens how to play from a game and returns to it', (
+      tester,
+    ) async {
+      await pumpApp(tester, location: '/game');
+      await tester.tap(find.byType(BoardSquare).first);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('How to play'));
+      await tester.pumpAndSettle();
+      expect(find.byType(HowToPlayPage), findsOneWidget);
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(HowToPlayPage), findsNothing);
+      expect(find.byType(DieFace), findsOneWidget);
     });
 
     testWidgets('opens the about page from home', (tester) async {

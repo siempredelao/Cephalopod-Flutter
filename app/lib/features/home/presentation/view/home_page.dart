@@ -2,7 +2,7 @@ import 'package:cephalopod/core/navigation/app_route.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// Start screen: start a new game or read about the game.
+/// Start screen: start a new game, learn how to play, or read about the game.
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -28,6 +28,11 @@ class HomePage extends StatelessWidget {
                 FilledButton(
                   onPressed: () => context.goNamed(AppRoute.game.name),
                   child: const Text('New game'),
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton(
+                  onPressed: () => context.goNamed(AppRoute.howToPlay.name),
+                  child: const Text('How to play'),
                 ),
                 const SizedBox(height: 12),
                 OutlinedButton(
