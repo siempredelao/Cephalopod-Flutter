@@ -21,7 +21,6 @@ class BoardSquare extends StatelessWidget {
   final VoidCallback onTap;
 
   static const double _markWidth = 3;
-  static const double _edgeWidth = 1;
   static const double _cornerRadius = 8;
   static const double _dieInset = 6;
 
@@ -49,7 +48,7 @@ class BoardSquare extends StatelessWidget {
             color: colors.square,
             borderRadius: BorderRadius.circular(_cornerRadius),
             border: markColor == null
-                ? Border.all(color: colors.squareEdge, width: _edgeWidth)
+                ? Border.all(color: colors.squareEdge)
                 : Border.all(color: markColor, width: _markWidth),
           ),
           child: Padding(
