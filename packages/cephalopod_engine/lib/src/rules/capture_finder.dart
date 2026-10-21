@@ -43,7 +43,13 @@ final class CaptureFinder {
 
 /// Every subset of [items], from the empty set to all of them: 2ⁿ sets for
 /// n items. Each item doubles the list, because every subset found so far
-/// appears once without the item and once with it.
+/// appears once without the item and once with it. For `[N, W]`:
+///
+/// ```text
+/// start      [ {} ]
+/// after N    [ {}, {N} ]
+/// after W    [ {}, {W}, {N}, {N, W} ]
+/// ```
 List<Set<T>> _subsetsOf<T>(List<T> items) {
   var subsets = [<T>{}];
   for (final item in items) {
