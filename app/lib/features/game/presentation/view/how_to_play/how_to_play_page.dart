@@ -79,6 +79,11 @@ class _StepView extends StatelessWidget {
 
   final TutorialStep step;
 
+  /// The board and the text get fixed shares of the page, whatever the text
+  /// says, so the board is in the same place on every page.
+  static const int _boardShare = 3;
+  static const int _textShare = 2;
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -89,6 +94,7 @@ class _StepView extends StatelessWidget {
           // An illustration: the text says everything a screen reader needs,
           // and its squares do nothing when tapped.
           Expanded(
+            flex: _boardShare,
             child: Center(
               child: ExcludeSemantics(
                 child: IgnorePointer(
@@ -98,16 +104,25 @@ class _StepView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: _spacing),
-          Text(
-            step.title,
-            style: textTheme.headlineSmall,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: _spacing / 2),
-          Text(
-            step.body,
-            style: textTheme.bodyLarge,
-            textAlign: TextAlign.center,
+          Expanded(
+            flex: _textShare,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Text(
+                    step.title,
+                    style: textTheme.headlineSmall,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: _spacing / 2),
+                  Text(
+                    step.body,
+                    style: textTheme.bodyLarge,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),

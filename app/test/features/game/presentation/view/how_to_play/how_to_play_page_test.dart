@@ -37,6 +37,18 @@ void main() {
       expect(find.text(tutorialSteps.first.title), findsNothing);
     });
 
+    testWidgets('keeps the board in the same place on every page', (
+      tester,
+    ) async {
+      await pumpTutorial(tester);
+      final first = tester.getRect(find.byType(GameBoard));
+
+      for (var step = 1; step < tutorialSteps.length; step++) {
+        await tapNext(tester);
+        expect(tester.getRect(find.byType(GameBoard)), first);
+      }
+    });
+
     testWidgets('turns the page on a swipe', (tester) async {
       await pumpTutorial(tester);
 
