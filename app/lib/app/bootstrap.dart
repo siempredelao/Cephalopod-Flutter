@@ -3,6 +3,7 @@ import 'package:cephalopod/app/flavor.dart';
 import 'package:cephalopod/app/router.dart';
 import 'package:cephalopod/features/game/data/game_record_json_codec.dart';
 import 'package:cephalopod/features/game/data/shared_preferences_game_repository.dart';
+import 'package:cephalopod/features/game/domain/use_cases/has_game_to_continue.dart';
 import 'package:cephalopod/features/game/domain/use_cases/play_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/resume_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/start_new_game.dart';
@@ -24,6 +25,7 @@ void bootstrap(Flavor flavor) {
   final playMove = PlayMove(rules: rules, repository: games);
   final undoMove = UndoMove(rules: rules, repository: games);
   final resumeGame = ResumeGame(rules: rules, repository: games);
+  final hasGameToContinue = HasGameToContinue(resumeGame: resumeGame);
 
   GameBloc createGameBloc() {
     return GameBloc(
@@ -35,6 +37,9 @@ void bootstrap(Flavor flavor) {
     );
   }
 
-  final router = createRouter(createGameBloc: createGameBloc);
+  final router = createRouter(
+    createGameBloc: createGameBloc,
+    hasGameToContinue: hasGameToContinue.call,
+  );
   runApp(App(flavor: flavor, router: router));
 }

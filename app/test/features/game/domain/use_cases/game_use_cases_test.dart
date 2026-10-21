@@ -1,5 +1,6 @@
 import 'package:cephalopod/features/game/data/in_memory_game_repository.dart';
 import 'package:cephalopod/features/game/domain/current_game.dart';
+import 'package:cephalopod/features/game/domain/use_cases/has_game_to_continue.dart';
 import 'package:cephalopod/features/game/domain/use_cases/play_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/resume_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/start_new_game.dart';
@@ -123,6 +124,37 @@ void main() {
 
       expect(await resumeGame(), isNull);
       expect(await repository.load(), isNull);
+    });
+  });
+
+  group('HasGameToContinue', () {
+    late HasGameToContinue hasGameToContinue;
+
+    setUp(() {
+      hasGameToContinue = HasGameToContinue(resumeGame: resumeGame);
+    });
+
+    test('says no when nothing is saved', () async {
+      expect(await hasGameToContinue(), isFalse);
+    });
+
+    test('says no for a new game with no moves yet', () async {
+      await startNewGame();
+
+      expect(await hasGameToContinue(), isFalse);
+    });
+
+    test('says yes once a move is played', () async {
+      await play(await startNewGame(), Move(center));
+
+      expect(await hasGameToContinue(), isTrue);
+    });
+
+    test('R8: says no once the game is over', () async {
+      const oneSquare = GameConfig(boardSize: 1);
+      await play(await startNewGame(oneSquare), Move(const Position(0, 0)));
+
+      expect(await hasGameToContinue(), isFalse);
     });
   });
 }

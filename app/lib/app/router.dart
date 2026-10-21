@@ -11,8 +11,10 @@ import 'package:go_router/go_router.dart';
 ///
 /// Each visit to the game route gets its own bloc from [createGameBloc]. The
 /// route starts a new game, or picks up the saved one with `?resume=true`.
+/// Home offers that when [hasGameToContinue] says there is one.
 GoRouter createRouter({
   required GameBloc Function() createGameBloc,
+  required Future<bool> Function() hasGameToContinue,
   String initialLocation = '/',
 }) {
   return GoRouter(
@@ -21,7 +23,7 @@ GoRouter createRouter({
       GoRoute(
         path: '/',
         name: AppRoute.home.name,
-        builder: (_, _) => const HomePage(),
+        builder: (_, _) => HomePage(hasGameToContinue: hasGameToContinue),
         routes: [
           GoRoute(
             path: 'game',
