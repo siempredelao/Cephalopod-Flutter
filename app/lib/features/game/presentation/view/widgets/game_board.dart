@@ -15,11 +15,15 @@ class GameBoard extends StatelessWidget {
   const GameBoard({
     required this.state,
     required this.onSquareTapped,
+    this.highlightLastMove = true,
     super.key,
   });
 
   final GameViewState state;
   final ValueChanged<Position> onSquareTapped;
+
+  /// Whether the square of the last move stands out.
+  final bool highlightLastMove;
 
   static const double _gap = 2;
   static const double _cornerRadius = 16;
@@ -75,7 +79,8 @@ class GameBoard extends StatelessWidget {
   }
 
   /// While a capture is being chosen, the target and the dice that can be
-  /// picked stand out; otherwise the last move does.
+  /// picked stand out; otherwise the last move does, unless
+  /// [highlightLastMove] is off.
   SquareMark _markOf(Position square) => switch (state.phase) {
     ChoosingCapture(:final selected) when selected.contains(square) =>
       SquareMark.captureSelected,
@@ -85,7 +90,8 @@ class GameBoard extends StatelessWidget {
         when options.any((option) => option.contains(square)) =>
       SquareMark.captureOption,
     ChoosingCapture() => SquareMark.none,
-    _ when state.lastMove?.position == square => SquareMark.lastMove,
+    _ when highlightLastMove && state.lastMove?.position == square =>
+      SquareMark.lastMove,
     _ => SquareMark.none,
   };
 

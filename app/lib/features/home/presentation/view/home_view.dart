@@ -5,7 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Start screen: continue the saved game, start a new one, learn how to
-/// play, or read about the game. It renders the `HomeCubit` above it.
+/// play, change the settings, or read about the game. It renders the
+/// `HomeCubit` above it.
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
@@ -59,6 +60,11 @@ class HomeView extends StatelessWidget {
                   OutlinedButton(
                     onPressed: () => context.goNamed(AppRoute.howToPlay.name),
                     child: const Text('How to play'),
+                  ),
+                  const SizedBox(height: 12),
+                  OutlinedButton(
+                    onPressed: () => context.goNamed(AppRoute.settings.name),
+                    child: const Text('Settings'),
                   ),
                   const SizedBox(height: 12),
                   OutlinedButton(
