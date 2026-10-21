@@ -14,3 +14,5 @@ supersedes an earlier one instead. Start new records from
 | [0005](0005-use-cases-only-where-needed.md) | Use cases only where they earn their place | Accepted |
 | [0006](0006-lint-baseline.md) | very_good_analysis 10.x; primary constructors deferred | Accepted |
 | [0007](0007-material-ui-package.md) | Material widgets from `package:material_ui` | Accepted |
+| [0008](0008-hand-written-equality.md) | Hand-written value equality in the engine | Accepted |
+| [0009](0009-plain-data-types.md) | Engine data types hold no behaviour | Accepted |

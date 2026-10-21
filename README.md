@@ -7,9 +7,9 @@ A Flutter implementation of **Cephalopod**, the two-player dice game invented by
 reference for clean architecture, SOLID and testing in Flutter: the rules live in
 a pure-Dart package, the app sits on top, and CI enforces the boundaries.
 
-**Status:** M0, foundations. The workspace, the engine package, the app shell,
-CI and the first architecture decision records are in place. The game becomes
-playable at M2.
+**Status:** M1, rules engine. The complete rules are implemented and tested in
+the pure-Dart engine, including 1,000 seeded random games checked move by
+move. The game becomes playable in the app at M2.
 
 ## The game
 
@@ -108,7 +108,7 @@ hooks: install [lefthook](https://lefthook.dev) and run `lefthook install`.
 ## Roadmap
 
 - [x] **M0 · Foundations**: workspace, lints, CI, ADRs, app shell
-- [ ] **M1 · Rules engine**: board, moves, captures, property tests
+- [x] **M1 · Rules engine**: board, moves, captures, property tests
 - [ ] **M2 · Playable MVP**: hot-seat game on one device
 - [ ] **M3 · Persistence and undo**: resume, undo/redo, settings
 - [ ] **M4 · AI opponent**: three difficulty levels
