@@ -19,8 +19,6 @@ final class MoveValidator {
   final BoardGeometry _geometry;
   final CaptureFinder _captureFinder;
 
-  static const SetEquality<Position> _sameSquares = SetEquality<Position>();
-
   late final List<IllegalMove? Function(GameState, Move)> _checks = [
     _isOnTheBoard,
     _isOnAVacantSquare,
@@ -59,7 +57,9 @@ final class MoveValidator {
     final captures = move.captures;
     if (captures.isEmpty) return null;
     final options = _optionsFor(state, move);
-    if (options.any((option) => _sameSquares.equals(option, captures))) {
+    if (options.any(
+      (option) => const SetEquality<Position>().equals(option, captures),
+    )) {
       return null;
     }
     return InvalidCapture(captures);

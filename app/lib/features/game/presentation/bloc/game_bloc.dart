@@ -21,8 +21,6 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
 
   final CephalopodRules _rules;
 
-  static const SetEquality<Position> _sameSquares = SetEquality<Position>();
-
   static GameViewState _startOf(GameState game) =>
       GameViewState(game: game, phase: const TurnPhase.awaitingPlacement());
 
@@ -80,7 +78,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
           selected: selected,
           selectedSum: selected.map((picked) => dice[picked]?.pips ?? 0).sum,
           canConfirm: phase.options.any(
-            (option) => _sameSquares.equals(option, selected),
+            (option) => const SetEquality<Position>().equals(option, selected),
           ),
         ),
       ),
