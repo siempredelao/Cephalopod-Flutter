@@ -96,7 +96,7 @@ void main() {
 
     testWidgets('R5: marks the target and the pickable dice', (tester) async {
       final choosing = placing(lastMove: Move(below)).copyWith(
-        phase: const TurnPhase.choosingCapture(
+        phase: TurnPhase.choosingCapture(
           target: top,
           options: [
             {left, right},
