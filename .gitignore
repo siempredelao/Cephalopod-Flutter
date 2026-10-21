@@ -5,7 +5,7 @@ coverage/
 .flutter-plugins
 .flutter-plugins-dependencies
 
-# Generated code is never committed; CI rebuilds it once codegen is added
+# Generated code is never committed; `dart run melos run generate` rebuilds it
 *.g.dart
 *.freezed.dart
 

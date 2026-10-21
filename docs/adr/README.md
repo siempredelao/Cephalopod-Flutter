@@ -17,3 +17,4 @@ supersedes an earlier one instead. Start new records from
 | [0008](0008-hand-written-equality.md) | Hand-written value equality in the engine | Accepted |
 | [0009](0009-plain-data-types.md) | Engine data types hold no behaviour | Accepted |
 | [0010](0010-constructor-injection-in-the-engine.md) | Constructor injection in the engine | Accepted |
+| [0011](0011-freezed-for-ui-states.md) | `freezed` for the app's UI states; generated code not committed | Accepted |

@@ -70,9 +70,15 @@ Requirements: Flutter 3.47.1 (Dart 3.13.1).
 
 ```sh
 flutter pub get                      # resolves the whole workspace
+dart run melos run generate          # freezed code, which is not committed
 dart run melos run verify            # everything CI checks
 cd app && flutter run -t lib/main_dev.dart
 ```
+
+UI states are [freezed](https://pub.dev/packages/freezed) classes. Run
+`generate` again after changing one, or keep `dart run melos run generate:watch`
+running. Why the generated files stay out of git:
+[ADR 0011](docs/adr/0011-freezed-for-ui-states.md).
 
 ### One-time: generate the platform folders
 
@@ -96,11 +102,12 @@ runs Android and web smoke builds.
 Every push and pull request runs, in order:
 
 1. `dart format` check
-2. `flutter analyze --fatal-infos` with [very_good_analysis](https://pub.dev/packages/very_good_analysis)
-3. Architecture check
-4. Engine tests, 100% line coverage required
-5. App tests, 85% line coverage required
-6. Android APK and web smoke builds
+2. Code generation (`build_runner`)
+3. `flutter analyze --fatal-infos` with [very_good_analysis](https://pub.dev/packages/very_good_analysis)
+4. Architecture check
+5. Engine tests, 100% line coverage required
+6. App tests, 85% line coverage required
+7. Android APK and web smoke builds
 
 Run the same checks locally with `dart run melos run verify`. Optional git
 hooks: install [lefthook](https://lefthook.dev) and run `lefthook install`.
