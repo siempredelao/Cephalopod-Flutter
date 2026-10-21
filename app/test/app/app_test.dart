@@ -2,7 +2,9 @@ import 'package:cephalopod/app/app.dart';
 import 'package:cephalopod/app/flavor.dart';
 import 'package:cephalopod/app/router.dart';
 import 'package:cephalopod/features/about/presentation/view/about_page.dart';
+import 'package:cephalopod/features/game/presentation/view/game_page.dart';
 import 'package:cephalopod/features/home/presentation/view/home_page.dart';
+import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -15,7 +17,10 @@ void main() {
     await tester.pumpWidget(
       App(
         flavor: flavor,
-        router: createRouter(initialLocation: location),
+        router: createRouter(
+          rules: CephalopodRules(),
+          initialLocation: location,
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -25,6 +30,25 @@ void main() {
     testWidgets('starts on the home page', (tester) async {
       await pumpApp(tester);
 
+      expect(find.byType(HomePage), findsOneWidget);
+    });
+
+    testWidgets('opens a new game from home', (tester) async {
+      await pumpApp(tester);
+
+      await tester.tap(find.widgetWithText(FilledButton, 'New game'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(GamePage), findsOneWidget);
+    });
+
+    testWidgets('goes back home from a deep link to a game', (tester) async {
+      await pumpApp(tester, location: '/game');
+
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(GamePage), findsNothing);
       expect(find.byType(HomePage), findsOneWidget);
     });
 

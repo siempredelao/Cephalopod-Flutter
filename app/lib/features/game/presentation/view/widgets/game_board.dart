@@ -1,6 +1,7 @@
 import 'package:cephalopod/core/theme/board_colors.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_view_state.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
+import 'package:cephalopod/features/game/presentation/view/player_name.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/square_mark.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
@@ -21,6 +22,8 @@ class GameBoard extends StatelessWidget {
   final ValueChanged<Position> onSquareTapped;
 
   static const double _gap = 2;
+  static const double _cornerRadius = 16;
+  static const double _edgeWidth = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +31,12 @@ class GameBoard extends StatelessWidget {
     final board = state.game.board;
     return AspectRatio(
       aspectRatio: 1,
-      child: ColoredBox(
-        color: colors.board,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: colors.board,
+          borderRadius: BorderRadius.circular(_cornerRadius),
+          border: Border.all(color: colors.boardEdge, width: _edgeWidth),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(_gap / 2),
           child: Column(
@@ -37,6 +44,9 @@ class GameBoard extends StatelessWidget {
               for (var row = 0; row < board.size; row++)
                 Expanded(
                   child: Row(
+                    // Each square takes the row's full height; centred, an
+                    // empty one would shrink to its padding.
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       for (var col = 0; col < board.size; col++)
                         Expanded(child: _square(Position(row, col), board)),
@@ -83,6 +93,6 @@ class GameBoard extends StatelessWidget {
     final where = 'Row ${square.row + 1}, column ${square.col + 1}';
     return die == null
         ? '$where, empty'
-        : '$where, ${die.owner.name} ${die.pips}';
+        : '$where, ${playerNameOf(die.owner)} die showing ${die.pips}';
   }
 }

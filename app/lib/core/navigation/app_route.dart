@@ -4,6 +4,9 @@ enum AppRoute {
   /// The start screen.
   home,
 
+  /// A game between two players taking turns on one device.
+  game,
+
   /// Credits and a link to the official rule sheet.
   about,
 }

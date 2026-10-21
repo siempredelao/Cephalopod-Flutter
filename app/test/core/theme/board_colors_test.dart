@@ -23,14 +23,14 @@ void main() {
       expect(copy.captureSelected, light.captureSelected);
     });
 
-    test('lerp blends every colour towards the other theme', () {
-      final half = light.lerp(dark, 0.5);
+    test('lerp blends every colour towards the other set', () {
+      const red = Color(0xFFFF0000);
+      final other = light.copyWith(board: red, captureSelected: red);
 
-      expect(half.board, Color.lerp(light.board, dark.board, 0.5));
-      expect(
-        half.captureSelected,
-        Color.lerp(light.captureSelected, dark.captureSelected, 0.5),
-      );
+      final half = light.lerp(other, 0.5);
+
+      expect(half.board, Color.lerp(light.board, red, 0.5));
+      expect(half.captureSelected, Color.lerp(light.captureSelected, red, 0.5));
     });
 
     test('lerp to nothing keeps the colours', () {

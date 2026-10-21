@@ -2,7 +2,7 @@ import 'package:cephalopod/core/navigation/app_route.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// Start screen. "New game" arrives with the playable MVP (M2).
+/// Start screen: start a new game or read about the game.
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -25,6 +25,11 @@ class HomePage extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
+                FilledButton(
+                  onPressed: () => context.goNamed(AppRoute.game.name),
+                  child: const Text('New game'),
+                ),
+                const SizedBox(height: 12),
                 OutlinedButton(
                   onPressed: () => context.goNamed(AppRoute.about.name),
                   child: const Text('About'),

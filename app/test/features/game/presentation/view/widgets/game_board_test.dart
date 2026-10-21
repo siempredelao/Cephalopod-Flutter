@@ -60,6 +60,16 @@ void main() {
       expect(find.byType(BoardSquare), findsNWidgets(25));
     });
 
+    testWidgets('draws empty and full squares as squares', (tester) async {
+      await pumpBoard(tester, placing());
+
+      for (final position in [top, below, const Position(4, 4)]) {
+        final size = tester.getSize(find.byKey(ValueKey(position)));
+        expect(size.height, moreOrLessEquals(size.width, epsilon: 0.01));
+        expect(size.width, greaterThan(100));
+      }
+    });
+
     testWidgets('shows each die on its square', (tester) async {
       await pumpBoard(tester, placing());
 
@@ -72,8 +82,14 @@ void main() {
       final semantics = tester.ensureSemantics();
       await pumpBoard(tester, placing());
 
-      expect(find.bySemanticsLabel('Row 1, column 2, white 1'), findsOne);
-      expect(find.bySemanticsLabel('Row 2, column 3, black 5'), findsOne);
+      expect(
+        find.bySemanticsLabel('Row 1, column 2, Player 2 die showing 1'),
+        findsOne,
+      );
+      expect(
+        find.bySemanticsLabel('Row 2, column 3, Player 1 die showing 5'),
+        findsOne,
+      );
       expect(find.bySemanticsLabel('Row 1, column 3, empty'), findsOne);
       semantics.dispose();
     });
