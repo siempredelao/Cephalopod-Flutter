@@ -84,6 +84,11 @@ Classes named above arrive in M1–M4; the table records how they will fit.
 - Material widgets come from `package:material_ui`, not
   `package:flutter/material.dart`. See [ADR 0007](adr/0007-material-ui-package.md).
 - Generated files (`*.g.dart`, `*.freezed.dart`) are never committed.
+- Widget previews (`@Preview`, shown by the IDE's Flutter Widget Preview tab
+  or `flutter widget-preview start`) live in `presentation/view/previews/`,
+  next to the widgets they show. They build positions from engine types, not
+  from `cephalopod_engine/testing.dart`, and a test builds every preview so a
+  broken one fails CI.
 
 ## Testing
 

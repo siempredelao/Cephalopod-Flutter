@@ -5,6 +5,9 @@ coverage/
 .flutter-plugins
 .flutter-plugins-dependencies
 
+# Widget previewer build cache (`flutter widget-preview start`)
+.widget_preview/
+
 # Generated code is never committed; `dart run melos run generate` rebuilds it
 *.g.dart
 *.freezed.dart
