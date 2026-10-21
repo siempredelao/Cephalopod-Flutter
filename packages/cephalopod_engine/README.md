@@ -55,7 +55,8 @@ stateless services ([ADR 0009](../../docs/adr/0009-plain-data-types.md)).
 | `BoardGeometry` | R3 | Squares of the board and their neighbours |
 | `CaptureFinder` | R4, R6 | Capture options from a square, and pip sums |
 | `Referee` | R8 | Whether the game is over, and who won |
-| `CephalopodRules` | R1, R2, R5, R7 | `newGame`, `opponentOf`, `legalMoves`, `apply` |
+| `MoveValidator` | R2, R4, R5 | `violationOf`: the first rule a move breaks, checked in order |
+| `CephalopodRules` | R1, R7, R8 | `newGame`, `opponentOf`, `legalMoves`, `apply` |
 
 ## Rules covered
 

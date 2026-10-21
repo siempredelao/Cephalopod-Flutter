@@ -29,7 +29,8 @@ each:
 | `BoardGeometry` | R3 | Which squares exist, which touch |
 | `CaptureFinder` | R4, R6 | Which captures a square offers, and their pip sum |
 | `Referee` | R8 | Whether the game is over, and who won |
-| `CephalopodRules` | R1, R2, R5, R7 | New game, legal moves, playing a move |
+| `MoveValidator` | R2, R4, R5 | Whether a move may be played: one check per rule, first failure wins |
+| `CephalopodRules` | R1, R7, R8 | New game, legal moves, playing a move |
 
 ## Consequences
 
