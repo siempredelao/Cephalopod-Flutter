@@ -60,6 +60,16 @@ void main() {
       expect(find.byType(BoardSquare), findsNWidgets(25));
     });
 
+    testWidgets('draws empty and full squares as squares', (tester) async {
+      await pumpBoard(tester, placing());
+
+      for (final position in [top, below, const Position(4, 4)]) {
+        final size = tester.getSize(find.byKey(ValueKey(position)));
+        expect(size.height, moreOrLessEquals(size.width, epsilon: 0.01));
+        expect(size.width, greaterThan(100));
+      }
+    });
+
     testWidgets('shows each die on its square', (tester) async {
       await pumpBoard(tester, placing());
 

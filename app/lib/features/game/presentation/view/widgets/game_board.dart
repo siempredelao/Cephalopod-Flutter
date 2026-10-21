@@ -37,6 +37,9 @@ class GameBoard extends StatelessWidget {
               for (var row = 0; row < board.size; row++)
                 Expanded(
                   child: Row(
+                    // Each square takes the row's full height; centred, an
+                    // empty one would shrink to its padding.
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       for (var col = 0; col < board.size; col++)
                         Expanded(child: _square(Position(row, col), board)),
