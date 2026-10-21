@@ -9,7 +9,7 @@ engine moves and renders the result. Every dependency points toward the engine.
 | Package | Path | Depends on | Purpose |
 | --- | --- | --- | --- |
 | `cephalopod_engine` | `packages/cephalopod_engine` | Dart SDK, `meta`, `collection` | Game rules, AI agents |
-| `cephalopod` | `app` | engine, Flutter, go_router, material_ui, freezed | The app |
+| `cephalopod` | `app` | engine, Flutter, go_router, material_ui, bloc, freezed | The app |
 | `cephalopod_workspace` | repo root | Melos, lints | Workspace, scripts, `tool/` checks |
 
 The packages form a [pub workspace](https://dart.dev/tools/pub/workspaces):
