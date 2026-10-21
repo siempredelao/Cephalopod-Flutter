@@ -86,7 +86,12 @@ GameViewState _mustCapture() {
     _right: _cream(5),
     const Position(4, 4): _coral(1),
   };
-  return _choosing(dice, options: [{_above, _left}]);
+  return _choosing(
+    dice,
+    options: [
+      {_above, _left},
+    ],
+  );
 }
 
 GameViewState _showingTheSum() {
@@ -102,7 +107,11 @@ GameViewState _choosingACapture() {
   final dice = {_left: _cream(1), _right: _cream(1), _below: _coral(5)};
   return _choosing(
     dice,
-    options: [{_left, _right}, {_left, _below}, {_right, _below}],
+    options: [
+      {_left, _right},
+      {_left, _below},
+      {_right, _below},
+    ],
     selected: {_left},
   );
 }
