@@ -20,7 +20,9 @@ class GameBoard extends StatelessWidget {
   final GameViewState state;
   final ValueChanged<Position> onSquareTapped;
 
-  static const double _gap = 4;
+  static const double _gap = 2;
+  static const double _cornerRadius = 16;
+  static const double _edgeWidth = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +30,12 @@ class GameBoard extends StatelessWidget {
     final board = state.game.board;
     return AspectRatio(
       aspectRatio: 1,
-      child: ColoredBox(
-        color: colors.board,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: colors.board,
+          borderRadius: BorderRadius.circular(_cornerRadius),
+          border: Border.all(color: colors.boardEdge, width: _edgeWidth),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(_gap / 2),
           child: Column(

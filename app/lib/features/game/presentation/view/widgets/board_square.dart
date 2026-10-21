@@ -4,8 +4,9 @@ import 'package:cephalopod/features/game/presentation/view/widgets/square_mark.d
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// One square of the board: empty or holding a [die], outlined by its
-/// [mark]. Screen readers announce it as [label].
+/// One square of the board: a dark tile or the [die] on it, with a glowing
+/// ring around it when it has a [mark]. Screen readers announce it as
+/// [label].
 class BoardSquare extends StatelessWidget {
   const BoardSquare({
     required this.die,
@@ -20,9 +21,13 @@ class BoardSquare extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  static const double _markWidth = 3;
-  static const double _cornerRadius = 8;
-  static const double _dieInset = 6;
+  static const double _ringWidth = 3;
+  static const double _ringGlow = 8;
+  static const double _glowOpacity = 0.4;
+  static const double _cornerRadius = 10;
+
+  /// Room for the ring, so the tile is the same size whether marked or not.
+  static const double _ringInset = 6;
 
   @override
   Widget build(BuildContext context) {
@@ -43,20 +48,36 @@ class BoardSquare extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: colors.square,
-            borderRadius: BorderRadius.circular(_cornerRadius),
-            border: markColor == null
-                ? Border.all(color: colors.squareEdge)
-                : Border.all(color: markColor, width: _markWidth),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(_dieInset),
-            child: die == null ? null : DieFace(die: die),
-          ),
+        child: Container(
+          decoration: _ringOf(markColor),
+          padding: const EdgeInsets.all(_ringInset),
+          child: die == null
+              ? DecoratedBox(decoration: _tileOf(colors.square))
+              : DieFace(die: die),
         ),
       ),
+    );
+  }
+
+  /// A glowing ring in [color] around the tile, or none without a colour.
+  static BoxDecoration? _ringOf(Color? color) {
+    if (color == null) return null;
+    return BoxDecoration(
+      borderRadius: BorderRadius.circular(_cornerRadius + _ringInset),
+      border: Border.all(color: color, width: _ringWidth),
+      boxShadow: [
+        BoxShadow(
+          color: color.withValues(alpha: _glowOpacity),
+          blurRadius: _ringGlow,
+        ),
+      ],
+    );
+  }
+
+  static BoxDecoration _tileOf(Color color) {
+    return BoxDecoration(
+      color: color,
+      borderRadius: BorderRadius.circular(_cornerRadius),
     );
   }
 }
