@@ -19,3 +19,6 @@ export 'src/model/game_status.dart';
 export 'src/model/move.dart';
 export 'src/model/player.dart';
 export 'src/model/position.dart';
+export 'src/rules/board_geometry.dart';
+export 'src/rules/capture_finder.dart';
+export 'src/rules/referee.dart';
