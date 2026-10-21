@@ -18,7 +18,7 @@ void main() {
 
       expect(find.byType(GameView), findsOne);
       expect(find.byType(BoardSquare), findsNWidgets(25));
-      expect(find.text('Black to move'), findsOne);
+      expect(find.text('Player 1 to move'), findsOne);
     });
   });
 }

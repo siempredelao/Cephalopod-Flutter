@@ -40,10 +40,10 @@ void main() {
       tester.widget<FilledButton>(find.byType(FilledButton));
 
   group('GameView', () {
-    testWidgets('R1: shows that Black moves first', (tester) async {
+    testWidgets('R1: shows that Player 1 moves first', (tester) async {
       await pumpGame(tester);
 
-      expect(find.text('Black to move'), findsOne);
+      expect(find.text('Player 1 to move'), findsOne);
       expect(find.byType(BoardSquare), findsNWidgets(25));
       expect(find.byType(CaptureControls), findsNothing);
     });
@@ -54,7 +54,7 @@ void main() {
       await tapSquare(tester, const Position(2, 2));
 
       expect(find.byType(DieFace), findsOne);
-      expect(find.text('White to move'), findsOne);
+      expect(find.text('Player 2 to move'), findsOne);
     });
 
     testWidgets('R8: names the winner of a full board', (tester) async {
@@ -62,7 +62,7 @@ void main() {
 
       await tapSquare(tester, const Position(0, 0));
 
-      expect(find.text('Black wins: Black 1, White 0'), findsOne);
+      expect(find.text('Player 1 wins 1 to 0'), findsOne);
     });
 
     testWidgets('starts a new game under the same rules', (tester) async {
@@ -74,7 +74,7 @@ void main() {
 
       expect(find.byType(DieFace), findsNothing);
       expect(find.byType(BoardSquare), findsNWidgets(9));
-      expect(find.text('Black to move'), findsOne);
+      expect(find.text('Player 1 to move'), findsOne);
     });
 
     group('R5: with four 1s around the centre of a 3 × 3 board', () {
@@ -111,7 +111,7 @@ void main() {
 
         expect(find.byType(DieFace), findsNWidgets(3));
         expect(find.byType(CaptureControls), findsNothing);
-        expect(find.text('White to move'), findsOne);
+        expect(find.text('Player 2 to move'), findsOne);
       });
 
       testWidgets('backs out without placing a die', (tester) async {
@@ -121,7 +121,7 @@ void main() {
 
         expect(find.byType(DieFace), findsNWidgets(4));
         expect(find.byType(CaptureControls), findsNothing);
-        expect(find.text('Black to move'), findsOne);
+        expect(find.text('Player 1 to move'), findsOne);
       });
     });
   });

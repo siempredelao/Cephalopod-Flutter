@@ -82,8 +82,14 @@ void main() {
       final semantics = tester.ensureSemantics();
       await pumpBoard(tester, placing());
 
-      expect(find.bySemanticsLabel('Row 1, column 2, white 1'), findsOne);
-      expect(find.bySemanticsLabel('Row 2, column 3, black 5'), findsOne);
+      expect(
+        find.bySemanticsLabel('Row 1, column 2, Player 2 die showing 1'),
+        findsOne,
+      );
+      expect(
+        find.bySemanticsLabel('Row 2, column 3, Player 1 die showing 5'),
+        findsOne,
+      );
       expect(find.bySemanticsLabel('Row 1, column 3, empty'), findsOne);
       semantics.dispose();
     });

@@ -2,6 +2,7 @@ import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_view_state.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
+import 'package:cephalopod/features/game/presentation/view/player_name.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/capture_controls.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
@@ -84,13 +85,16 @@ class GameView extends StatelessWidget {
   }
 
   static String _headlineOf(GameStatus status) => switch (status) {
-    InProgress(:final toMove) => '${_nameOf(toMove)} to move',
-    Finished(:final winner, :final blackDice, :final whiteDice) =>
-      '${_nameOf(winner)} wins: Black $blackDice, White $whiteDice',
+    InProgress(:final toMove) => '${playerNameOf(toMove)} to move',
+    final Finished result => _resultOf(result),
   };
 
-  static String _nameOf(Player player) => switch (player) {
-    Player.black => 'Black',
-    Player.white => 'White',
-  };
+  /// Who won and by how much, winner first: "Player 2 wins 13 to 12".
+  static String _resultOf(Finished result) {
+    final (won, lost) = switch (result.winner) {
+      Player.black => (result.blackDice, result.whiteDice),
+      Player.white => (result.whiteDice, result.blackDice),
+    };
+    return '${playerNameOf(result.winner)} wins $won to $lost';
+  }
 }
