@@ -48,7 +48,7 @@ String boardToAscii(Board board) => [
 ].join('\n');
 
 /// Builds a [GameState] from a text grid (see [boardFromAscii]) with [toMove]
-/// to play. The status comes from the [Referee], as in a real game.
+/// to play. The status comes from [referee], as in a real game.
 ///
 /// Uses [config] when given, otherwise the standard rules on a board the size
 /// of the grid.
@@ -56,11 +56,12 @@ GameState stateFromAscii(
   String grid, {
   required Player toMove,
   GameConfig? config,
+  Referee? referee,
 }) {
   final board = boardFromAscii(grid);
   return GameState(
     board: board,
-    status: Referee().statusOf(board, toMove),
+    status: (referee ?? Referee()).statusOf(board, toMove),
     config: config ?? GameConfig(boardSize: board.size),
   );
 }

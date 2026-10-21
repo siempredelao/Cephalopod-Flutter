@@ -5,7 +5,10 @@ import 'package:cephalopod_engine/src/rules/board_geometry.dart';
 
 /// Finds the captures available to a die placed on a square (rule R4).
 final class CaptureFinder {
-  final BoardGeometry _geometry = BoardGeometry();
+  /// A capture finder that reads the shape of the board from `geometry`.
+  CaptureFinder({required this._geometry});
+
+  final BoardGeometry _geometry;
 
   /// Every set of dice that a die placed on [target] could capture: 2 or more
   /// orthogonal neighbours whose pips add up to at most

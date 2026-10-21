@@ -3,7 +3,11 @@ import 'package:cephalopod_engine/testing.dart';
 import 'package:test/test.dart';
 
 void main() {
-  final validator = MoveValidator();
+  final geometry = BoardGeometry();
+  final validator = MoveValidator(
+    geometry: geometry,
+    captureFinder: CaptureFinder(geometry: geometry),
+  );
   const top = Position(0, 2);
   const leftOfTop = Position(0, 1);
   const rightOfTop = Position(0, 3);

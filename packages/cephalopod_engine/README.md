@@ -39,6 +39,9 @@ die is never part of the move: the rules derive it from the captures.
 
 Data types hold data only, like Kotlin data classes; the rules live in
 stateless services ([ADR 0009](../../docs/adr/0009-plain-data-types.md)).
+Services receive their collaborators through their constructors, and
+`CephalopodRules()` wires a shared set by default
+([ADR 0010](../../docs/adr/0010-constructor-injection-in-the-engine.md)).
 
 | Data | Holds |
 | --- | --- |

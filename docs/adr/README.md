@@ -16,3 +16,4 @@ supersedes an earlier one instead. Start new records from
 | [0007](0007-material-ui-package.md) | Material widgets from `package:material_ui` | Accepted |
 | [0008](0008-hand-written-equality.md) | Hand-written value equality in the engine | Accepted |
 | [0009](0009-plain-data-types.md) | Engine data types hold no behaviour | Accepted |
+| [0010](0010-constructor-injection-in-the-engine.md) | Constructor injection in the engine | Accepted |
