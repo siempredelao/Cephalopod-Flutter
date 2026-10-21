@@ -20,7 +20,7 @@ class GameBoard extends StatelessWidget {
   final GameViewState state;
   final ValueChanged<Position> onSquareTapped;
 
-  static const double _gap = 2;
+  static const double _gap = 4;
 
   @override
   Widget build(BuildContext context) {
