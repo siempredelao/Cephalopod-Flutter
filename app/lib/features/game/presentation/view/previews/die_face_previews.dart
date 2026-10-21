@@ -32,7 +32,9 @@ Widget _allValuesOf(Player owner) {
       for (var pips = 1; pips <= 6; pips++)
         SizedBox.square(
           dimension: _dieSide,
-          child: DieFace(die: Die(owner: owner, pips: pips)),
+          child: DieFace(
+            die: Die(owner: owner, pips: pips),
+          ),
         ),
     ],
   );
