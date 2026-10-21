@@ -233,4 +233,39 @@ void main() {
       }
     });
   });
+
+  group('CephalopodRules.replay', () {
+    test('rebuilds a game by playing its moves from the start', () {
+      final first = rules.apply(rules.newGame(), Move(center)).valueOrFail;
+      final second = rules.apply(first, Move(top)).valueOrFail;
+      final record = GameRecord(moves: [Move(center), Move(top)]);
+
+      expect(rules.replay(record).valueOrFail, second);
+    });
+
+    test('gives a new game under the config when no move is played', () {
+      const config = GameConfig(boardSize: 3, firstPlayer: Player.white);
+      final record = GameRecord(config: config);
+
+      expect(rules.replay(record).valueOrFail, rules.newGame(config));
+    });
+
+    test('rejects a config that breaks the rules', () {
+      const config = GameConfig(boardSize: 4);
+      final record = GameRecord(config: config);
+
+      final failure = rules.replay(record).errorOrFail as InvalidConfig;
+
+      expect(failure.reason.name, 'boardSize');
+    });
+
+    test('R2: reports the first move that cannot be played, and where', () {
+      final record = GameRecord(moves: [Move(center), Move(top), Move(center)]);
+
+      final failure = rules.replay(record).errorOrFail as IllegalMoveAt;
+
+      expect(failure.index, 2);
+      expect(failure.reason, isA<SquareOccupied>());
+    });
+  });
 }

@@ -1,6 +1,7 @@
 import 'package:cephalopod_engine/src/model/board.dart';
 import 'package:cephalopod_engine/src/model/die.dart';
 import 'package:cephalopod_engine/src/model/game_config.dart';
+import 'package:cephalopod_engine/src/model/game_record.dart';
 import 'package:cephalopod_engine/src/model/game_state.dart';
 import 'package:cephalopod_engine/src/model/game_status.dart';
 import 'package:cephalopod_engine/src/model/move.dart';
@@ -12,6 +13,7 @@ import 'package:cephalopod_engine/src/rules/capture_finder.dart';
 import 'package:cephalopod_engine/src/rules/illegal_move.dart';
 import 'package:cephalopod_engine/src/rules/move_validator.dart';
 import 'package:cephalopod_engine/src/rules/referee.dart';
+import 'package:cephalopod_engine/src/rules/replay_failure.dart';
 
 /// The rules of Cephalopod: how a game starts, which moves are legal and
 /// what a move does.
@@ -65,7 +67,7 @@ final class CephalopodRules {
   /// size, which would allow a draw; captures of fewer than 2 or more than 4
   /// dice; or a capture sum outside 2 to 6, which no die could show.
   GameState newGame([GameConfig config = GameConfig.standard]) {
-    _checkRules(config);
+    if (_ruleBrokenBy(config) case final error?) throw error;
     return GameState(
       board: Board(size: config.boardSize),
       status: InProgress(config.firstPlayer),
@@ -73,15 +75,44 @@ final class CephalopodRules {
     );
   }
 
-  void _checkRules(GameConfig config) {
+  /// The rule [config] breaks, as the error [newGame] throws, or `null` when
+  /// it keeps them all.
+  ArgumentError? _ruleBrokenBy(GameConfig config) {
     final GameConfig(:boardSize, :minCaptureDice, :maxCaptureSum) = config;
     if (boardSize < 1 || boardSize.isEven) {
-      throw ArgumentError.value(boardSize, 'boardSize', 'must be odd');
+      return ArgumentError.value(boardSize, 'boardSize', 'must be odd');
     }
     // A capture takes 2 to 4 dice (a square has at most 4 neighbours), and
     // the capturing die shows their sum, so that sum lies between 2 and 6.
-    RangeError.checkValueInInterval(minCaptureDice, 2, 4, 'minCaptureDice');
-    RangeError.checkValueInInterval(maxCaptureSum, 2, 6, 'maxCaptureSum');
+    if (minCaptureDice < 2 || minCaptureDice > 4) {
+      return RangeError.range(minCaptureDice, 2, 4, 'minCaptureDice');
+    }
+    if (maxCaptureSum < 2 || maxCaptureSum > 6) {
+      return RangeError.range(maxCaptureSum, 2, 6, 'maxCaptureSum');
+    }
+    return null;
+  }
+
+  /// The position [record] reaches: its moves played in order from a new
+  /// game under its config.
+  ///
+  /// A record that cannot be replayed, such as a corrupted save, gives the
+  /// reason instead: a config that breaks the rules, or the first move that
+  /// is illegal where it is played.
+  Result<GameState, ReplayFailure> replay(GameRecord record) {
+    if (_ruleBrokenBy(record.config) case final error?) {
+      return Err(InvalidConfig(error));
+    }
+    var state = newGame(record.config);
+    for (final (index, move) in record.moves.indexed) {
+      switch (apply(state, move)) {
+        case Ok(:final value):
+          state = value;
+        case Err(:final error):
+          return Err(IllegalMoveAt(index, error));
+      }
+    }
+    return Ok(state);
   }
 
   /// The player who moves after [player]: turns alternate (rule R1).

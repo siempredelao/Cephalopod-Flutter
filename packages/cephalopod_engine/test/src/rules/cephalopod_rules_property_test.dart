@@ -6,7 +6,8 @@ import 'package:test/test.dart';
 import '../../helpers/result.dart';
 
 /// Plays seeded random games to the end and checks, after every move, the
-/// properties that make Cephalopod well defined.
+/// properties that make Cephalopod well defined. Replaying each game's moves
+/// must then rebuild the position it ended in.
 ///
 /// The game always ends. A non-capturing move adds one die and 1 pip; a
 /// capture keeps the pip total and removes at least one die net. The pip
@@ -26,6 +27,7 @@ void main() {
       final random = Random(seed);
       var state = rules.newGame();
       var moves = 0;
+      final played = <Move>[];
 
       while (true) {
         final status = state.status;
@@ -63,6 +65,7 @@ void main() {
         expect(placed?.pips, inInclusiveRange(1, 6), reason: where);
 
         state = next;
+        played.add(move);
         moves++;
         expect(moves, lessThanOrEqualTo(maxMoves), reason: 'seed $seed');
       }
@@ -74,6 +77,9 @@ void main() {
           : status.whiteDice;
       expect(state.board.dice, hasLength(25), reason: 'R8, seed $seed');
       expect(winnerDice, greaterThan(25 - winnerDice), reason: 'seed $seed');
+
+      final replayed = rules.replay(GameRecord(moves: played));
+      expect(replayed.valueOrFail, state, reason: 'replay, seed $seed');
     }
   });
 }
