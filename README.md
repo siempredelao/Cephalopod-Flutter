@@ -117,11 +117,15 @@ hooks: install [lefthook](https://lefthook.dev) and run `lefthook install`.
 - [x] **M0 · Foundations**: workspace, lints, CI, ADRs, app shell
 - [x] **M1 · Rules engine**: board, moves, captures, property tests
 - [x] **M2 · Playable MVP**: hot-seat game on one device
-- [ ] **M3 · Persistence and undo**: resume, undo/redo, settings
+- [ ] **M3 · Persistence and undo**: resume, undo/redo, settings with a theme
+  choice (system, light or dark)
 - [ ] **M4 · AI opponent**: three difficulty levels
-- [ ] **M5 · Polish**: accessibility, English and Spanish, light and dark board
-  palettes with a theme choice (system, light or dark), goldens
-- [ ] **M6 · Release v1.0**: playable web build on GitHub Pages
+- [ ] **M5 · Polish**: accessibility, English and Spanish, placement and capture
+  animations, light and dark board palettes, rule-sheet link and app version on
+  About, goldens
+- [ ] **M6 · Release v1.0**: launcher icons and splash screen, playable web
+  build on GitHub Pages
+- [ ] **M7 · Google Play**: crash reporting, release signing, store listing
 
 ## Contributing
 
