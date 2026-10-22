@@ -25,7 +25,12 @@ class _HomePageState extends State<HomePage> {
       AppRoute.game.name,
       queryParameters: {if (resume) 'resume': 'true'},
     );
-    if (mounted) setState(() => _canContinue = widget.hasGameToContinue());
+    if (!mounted) return;
+    final canContinue = widget.hasGameToContinue();
+    // A block body: an arrow would return the Future, which setState rejects.
+    setState(() {
+      _canContinue = canContinue;
+    });
   }
 
   @override
