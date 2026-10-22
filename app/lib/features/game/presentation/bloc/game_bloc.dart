@@ -169,9 +169,10 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   }
 
   /// Takes back the last move, if there is one, and remembers it for redo.
+  /// A finished game stays finished.
   Future<void> _undo(Emitter<GameViewState> emit) async {
     final moves = _record.moves;
-    if (moves.isEmpty) return;
+    if (moves.isEmpty || state.phase is GameEnded) return;
     final game = await _undoMove((record: _record, state: state.game));
     _undone.add(moves.last);
     _show(game, emit);
@@ -191,12 +192,13 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// next move.
   void _show(CurrentGame game, Emitter<GameViewState> emit) {
     _record = game.record;
+    final inProgress = game.state.status is InProgress;
     emit(
       GameViewState(
         game: game.state,
         phase: _phaseOf(game.state),
         lastMove: game.record.moves.lastOrNull,
-        canUndo: game.record.moves.isNotEmpty,
+        canUndo: inProgress && game.record.moves.isNotEmpty,
         canRedo: _undone.isNotEmpty,
       ),
     );

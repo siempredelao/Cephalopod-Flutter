@@ -222,7 +222,6 @@ void main() {
           game: after(lastSquare, Move(const Position(1, 1))),
           phase: const TurnPhase.gameEnded(blackWins),
           lastMove: Move(const Position(1, 1)),
-          canUndo: true,
         ),
       ],
     );
@@ -302,6 +301,20 @@ void main() {
           canUndo: true,
         ),
       ],
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      'R8: a finished game cannot be undone',
+      build: () => createTestGameBloc(config: const GameConfig(boardSize: 1)),
+      act: (bloc) => bloc
+        ..add(const SquareTapped(Position(0, 0)))
+        ..add(const UndoRequested()),
+      skip: 1,
+      expect: () => <GameViewState>[],
+      verify: (bloc) {
+        expect(bloc.state.phase, isA<GameEnded>());
+        expect(bloc.state.canUndo, isFalse);
+      },
     );
 
     blocTest<GameBloc, GameViewState>(
