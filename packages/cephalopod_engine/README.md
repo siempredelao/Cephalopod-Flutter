@@ -51,7 +51,8 @@ Services receive their collaborators through their constructors, and
 | `GameConfig` | Every rule constant; `GameConfig.standard` is the published game |
 | `GameStatus` | Sealed: `InProgress(toMove)` or `Finished(winner, blackDice, whiteDice)` |
 | `GameState` | Board, status and config |
-| `Result`, `IllegalMove` | Sealed outcomes ([ADR 0004](../../docs/adr/0004-result-for-domain-errors.md)) |
+| `GameRecord` | Config and the moves played: a game as it is saved ([ADR 0003](../../docs/adr/0003-move-log-persistence.md)) |
+| `Result`, `IllegalMove`, `ReplayFailure` | Sealed outcomes ([ADR 0004](../../docs/adr/0004-result-for-domain-errors.md)) |
 
 | Service | Rules | Does |
 | --- | --- | --- |
@@ -59,7 +60,7 @@ Services receive their collaborators through their constructors, and
 | `CaptureFinder` | R4, R6 | Capture options from a square, and pip sums |
 | `Referee` | R8 | Whether the game is over, and who won |
 | `MoveValidator` | R2, R4, R5 | `violationOf`: the first rule a move breaks, checked in order |
-| `CephalopodRules` | R1, R7, R8 | `newGame`, `opponentOf`, `legalMoves`, `apply` |
+| `CephalopodRules` | R1, R7, R8 | `newGame`, `opponentOf`, `legalMoves`, `apply`, and `replay`, which rebuilds a `GameRecord` |
 
 ## Rules covered
 
