@@ -7,9 +7,10 @@ import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_pl
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
 import 'package:cephalopod/features/home/presentation/view/home_page.dart';
-import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+import '../helpers/game_bloc_factory.dart';
 
 void main() {
   Future<void> pumpApp(
@@ -21,7 +22,7 @@ void main() {
       App(
         flavor: flavor,
         router: createRouter(
-          rules: CephalopodRules(),
+          createGameBloc: createTestGameBloc,
           initialLocation: location,
         ),
       ),

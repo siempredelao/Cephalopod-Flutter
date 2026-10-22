@@ -1,4 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:cephalopod/features/game/data/in_memory_game_repository.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_view_state.dart';
@@ -6,6 +7,8 @@ import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:cephalopod_engine/testing.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../../../../helpers/game_bloc_factory.dart';
 
 void main() {
   final rules = CephalopodRules();
@@ -15,7 +18,7 @@ void main() {
   const right = Position(0, 3);
   const below = Position(1, 2);
 
-  GameBloc build() => GameBloc(rules: rules);
+  GameBloc build() => createTestGameBloc();
 
   GameViewState placing(GameState game) =>
       GameViewState(game: game, phase: const TurnPhase.awaitingPlacement());
@@ -63,7 +66,7 @@ void main() {
     test('starts under the config it is given', () {
       const config = GameConfig(firstPlayer: Player.white);
 
-      final bloc = GameBloc(rules: rules, config: config);
+      final bloc = createTestGameBloc(config: config);
 
       expect(bloc.state, placing(rules.newGame(config)));
     });
@@ -77,6 +80,7 @@ void main() {
           game: after(rules.newGame(), Move(center)),
           phase: const TurnPhase.awaitingPlacement(),
           lastMove: Move(center),
+          canUndo: true,
         ),
       ],
     );
@@ -111,6 +115,7 @@ void main() {
           game: after(oneCapture, captureBoth),
           phase: const TurnPhase.awaitingPlacement(),
           lastMove: captureBoth,
+          canUndo: true,
         ),
       ],
     );
@@ -165,6 +170,7 @@ void main() {
           game: after(figure4, Move(top, captures: {left, right})),
           phase: const TurnPhase.awaitingPlacement(),
           lastMove: Move(top, captures: {left, right}),
+          canUndo: true,
         ),
       ],
     );
@@ -238,5 +244,127 @@ void main() {
       act: (bloc) => bloc.add(const GameStarted(GameConfig(boardSize: 3))),
       expect: () => [placing(rules.newGame(const GameConfig(boardSize: 3)))],
     );
+  });
+
+  group('GameBloc saving and history', () {
+    late InMemoryGameRepository repository;
+    final played = GameViewState(
+      game: after(rules.newGame(), Move(center)),
+      phase: const TurnPhase.awaitingPlacement(),
+      lastMove: Move(center),
+      canUndo: true,
+    );
+    final undone = placing(rules.newGame()).copyWith(canRedo: true);
+
+    setUp(() => repository = InMemoryGameRepository());
+
+    GameBloc buildSaving() => createTestGameBloc(repository: repository);
+
+    /// Lets the bloc finish the events it was given, storage included.
+    Future<void> settle() => Future<void>.delayed(Duration.zero);
+
+    test('saves the game after every move', () async {
+      final bloc = buildSaving()
+        ..add(const SquareTapped(center))
+        ..add(const SquareTapped(top));
+      await settle();
+
+      final saved = GameRecord(moves: [Move(center), Move(top)]);
+      expect(await repository.load(), saved);
+      await bloc.close();
+    });
+
+    blocTest<GameBloc, GameViewState>(
+      'undo takes back the last move, and redo plays it again',
+      build: build,
+      act: (bloc) => bloc
+        ..add(const SquareTapped(center))
+        ..add(const UndoRequested())
+        ..add(const RedoRequested()),
+      expect: () => [played, undone, played],
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      'a new move clears the moves taken back',
+      build: build,
+      act: (bloc) => bloc
+        ..add(const SquareTapped(center))
+        ..add(const UndoRequested())
+        ..add(const SquareTapped(top)),
+      expect: () => [
+        played,
+        undone,
+        GameViewState(
+          game: after(rules.newGame(), Move(top)),
+          phase: const TurnPhase.awaitingPlacement(),
+          lastMove: Move(top),
+          canUndo: true,
+        ),
+      ],
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      'R8: a finished game cannot be undone',
+      build: () => createTestGameBloc(config: const GameConfig(boardSize: 1)),
+      act: (bloc) => bloc
+        ..add(const SquareTapped(Position(0, 0)))
+        ..add(const UndoRequested()),
+      skip: 1,
+      expect: () => <GameViewState>[],
+      verify: (bloc) {
+        expect(bloc.state.phase, isA<GameEnded>());
+        expect(bloc.state.canUndo, isFalse);
+      },
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      'undo and redo do nothing with no move to take back or play again',
+      build: build,
+      act: (bloc) => bloc
+        ..add(const UndoRequested())
+        ..add(const RedoRequested()),
+      expect: () => <GameViewState>[],
+    );
+
+    test('picks up the saved game', () async {
+      final saved = GameRecord(moves: [Move(center), Move(top)]);
+      await repository.save(saved);
+      final first = after(rules.newGame(), Move(center));
+      final second = after(first, Move(top));
+
+      final bloc = buildSaving()..add(const GameResumed());
+      await settle();
+
+      expect(
+        bloc.state,
+        GameViewState(
+          game: second,
+          phase: const TurnPhase.awaitingPlacement(),
+          lastMove: Move(top),
+          canUndo: true,
+        ),
+      );
+      await bloc.close();
+    });
+
+    test('starts and saves a new game when there is none to resume', () async {
+      final bloc = buildSaving()..add(const GameResumed());
+      await settle();
+
+      expect(bloc.state, placing(rules.newGame()));
+      expect(await repository.load(), GameRecord());
+      await bloc.close();
+    });
+
+    test('starting a game replaces the saved one', () async {
+      final saved = GameRecord(moves: [Move(center)]);
+      await repository.save(saved);
+
+      final bloc = buildSaving()..add(const GameStarted());
+      await settle();
+
+      expect(await repository.load(), GameRecord());
+      await bloc.close();
+    });
   });
 }

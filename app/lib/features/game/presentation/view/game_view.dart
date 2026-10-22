@@ -29,6 +29,7 @@ class GameView extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Cephalopod'),
         actions: [
+          const _HistoryButtons(),
           // Pushed on top, so the game is still here on the way back.
           IconButton(
             tooltip: 'How to play',
@@ -104,5 +105,37 @@ class GameView extends StatelessWidget {
       Player.white => (result.whiteDice, result.blackDice),
     };
     return '${playerNameOf(result.winner)} wins $won to $lost';
+  }
+}
+
+/// Undo and redo, each enabled when there is a move to take back or to play
+/// again.
+class _HistoryButtons extends StatelessWidget {
+  const _HistoryButtons();
+
+  @override
+  Widget build(BuildContext context) {
+    final bloc = context.read<GameBloc>();
+    return BlocBuilder<GameBloc, GameViewState>(
+      builder: (context, state) => Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            tooltip: 'Undo',
+            icon: const Icon(Icons.undo),
+            onPressed: state.canUndo
+                ? () => bloc.add(const UndoRequested())
+                : null,
+          ),
+          IconButton(
+            tooltip: 'Redo',
+            icon: const Icon(Icons.redo),
+            onPressed: state.canRedo
+                ? () => bloc.add(const RedoRequested())
+                : null,
+          ),
+        ],
+      ),
+    );
   }
 }
