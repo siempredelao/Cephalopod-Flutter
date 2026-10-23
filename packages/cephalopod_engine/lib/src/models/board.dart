@@ -1,5 +1,5 @@
-import 'package:cephalopod_engine/src/model/die.dart';
-import 'package:cephalopod_engine/src/model/position.dart';
+import 'package:cephalopod_engine/src/models/die.dart';
+import 'package:cephalopod_engine/src/models/position.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 

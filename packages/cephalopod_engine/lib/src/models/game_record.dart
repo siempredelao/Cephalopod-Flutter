@@ -1,5 +1,5 @@
-import 'package:cephalopod_engine/src/model/game_config.dart';
-import 'package:cephalopod_engine/src/model/move.dart';
+import 'package:cephalopod_engine/src/models/game_config.dart';
+import 'package:cephalopod_engine/src/models/move.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 

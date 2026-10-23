@@ -1,5 +1,5 @@
-import 'package:cephalopod/features/game/domain/current_game.dart';
 import 'package:cephalopod/features/game/domain/game_repository.dart';
+import 'package:cephalopod/features/game/domain/models/current_game.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
 /// Picks up the saved game.

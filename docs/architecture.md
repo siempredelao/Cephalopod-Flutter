@@ -69,6 +69,10 @@ Classes named above arrive in M1–M4; the table records how they will fit.
 
 - Files in `snake_case`, one public type per file, named after the type.
 - `test/` mirrors `lib/`, so every class has an obvious test file.
+- Data types live in a `models/` folder inside the layer that owns them
+  (`src/models/` in the engine, `domain/models/` in a feature), as in
+  Flutter's architecture guide. A bloc's states and events stay next to the
+  bloc, because they are its interface.
 - Engine tests are named after the rule they cover (`R5: …`).
 - Expected domain failures are values (`Result`), exceptions are for bugs.
   See [ADR 0004](adr/0004-result-for-domain-errors.md).
