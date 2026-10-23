@@ -1,6 +1,6 @@
-import 'package:cephalopod_engine/src/model/board.dart';
-import 'package:cephalopod_engine/src/model/game_config.dart';
-import 'package:cephalopod_engine/src/model/game_status.dart';
+import 'package:cephalopod_engine/src/models/board.dart';
+import 'package:cephalopod_engine/src/models/game_config.dart';
+import 'package:cephalopod_engine/src/models/game_status.dart';
 import 'package:meta/meta.dart';
 
 /// A moment in a game: the [board], the [status] and the [config].

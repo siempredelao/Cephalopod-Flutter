@@ -1,4 +1,4 @@
-import 'package:cephalopod_engine/src/model/player.dart';
+import 'package:cephalopod_engine/src/models/player.dart';
 import 'package:meta/meta.dart';
 
 /// Whether a game is still being played and, once it is over, who won.

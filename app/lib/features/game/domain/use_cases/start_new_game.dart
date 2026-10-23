@@ -1,5 +1,5 @@
-import 'package:cephalopod/features/game/domain/current_game.dart';
 import 'package:cephalopod/features/game/domain/game_repository.dart';
+import 'package:cephalopod/features/game/domain/models/current_game.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
 /// Starts a new game and saves it, replacing any saved game.

@@ -1,6 +1,6 @@
-import 'package:cephalopod_engine/src/model/board.dart';
-import 'package:cephalopod_engine/src/model/game_status.dart';
-import 'package:cephalopod_engine/src/model/player.dart';
+import 'package:cephalopod_engine/src/models/board.dart';
+import 'package:cephalopod_engine/src/models/game_status.dart';
+import 'package:cephalopod_engine/src/models/player.dart';
 
 /// Decides whether a game is over and who won (rule R8).
 final class Referee {

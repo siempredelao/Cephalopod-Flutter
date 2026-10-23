@@ -1,5 +1,5 @@
 import 'package:bloc/bloc.dart';
-import 'package:cephalopod/features/game/domain/current_game.dart';
+import 'package:cephalopod/features/game/domain/models/current_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/play_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/resume_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/start_new_game.dart';

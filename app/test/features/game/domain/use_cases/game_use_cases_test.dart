@@ -1,5 +1,5 @@
 import 'package:cephalopod/features/game/data/in_memory_game_repository.dart';
-import 'package:cephalopod/features/game/domain/current_game.dart';
+import 'package:cephalopod/features/game/domain/models/current_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/has_game_to_continue.dart';
 import 'package:cephalopod/features/game/domain/use_cases/play_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/resume_game.dart';
