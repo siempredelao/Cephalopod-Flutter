@@ -1,4 +1,4 @@
-# Cephalopod
+![Cephalopod](art/social-preview.png)
 
 [![CI](https://github.com/siempredelao/Cephalopod-Flutter/actions/workflows/ci.yaml/badge.svg)](https://github.com/siempredelao/Cephalopod-Flutter/actions/workflows/ci.yaml)
 
