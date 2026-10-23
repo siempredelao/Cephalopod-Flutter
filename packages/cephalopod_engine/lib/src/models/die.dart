@@ -1,4 +1,4 @@
-import 'package:cephalopod_engine/src/model/player.dart';
+import 'package:cephalopod_engine/src/models/player.dart';
 import 'package:meta/meta.dart';
 
 /// A die on the board: its [owner] and the number of [pips] on top.

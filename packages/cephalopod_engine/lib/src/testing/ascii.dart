@@ -1,9 +1,9 @@
-import 'package:cephalopod_engine/src/model/board.dart';
-import 'package:cephalopod_engine/src/model/die.dart';
-import 'package:cephalopod_engine/src/model/game_config.dart';
-import 'package:cephalopod_engine/src/model/game_state.dart';
-import 'package:cephalopod_engine/src/model/player.dart';
-import 'package:cephalopod_engine/src/model/position.dart';
+import 'package:cephalopod_engine/src/models/board.dart';
+import 'package:cephalopod_engine/src/models/die.dart';
+import 'package:cephalopod_engine/src/models/game_config.dart';
+import 'package:cephalopod_engine/src/models/game_state.dart';
+import 'package:cephalopod_engine/src/models/player.dart';
+import 'package:cephalopod_engine/src/models/position.dart';
 import 'package:cephalopod_engine/src/rules/referee.dart';
 
 /// Builds a [Board] from a text grid, the format [boardToAscii] prints.
