@@ -18,11 +18,12 @@ void main() {
       expect: () => [true],
     );
 
+    // Bloc skips a state equal to the current one, except the first emit.
     blocTest<HomeCubit, bool>(
-      'emits nothing new when there is still no saved game',
+      'does not offer to continue when nothing is saved',
       build: () => HomeCubit(hasGameToContinue: () async => false),
       act: (cubit) => cubit.refresh(),
-      expect: () => <bool>[],
+      expect: () => [false],
     );
 
     var saved = true;
