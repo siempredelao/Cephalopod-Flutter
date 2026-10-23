@@ -10,6 +10,9 @@ enum AppRoute {
   /// How to play, one rule per page with a board that shows it.
   howToPlay,
 
+  /// The player's settings.
+  settings,
+
   /// Credits and a link to the official rule sheet.
   about,
 }

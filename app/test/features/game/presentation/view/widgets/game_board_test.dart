@@ -103,6 +103,23 @@ void main() {
       expect(tapped, [top]);
     });
 
+    testWidgets('leaves the last move unmarked when told to', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: const [BoardColors.light]),
+          home: Center(
+            child: GameBoard(
+              state: placing(lastMove: Move(below)),
+              onSquareTapped: (_) {},
+              highlightLastMove: false,
+            ),
+          ),
+        ),
+      );
+
+      expect(squareAt(tester, below).mark, SquareMark.none);
+    });
+
     testWidgets('marks the last move', (tester) async {
       await pumpBoard(tester, placing(lastMove: Move(below)));
 
