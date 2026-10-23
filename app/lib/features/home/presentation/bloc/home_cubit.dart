@@ -6,12 +6,10 @@ import 'package:bloc/bloc.dart';
 /// It starts at `false` and asks again on [refresh]: when Home opens and
 /// each time the player comes back from a game.
 class HomeCubit extends Cubit<bool> {
-  /// [hasGameToContinue] is a plain function rather than the game feature's
+  /// `hasGameToContinue` is a plain function rather than the game feature's
   /// use case, because features may not import each other. The composition
   /// root wires it to `HasGameToContinue`.
-  HomeCubit({required Future<bool> Function() hasGameToContinue})
-    : _hasGameToContinue = hasGameToContinue,
-      super(false);
+  HomeCubit({required this._hasGameToContinue}) : super(false);
 
   final Future<bool> Function() _hasGameToContinue;
 
