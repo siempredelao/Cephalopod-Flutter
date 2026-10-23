@@ -3,15 +3,19 @@ import 'package:cephalopod/features/about/presentation/view/about_page.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
+import 'package:cephalopod/features/home/presentation/bloc/home_cubit.dart';
 import 'package:cephalopod/features/home/presentation/view/home_page.dart';
 import 'package:go_router/go_router.dart';
 
 /// Builds the app's router. Routes are nested, so a deep link to `/about`
 /// still has the home page underneath it and a working back button.
 ///
-/// Each visit to the game route gets its own bloc from [createGameBloc]. The
-/// route starts a new game, or picks up the saved one with `?resume=true`.
+/// Home gets its cubit from [createHomeCubit], and each visit to the game
+/// route gets its own bloc from [createGameBloc]. The game route starts a
+/// new game, or picks up the saved one with `?resume=true`, which Home
+/// offers when there is one.
 GoRouter createRouter({
+  required HomeCubit Function() createHomeCubit,
   required GameBloc Function() createGameBloc,
   String initialLocation = '/',
 }) {
@@ -21,7 +25,7 @@ GoRouter createRouter({
       GoRoute(
         path: '/',
         name: AppRoute.home.name,
-        builder: (_, _) => const HomePage(),
+        builder: (_, _) => HomePage(createCubit: createHomeCubit),
         routes: [
           GoRoute(
             path: 'game',

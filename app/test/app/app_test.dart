@@ -2,11 +2,16 @@ import 'package:cephalopod/app/app.dart';
 import 'package:cephalopod/app/flavor.dart';
 import 'package:cephalopod/app/router.dart';
 import 'package:cephalopod/features/about/presentation/view/about_page.dart';
+import 'package:cephalopod/features/game/data/in_memory_game_repository.dart';
+import 'package:cephalopod/features/game/domain/use_cases/has_game_to_continue.dart';
+import 'package:cephalopod/features/game/domain/use_cases/resume_game.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
+import 'package:cephalopod/features/home/presentation/bloc/home_cubit.dart';
 import 'package:cephalopod/features/home/presentation/view/home_page.dart';
+import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -18,15 +23,16 @@ void main() {
     Flavor flavor = Flavor.prod,
     String location = '/',
   }) async {
-    await tester.pumpWidget(
-      App(
-        flavor: flavor,
-        router: createRouter(
-          createGameBloc: createTestGameBloc,
-          initialLocation: location,
-        ),
-      ),
+    final games = InMemoryGameRepository();
+    final resumeGame = ResumeGame(rules: CephalopodRules(), repository: games);
+    final hasGameToContinue = HasGameToContinue(resumeGame: resumeGame);
+    final router = createRouter(
+      createHomeCubit: () =>
+          HomeCubit(hasGameToContinue: hasGameToContinue.call),
+      createGameBloc: () => createTestGameBloc(repository: games),
+      initialLocation: location,
     );
+    await tester.pumpWidget(App(flavor: flavor, router: router));
     await tester.pumpAndSettle();
   }
 
@@ -44,6 +50,24 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(GamePage), findsOneWidget);
+    });
+
+    testWidgets('offers to continue a game left unfinished', (tester) async {
+      await pumpApp(tester);
+      expect(find.text('Continue'), findsNothing);
+
+      await tester.tap(find.widgetWithText(FilledButton, 'New game'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(BoardSquare).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(GamePage), findsOneWidget);
+      expect(find.byType(DieFace), findsOneWidget);
     });
 
     testWidgets('goes back home from a deep link to a game', (tester) async {
