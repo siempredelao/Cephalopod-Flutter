@@ -9,6 +9,7 @@ import 'package:cephalopod/features/game/presentation/view/game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
+import 'package:cephalopod/features/home/presentation/bloc/home_cubit.dart';
 import 'package:cephalopod/features/home/presentation/view/home_page.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -26,8 +27,9 @@ void main() {
     final resumeGame = ResumeGame(rules: CephalopodRules(), repository: games);
     final hasGameToContinue = HasGameToContinue(resumeGame: resumeGame);
     final router = createRouter(
+      createHomeCubit: () =>
+          HomeCubit(hasGameToContinue: hasGameToContinue.call),
       createGameBloc: () => createTestGameBloc(repository: games),
-      hasGameToContinue: hasGameToContinue.call,
       initialLocation: location,
     );
     await tester.pumpWidget(App(flavor: flavor, router: router));
