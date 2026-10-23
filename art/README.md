@@ -67,3 +67,9 @@ opaque and remove the alpha channel from the iOS master.
 | Board squares | `#0C443C` |
 | Highlight and arrows | `#5EEAD4` |
 | Die face / edge / pips | `#FF7A5C` / `#C24A30` / `#3A1208` |
+
+## Social preview
+
+`social-preview.png` (1280 × 640) is the repository's social preview and the banner
+at the top of the main README. To use it as the preview, upload it under the
+repository's **Settings → General → Social preview**.
