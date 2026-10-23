@@ -1,4 +1,4 @@
-import 'package:cephalopod/core/settings/app_settings.dart';
+import 'package:cephalopod/core/settings/models/app_settings.dart';
 import 'package:cephalopod/features/settings/data/shared_preferences_settings_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';

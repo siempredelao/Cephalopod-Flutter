@@ -1,6 +1,6 @@
-import 'package:cephalopod/core/settings/app_settings.dart';
+import 'package:cephalopod/core/settings/models/app_settings.dart';
+import 'package:cephalopod/core/settings/models/theme_preference.dart';
 import 'package:cephalopod/core/settings/settings_repository.dart';
-import 'package:cephalopod/core/settings/theme_preference.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// A [SettingsRepository] that keeps each setting under its own key with

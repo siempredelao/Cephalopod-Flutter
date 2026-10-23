@@ -1,4 +1,4 @@
-import 'package:cephalopod/core/settings/app_settings.dart';
+import 'package:cephalopod/core/settings/models/app_settings.dart';
 import 'package:cephalopod/core/settings/settings_repository.dart';
 
 /// A [SettingsRepository] that keeps the settings in memory only, so they

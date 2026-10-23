@@ -1,5 +1,5 @@
+import 'package:cephalopod/core/settings/models/theme_preference.dart';
 import 'package:cephalopod/core/settings/settings_cubit.dart';
-import 'package:cephalopod/core/settings/theme_preference.dart';
 import 'package:cephalopod/features/settings/data/in_memory_settings_repository.dart';
 import 'package:cephalopod/features/settings/presentation/view/settings_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

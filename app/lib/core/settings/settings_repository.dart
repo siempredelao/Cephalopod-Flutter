@@ -1,4 +1,4 @@
-import 'package:cephalopod/core/settings/app_settings.dart';
+import 'package:cephalopod/core/settings/models/app_settings.dart';
 
 /// Keeps the player's settings, so they survive the app closing. Every
 /// implementation passes the same contract tests.
