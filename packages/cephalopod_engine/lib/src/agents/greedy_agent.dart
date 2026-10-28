@@ -1,0 +1,64 @@
+import 'dart:math';
+
+import 'package:cephalopod_engine/src/agents/game_agent.dart';
+import 'package:cephalopod_engine/src/agents/move_generator.dart';
+import 'package:cephalopod_engine/src/agents/position_evaluator.dart';
+import 'package:cephalopod_engine/src/models/game_state.dart';
+import 'package:cephalopod_engine/src/models/game_status.dart';
+import 'package:cephalopod_engine/src/models/move.dart';
+import 'package:cephalopod_engine/src/result.dart';
+
+/// The Medium opponent: plays the move that leaves the best position, as the
+/// [PositionEvaluator] scores it, and picks at random among equally good
+/// moves.
+///
+/// It looks one move ahead and no further, so it never sees the reply: it
+/// takes every profitable capture and builds dice that cannot be captured,
+/// but it can leave dice for the opponent to capture next turn.
+final class GreedyAgent implements GameAgent {
+  /// An agent that asks `moves` for the legal moves and what they lead to,
+  /// scores each result with `evaluator`, and breaks ties with `random`.
+  GreedyAgent({
+    required this._moves,
+    required this._evaluator,
+    required this._random,
+  });
+
+  final MoveGenerator _moves;
+  final PositionEvaluator _evaluator;
+  final Random _random;
+
+  @override
+  Move chooseMove(GameState state) {
+    final status = state.status;
+    if (status is! InProgress) {
+      throw ArgumentError.value(state, 'state', 'The game is over');
+    }
+    int? bestScore;
+    final best = <Move>[];
+    for (final move in _moves.legalMoves(state)) {
+      final score = _evaluator.score(_play(state, move), status.toMove);
+      if (bestScore == null || score > bestScore) {
+        bestScore = score;
+        best
+          ..clear()
+          ..add(move);
+      } else if (score == bestScore) {
+        best.add(move);
+      }
+    }
+    return best[_random.nextInt(best.length)];
+  }
+
+  /// The position after [move], which came from the legal moves.
+  GameState _play(GameState state, Move move) {
+    switch (_moves.apply(state, move)) {
+      case Ok(:final value):
+        return value;
+      case Err(:final error):
+        throw StateError(
+          'The rules listed $move as legal but refused it: $error',
+        );
+    }
+  }
+}
