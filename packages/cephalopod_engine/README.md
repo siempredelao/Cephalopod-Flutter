@@ -62,6 +62,26 @@ Services receive their collaborators through their constructors, and
 | `MoveValidator` | R2, R4, R5 | `violationOf`: the first rule a move breaks, checked in order |
 | `CephalopodRules` | R1, R7, R8 | `newGame`, `opponentOf`, `legalMoves`, `apply`, and `replay`, which rebuilds a `GameRecord` |
 
+## Computer opponents
+
+A computer opponent is a `GameAgent`: `chooseMove(state)` returns the move it
+plays. Agents see the rules as a `MoveGenerator`, which only lists legal moves
+and applies one, and take an injected `Random`, so a seeded agent always plays
+the same game ([ADR 0014](../../docs/adr/0014-game-agents-in-the-engine.md)).
+
+```dart
+final rules = CephalopodRules();
+final easy = RandomAgent(moves: rules, random: Random(42));
+final move = easy.chooseMove(rules.newGame());
+```
+
+| Agent | Level | Plays |
+| --- | --- | --- |
+| `RandomAgent` | Easy | Any legal move, uniformly at random |
+
+Every agent runs one shared contract suite,
+`test/src/agents/game_agent_contract.dart`.
+
 ## Rules covered
 
 Each rule has an ID. Tests are named after the rule they cover (`R5: …`), so a

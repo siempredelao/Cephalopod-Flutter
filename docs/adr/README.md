@@ -20,3 +20,4 @@ supersedes an earlier one instead. Start new records from
 | [0011](0011-freezed-for-ui-states.md) | `freezed` for the app's UI states; generated code not committed | Accepted |
 | [0012](0012-shared-preferences-for-local-storage.md) | Local storage with `shared_preferences` | Accepted |
 | [0013](0013-hand-written-feature-modules.md) | Hand-written feature modules instead of a DI container | Accepted |
+| [0014](0014-game-agents-in-the-engine.md) | Computer opponents as engine agents | Accepted |
