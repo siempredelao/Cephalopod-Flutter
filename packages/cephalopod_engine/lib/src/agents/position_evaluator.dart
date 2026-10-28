@@ -28,6 +28,9 @@ final class PositionEvaluator {
   /// always worth it, even by capturing your own dice.
   static const int permanentDieValue = 5;
 
+  /// The fewest pips a die can show.
+  static const int _lowestPips = 1;
+
   /// How good [state] is for [player].
   int score(GameState state, Player player) => switch (state.status) {
     Finished(:final winner) => winner == player ? winScore : -winScore,
@@ -54,7 +57,8 @@ final class PositionEvaluator {
   /// limit, no capture can include the die. In the standard game only a 6 is
   /// safe: 6 + 1 = 7.
   bool _isPermanent(Die die, GameConfig config) {
-    final smallestCaptureTotal = die.pips + (config.minCaptureDice - 1);
+    final otherDice = config.minCaptureDice - 1;
+    final smallestCaptureTotal = die.pips + otherDice * _lowestPips;
     return smallestCaptureTotal > config.maxCaptureSum;
   }
 }
