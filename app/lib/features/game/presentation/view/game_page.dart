@@ -8,12 +8,20 @@ import 'package:material_ui/material_ui.dart';
 /// a new game or, with [resume], picks up the saved one, and hands the bloc
 /// to [GameView].
 class GamePage extends StatelessWidget {
-  const GamePage({required this.createBloc, this.resume = false, super.key});
+  const GamePage({
+    required this.createBloc,
+    this.resume = false,
+    this.highlightLastMove = true,
+    super.key,
+  });
 
   /// Builds the screen's bloc. The composition root wires it to the device's
   /// storage; tests wire it to memory.
   final GameBloc Function() createBloc;
   final bool resume;
+
+  /// Whether the board marks the last move, as the player's settings say.
+  final bool highlightLastMove;
 
   GameEvent get _opening => resume ? const GameResumed() : const GameStarted();
 
@@ -21,7 +29,7 @@ class GamePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => createBloc()..add(_opening),
-      child: const GameView(),
+      child: GameView(highlightLastMove: highlightLastMove),
     );
   }
 }

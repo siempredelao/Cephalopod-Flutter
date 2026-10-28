@@ -15,7 +15,10 @@ import 'package:material_ui/material_ui.dart';
 /// choosing a capture. It renders the state of the `GameBloc` above it and
 /// adds events; the bloc decides what they do.
 class GameView extends StatelessWidget {
-  const GameView({super.key});
+  const GameView({this.highlightLastMove = true, super.key});
+
+  /// Whether the board marks the last move.
+  final bool highlightLastMove;
 
   static const double _spacing = 16;
 
@@ -58,6 +61,7 @@ class GameView extends StatelessWidget {
                   child: Center(
                     child: GameBoard(
                       state: state,
+                      highlightLastMove: highlightLastMove,
                       onSquareTapped: (square) =>
                           context.read<GameBloc>().add(SquareTapped(square)),
                     ),

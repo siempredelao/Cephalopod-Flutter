@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cephalopod/app/app.dart';
 import 'package:cephalopod/app/flavor.dart';
 import 'package:cephalopod/app/router.dart';
@@ -10,6 +12,8 @@ import 'package:cephalopod/features/game/domain/use_cases/start_new_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/undo_move.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/home/presentation/bloc/home_cubit.dart';
+import 'package:cephalopod/features/settings/data/shared_preferences_settings_repository.dart';
+import 'package:cephalopod/features/settings/presentation/bloc/settings_cubit.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,9 +21,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Composition root: the only code that creates concrete dependencies and
 /// wires them together. Everything else receives them through constructors.
 void bootstrap(Flavor flavor) {
+  // Storage plugins are used before runApp, so the bindings come first.
+  WidgetsFlutterBinding.ensureInitialized();
+  final preferences = SharedPreferencesAsync();
   final rules = CephalopodRules();
   final games = SharedPreferencesGameRepository(
-    preferences: SharedPreferencesAsync(),
+    preferences: preferences,
     codec: GameRecordJsonCodec(),
   );
   final startNewGame = StartNewGame(rules: rules, repository: games);
@@ -46,5 +53,12 @@ void bootstrap(Flavor flavor) {
     createHomeCubit: createHomeCubit,
     createGameBloc: createGameBloc,
   );
-  runApp(App(flavor: flavor, router: router));
+  final settingsRepository = SharedPreferencesSettingsRepository(
+    preferences: preferences,
+  );
+  final settings = SettingsCubit(repository: settingsRepository);
+  // Shows the defaults for the moment the saved settings take to load.
+  unawaited(settings.load());
+
+  runApp(App(flavor: flavor, router: router, settings: settings));
 }

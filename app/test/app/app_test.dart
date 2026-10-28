@@ -11,6 +11,9 @@ import 'package:cephalopod/features/game/presentation/view/widgets/board_square.
 import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
 import 'package:cephalopod/features/home/presentation/bloc/home_cubit.dart';
 import 'package:cephalopod/features/home/presentation/view/home_page.dart';
+import 'package:cephalopod/features/settings/data/in_memory_settings_repository.dart';
+import 'package:cephalopod/features/settings/presentation/bloc/settings_cubit.dart';
+import 'package:cephalopod/features/settings/presentation/view/settings_page.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -32,7 +35,11 @@ void main() {
       createGameBloc: () => createTestGameBloc(repository: games),
       initialLocation: location,
     );
-    await tester.pumpWidget(App(flavor: flavor, router: router));
+    final settings = SettingsCubit(repository: InMemorySettingsRepository());
+    addTearDown(settings.close);
+    await tester.pumpWidget(
+      App(flavor: flavor, router: router, settings: settings),
+    );
     await tester.pumpAndSettle();
   }
 
@@ -104,6 +111,19 @@ void main() {
 
       expect(find.byType(HowToPlayPage), findsNothing);
       expect(find.byType(DieFace), findsOneWidget);
+    });
+
+    testWidgets('switches to the dark theme from the settings', (tester) async {
+      await pumpApp(tester);
+
+      await tester.tap(find.widgetWithText(OutlinedButton, 'Settings'));
+      await tester.pumpAndSettle();
+      expect(find.byType(SettingsPage), findsOneWidget);
+      await tester.tap(find.text('Dark'));
+      await tester.pumpAndSettle();
+
+      final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
+      expect(app.themeMode, ThemeMode.dark);
     });
 
     testWidgets('opens the about page from home', (tester) async {

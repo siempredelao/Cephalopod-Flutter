@@ -5,6 +5,9 @@ import 'package:cephalopod/features/game/presentation/view/game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
 import 'package:cephalopod/features/home/presentation/bloc/home_cubit.dart';
 import 'package:cephalopod/features/home/presentation/view/home_page.dart';
+import 'package:cephalopod/features/settings/presentation/bloc/settings_cubit.dart';
+import 'package:cephalopod/features/settings/presentation/view/settings_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 /// Builds the app's router. Routes are nested, so a deep link to `/about`
@@ -30,15 +33,26 @@ GoRouter createRouter({
           GoRoute(
             path: 'game',
             name: AppRoute.game.name,
-            builder: (_, state) => GamePage(
-              createBloc: createGameBloc,
-              resume: state.uri.queryParameters['resume'] == 'true',
-            ),
+            // Settings cannot change while a game is on screen, so the game
+            // reads the highlight setting once, when it opens.
+            builder: (context, state) {
+              final settings = context.read<SettingsCubit>().state;
+              return GamePage(
+                createBloc: createGameBloc,
+                resume: state.uri.queryParameters['resume'] == 'true',
+                highlightLastMove: settings.highlightLastMove,
+              );
+            },
           ),
           GoRoute(
             path: 'how-to-play',
             name: AppRoute.howToPlay.name,
             builder: (_, _) => const HowToPlayPage(),
+          ),
+          GoRoute(
+            path: 'settings',
+            name: AppRoute.settings.name,
+            builder: (_, _) => const SettingsPage(),
           ),
           GoRoute(
             path: 'about',
