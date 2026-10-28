@@ -1,7 +1,6 @@
 import 'package:cephalopod/app/app.dart';
 import 'package:cephalopod/app/flavor.dart';
 import 'package:cephalopod/app/router.dart';
-import 'package:cephalopod/core/settings/settings_cubit.dart';
 import 'package:cephalopod/features/about/presentation/view/about_page.dart';
 import 'package:cephalopod/features/game/data/in_memory_game_repository.dart';
 import 'package:cephalopod/features/game/domain/use_cases/has_game_to_continue.dart';
@@ -13,6 +12,7 @@ import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart
 import 'package:cephalopod/features/home/presentation/bloc/home_cubit.dart';
 import 'package:cephalopod/features/home/presentation/view/home_page.dart';
 import 'package:cephalopod/features/settings/data/in_memory_settings_repository.dart';
+import 'package:cephalopod/features/settings/presentation/bloc/settings_cubit.dart';
 import 'package:cephalopod/features/settings/presentation/view/settings_page.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_test/flutter_test.dart';

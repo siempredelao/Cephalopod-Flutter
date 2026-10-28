@@ -1,11 +1,11 @@
 import 'package:cephalopod/core/navigation/app_route.dart';
-import 'package:cephalopod/core/settings/settings_cubit.dart';
 import 'package:cephalopod/features/about/presentation/view/about_page.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
 import 'package:cephalopod/features/home/presentation/bloc/home_cubit.dart';
 import 'package:cephalopod/features/home/presentation/view/home_page.dart';
+import 'package:cephalopod/features/settings/presentation/bloc/settings_cubit.dart';
 import 'package:cephalopod/features/settings/presentation/view/settings_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';

@@ -1,8 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:cephalopod/core/settings/models/app_settings.dart';
-import 'package:cephalopod/core/settings/models/theme_preference.dart';
-import 'package:cephalopod/core/settings/settings_cubit.dart';
 import 'package:cephalopod/features/settings/data/in_memory_settings_repository.dart';
+import 'package:cephalopod/features/settings/domain/models/app_settings.dart';
+import 'package:cephalopod/features/settings/domain/models/theme_preference.dart';
+import 'package:cephalopod/features/settings/presentation/bloc/settings_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

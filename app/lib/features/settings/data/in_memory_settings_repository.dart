@@ -1,5 +1,5 @@
-import 'package:cephalopod/core/settings/models/app_settings.dart';
-import 'package:cephalopod/core/settings/settings_repository.dart';
+import 'package:cephalopod/features/settings/domain/models/app_settings.dart';
+import 'package:cephalopod/features/settings/domain/settings_repository.dart';
 
 /// A [SettingsRepository] that keeps the settings in memory only, so they
 /// are lost when the app closes. For tests, and as the reference the

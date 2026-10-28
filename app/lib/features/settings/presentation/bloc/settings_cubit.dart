@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
-import 'package:cephalopod/core/settings/models/app_settings.dart';
-import 'package:cephalopod/core/settings/models/theme_preference.dart';
-import 'package:cephalopod/core/settings/settings_repository.dart';
+import 'package:cephalopod/features/settings/domain/models/app_settings.dart';
+import 'package:cephalopod/features/settings/domain/models/theme_preference.dart';
+import 'package:cephalopod/features/settings/domain/settings_repository.dart';
 
 /// The player's settings, for the whole app: the settings screen changes
 /// them, the app's theme and the game board follow them.

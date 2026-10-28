@@ -1,4 +1,4 @@
-import 'package:cephalopod/core/settings/models/theme_preference.dart';
+import 'package:cephalopod/features/settings/domain/models/theme_preference.dart';
 
 /// The player's choices that apply across the app: the `theme`, and whether
 /// the game board marks the last move (`highlightLastMove`).

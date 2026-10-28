@@ -27,7 +27,7 @@ by feature first and by layer second.
 | Presentation | `features/<f>/presentation` | Views (widgets), blocs as view models | Own `domain`, `core`, engine, Flutter |
 | Domain | `features/<f>/domain` | Use cases, repository interfaces | `core`, engine. **No Flutter** |
 | Data | `features/<f>/data` | Repository implementations, DTOs, services | Own `domain`, `core`, engine |
-| Core | `core` | Code shared by features: route names, theme, settings, shared widgets | `core`, engine, Flutter |
+| Core | `core` | Code shared by features: route names, theme, shared widgets | `core`, engine, Flutter |
 | App | `app` | `App` widget, router, theme, composition root | Anything |
 
 `app/bootstrap.dart` is the composition root: the only code that creates
