@@ -27,14 +27,26 @@ by feature first and by layer second.
 | Presentation | `features/<f>/presentation` | Views (widgets), blocs as view models | Own `domain`, `core`, engine, Flutter |
 | Domain | `features/<f>/domain` | Use cases, repository interfaces | `core`, engine. **No Flutter** |
 | Data | `features/<f>/data` | Repository implementations, DTOs, services | Own `domain`, `core`, engine |
-| Core | `core` | Code shared by features: route names, theme, shared widgets | `core`, engine, Flutter |
+| Module | `features/<f>/<f>_module.dart` | The feature's wiring and its routes | Own feature, `core`, engine, Flutter |
+| Core | `core` | Code shared by features: route names, the `FeatureModule` interface, theme, shared widgets | `core`, engine, Flutter |
 | App | `app` | `App` widget, router, theme, composition root | Anything |
 
-`app/bootstrap.dart` is the composition root: the only code that creates
-concrete classes and wires them together. Everything else receives its
-dependencies through constructors. The engine follows the same rule on its
-own scale: its services take their collaborators as required constructor
-parameters, and the `CephalopodRules` factory wires them
+Dependencies are wired by hand, in two levels
+([ADR 0013](adr/0013-hand-written-feature-modules.md)):
+
+- `app/bootstrap.dart` is the composition root. It picks the concrete
+  implementations, such as device storage, and connects features to each
+  other, such as Home asking the game feature whether there is a game to
+  continue, or the game asking the settings whether to mark the last move.
+- Each feature's module builds the rest of that feature from what the
+  composition root hands it, and exposes the feature's routes. The router
+  nests every module's routes under Home, so it never imports a page.
+
+Everything else receives its dependencies through constructors. Adding a
+feature means writing its module and adding it to the list in
+`bootstrap.dart`. The engine follows the same rule on its own scale: its
+services take their collaborators as required constructor parameters, and
+the `CephalopodRules` factory wires them
 ([ADR 0010](adr/0010-constructor-injection-in-the-engine.md)).
 
 ## The dependency rule and how it is enforced
@@ -61,7 +73,7 @@ being imported across features; screens navigate by route name
 | Open/closed | New opponents implement `GameAgent`; new storage implements `GameRepository`. Neither touches the bloc |
 | Liskov substitution | Every `GameRepository` and `GameAgent` runs one shared contract test suite |
 | Interface segregation | Agents depend on a narrow move-generator interface; games and settings have separate repositories |
-| Dependency inversion | Domain owns the interfaces, data implements them, the composition root wires them |
+| Dependency inversion | Domain owns the interfaces, data implements them, the composition root picks the implementation and the feature's module wires it |
 
 Classes named above arrive in M1–M4; the table records how they will fit.
 

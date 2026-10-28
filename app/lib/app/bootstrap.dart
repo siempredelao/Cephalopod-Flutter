@@ -3,62 +3,44 @@ import 'dart:async';
 import 'package:cephalopod/app/app.dart';
 import 'package:cephalopod/app/flavor.dart';
 import 'package:cephalopod/app/router.dart';
+import 'package:cephalopod/features/about/about_module.dart';
 import 'package:cephalopod/features/game/data/game_record_json_codec.dart';
 import 'package:cephalopod/features/game/data/shared_preferences_game_repository.dart';
-import 'package:cephalopod/features/game/domain/use_cases/has_game_to_continue.dart';
-import 'package:cephalopod/features/game/domain/use_cases/play_move.dart';
-import 'package:cephalopod/features/game/domain/use_cases/resume_game.dart';
-import 'package:cephalopod/features/game/domain/use_cases/start_new_game.dart';
-import 'package:cephalopod/features/game/domain/use_cases/undo_move.dart';
-import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
-import 'package:cephalopod/features/home/presentation/bloc/home_cubit.dart';
+import 'package:cephalopod/features/game/game_module.dart';
+import 'package:cephalopod/features/home/home_module.dart';
 import 'package:cephalopod/features/settings/data/shared_preferences_settings_repository.dart';
-import 'package:cephalopod/features/settings/presentation/bloc/settings_cubit.dart';
+import 'package:cephalopod/features/settings/settings_module.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Composition root: the only code that creates concrete dependencies and
-/// wires them together. Everything else receives them through constructors.
+/// Composition root: the only code that picks concrete implementations,
+/// such as device storage, and connects features to each other. Each
+/// feature's module wires the rest of that feature, and everything else
+/// receives its dependencies through constructors.
 void bootstrap(Flavor flavor) {
   // Storage plugins are used before runApp, so the bindings come first.
   WidgetsFlutterBinding.ensureInitialized();
   final preferences = SharedPreferencesAsync();
-  final rules = CephalopodRules();
-  final games = SharedPreferencesGameRepository(
-    preferences: preferences,
-    codec: GameRecordJsonCodec(),
-  );
-  final startNewGame = StartNewGame(rules: rules, repository: games);
-  final playMove = PlayMove(rules: rules, repository: games);
-  final undoMove = UndoMove(rules: rules, repository: games);
-  final resumeGame = ResumeGame(rules: rules, repository: games);
-  final hasGameToContinue = HasGameToContinue(resumeGame: resumeGame);
 
-  HomeCubit createHomeCubit() {
-    return HomeCubit(hasGameToContinue: hasGameToContinue.call);
-  }
-
-  GameBloc createGameBloc() {
-    return GameBloc(
-      rules: rules,
-      startNewGame: startNewGame,
-      playMove: playMove,
-      undoMove: undoMove,
-      resumeGame: resumeGame,
-    );
-  }
-
-  final router = createRouter(
-    createHomeCubit: createHomeCubit,
-    createGameBloc: createGameBloc,
+  final settings = SettingsModule(
+    repository: SharedPreferencesSettingsRepository(preferences: preferences),
   );
-  final settingsRepository = SharedPreferencesSettingsRepository(
-    preferences: preferences,
-  );
-  final settings = SettingsCubit(repository: settingsRepository);
   // Shows the defaults for the moment the saved settings take to load.
-  unawaited(settings.load());
+  unawaited(settings.cubit.load());
 
-  runApp(App(flavor: flavor, router: router, settings: settings));
+  final game = GameModule(
+    rules: CephalopodRules(),
+    repository: SharedPreferencesGameRepository(
+      preferences: preferences,
+      codec: GameRecordJsonCodec(),
+    ),
+    highlightLastMove: settings.highlightLastMove,
+  );
+  final router = createRouter(
+    home: HomeModule(hasGameToContinue: game.hasGameToContinue),
+    features: [game, settings, const AboutModule()],
+  );
+
+  runApp(App(flavor: flavor, router: router, settings: settings.cubit));
 }
