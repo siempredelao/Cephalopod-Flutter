@@ -1,5 +1,5 @@
 /// Names of the app's routes. Screens navigate by name, never by path, so a
-/// path can change in one place: `app/router.dart`.
+/// path can change in one place: the module of the feature that owns it.
 enum AppRoute {
   /// The start screen.
   home,
