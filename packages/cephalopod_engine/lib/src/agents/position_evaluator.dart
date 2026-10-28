@@ -45,10 +45,16 @@ final class PositionEvaluator {
     return total;
   }
 
-  /// Whether no capture can ever remove [die] (rule R4). A capture takes at
-  /// least [GameConfig.minCaptureDice] dice, each showing at least 1, and
-  /// their sum must not pass [GameConfig.maxCaptureSum]. So a die is safe
-  /// once its pips plus 1 for each other die exceed that sum.
-  bool _isPermanent(Die die, GameConfig config) =>
-      die.pips + config.minCaptureDice - 1 > config.maxCaptureSum;
+  /// Whether no capture can ever remove [die] (rule R4).
+  ///
+  /// A capture takes at least [GameConfig.minCaptureDice] dice whose pips add
+  /// up to at most [GameConfig.maxCaptureSum]. The smallest capture that could
+  /// include [die] pairs it with dice showing 1, so its total is the die's
+  /// pips plus 1 for each of the other dice. When even that total passes the
+  /// limit, no capture can include the die. In the standard game only a 6 is
+  /// safe: 6 + 1 = 7.
+  bool _isPermanent(Die die, GameConfig config) {
+    final smallestCaptureTotal = die.pips + (config.minCaptureDice - 1);
+    return smallestCaptureTotal > config.maxCaptureSum;
+  }
 }
