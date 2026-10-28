@@ -1,4 +1,4 @@
-import 'package:cephalopod_engine/src/model/position.dart';
+import 'package:cephalopod_engine/src/models/position.dart';
 
 /// Why a move was refused. Each case points to the rule it breaks.
 sealed class IllegalMove {}

@@ -1,6 +1,6 @@
-import 'package:cephalopod_engine/src/model/game_state.dart';
-import 'package:cephalopod_engine/src/model/move.dart';
-import 'package:cephalopod_engine/src/model/position.dart';
+import 'package:cephalopod_engine/src/models/game_state.dart';
+import 'package:cephalopod_engine/src/models/move.dart';
+import 'package:cephalopod_engine/src/models/position.dart';
 import 'package:cephalopod_engine/src/rules/board_geometry.dart';
 import 'package:cephalopod_engine/src/rules/capture_finder.dart';
 import 'package:cephalopod_engine/src/rules/illegal_move.dart';

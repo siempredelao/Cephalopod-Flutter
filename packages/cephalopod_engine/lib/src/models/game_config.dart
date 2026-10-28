@@ -1,4 +1,4 @@
-import 'package:cephalopod_engine/src/model/player.dart';
+import 'package:cephalopod_engine/src/models/player.dart';
 import 'package:meta/meta.dart';
 
 /// The numbers that define a game, in one place. [standard] is the game as

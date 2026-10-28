@@ -1,4 +1,4 @@
-import 'package:cephalopod/features/game/presentation/view/how_to_play/tutorial_step.dart';
+import 'package:cephalopod/features/game/presentation/view/how_to_play/models/tutorial_step.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/tutorial_steps.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
 import 'package:material_ui/material_ui.dart';

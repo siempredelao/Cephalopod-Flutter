@@ -1,4 +1,4 @@
-import 'package:cephalopod_engine/src/model/position.dart';
+import 'package:cephalopod_engine/src/models/position.dart';
 
 /// The shape of the board: which squares exist and which touch (rule R3).
 final class BoardGeometry {

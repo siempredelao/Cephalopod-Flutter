@@ -1,6 +1,6 @@
-import 'package:cephalopod_engine/src/model/board.dart';
-import 'package:cephalopod_engine/src/model/game_config.dart';
-import 'package:cephalopod_engine/src/model/position.dart';
+import 'package:cephalopod_engine/src/models/board.dart';
+import 'package:cephalopod_engine/src/models/game_config.dart';
+import 'package:cephalopod_engine/src/models/position.dart';
 import 'package:cephalopod_engine/src/rules/board_geometry.dart';
 
 /// Finds the captures available to a die placed on a square (rule R4).
