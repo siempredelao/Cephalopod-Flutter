@@ -1,3 +1,4 @@
+import 'package:cephalopod_engine/src/agents/move_generator.dart';
 import 'package:cephalopod_engine/src/models/board.dart';
 import 'package:cephalopod_engine/src/models/die.dart';
 import 'package:cephalopod_engine/src/models/game_config.dart';
@@ -20,7 +21,9 @@ import 'package:cephalopod_engine/src/rules/replay_failure.dart';
 ///
 /// Pure: the same state and move always give the same result, and nothing
 /// outside the returned value changes.
-final class CephalopodRules {
+///
+/// Agents see the rules only as a [MoveGenerator]: [legalMoves] and [apply].
+final class CephalopodRules implements MoveGenerator {
   /// The rules, built from their parts. This is the engine's composition
   /// root: the only place that creates its services and wires them together.
   ///
@@ -126,6 +129,7 @@ final class CephalopodRules {
   /// Empty once the game is over. Otherwise never empty, because every
   /// vacant square accepts a die (rule R2): a non-capturing die where no
   /// capture is possible, otherwise one move per capture option (rule R5).
+  @override
   List<Move> legalMoves(GameState state) {
     if (state.status is! InProgress) return const [];
     final board = state.board;
@@ -138,6 +142,7 @@ final class CephalopodRules {
   /// Plays [move] in [state]: the next state, or the reason the move is
   /// illegal. A finished game refuses every move (rule R8); otherwise the
   /// [MoveValidator] reports the first rule the move breaks.
+  @override
   Result<GameState, IllegalMove> apply(GameState state, Move move) {
     final status = state.status;
     if (status is! InProgress) return Err(GameOver());

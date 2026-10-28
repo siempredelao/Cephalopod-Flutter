@@ -10,9 +10,15 @@
 /// `CephalopodRules.legalMoves` what can be played, and play a `Move` with
 /// `CephalopodRules.apply`.
 ///
+/// Computer opponents implement `GameAgent`: `chooseMove` picks the move to
+/// play in a position.
+///
 /// Rule sheet: https://www.marksteeregames.com/Cephalopod_rules.pdf
 library;
 
+export 'src/agents/game_agent.dart';
+export 'src/agents/move_generator.dart';
+export 'src/agents/random_agent.dart';
 export 'src/models/board.dart';
 export 'src/models/die.dart';
 export 'src/models/game_config.dart';
