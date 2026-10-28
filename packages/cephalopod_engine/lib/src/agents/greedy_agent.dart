@@ -35,14 +35,12 @@ final class GreedyAgent implements GameAgent {
       throw ArgumentError.value(state, 'state', 'The game is over');
     }
     int? bestScore;
-    final best = <Move>[];
+    var best = <Move>[];
     for (final move in _moves.legalMoves(state)) {
       final score = _evaluator.score(_play(state, move), status.toMove);
       if (bestScore == null || score > bestScore) {
         bestScore = score;
-        best
-          ..clear()
-          ..add(move);
+        best = [move];
       } else if (score == bestScore) {
         best.add(move);
       }
