@@ -31,7 +31,7 @@ void main() {
         greedy(rules, Random(0)).chooseMove(state),
         Move(
           const Position(0, 1),
-          captures: const {Position(0, 0), Position(0, 2)},
+          captures: {const Position(0, 0), const Position(0, 2)},
         ),
       );
     });
@@ -48,7 +48,7 @@ void main() {
         greedy(rules, Random(0)).chooseMove(state),
         Move(
           const Position(0, 1),
-          captures: const {Position(0, 0), Position(0, 2)},
+          captures: {const Position(0, 0), const Position(0, 2)},
         ),
       );
     });
