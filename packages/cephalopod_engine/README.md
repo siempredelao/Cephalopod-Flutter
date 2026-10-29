@@ -79,6 +79,7 @@ final move = easy.chooseMove(rules.newGame());
 | --- | --- | --- |
 | `RandomAgent` | Easy | Any legal move, uniformly at random |
 | `GreedyAgent` | Medium | The move whose result `PositionEvaluator` scores best, ties at random |
+| `SearchAgent` | Hard | Alpha-beta search, one move deeper at a time, until it has generated `nodeBudget` positions |
 
 `PositionEvaluator` scores a position for one player by counting dice: 1 for
 each die that could still be captured and 5 for each that never can be (a 6 in
@@ -88,6 +89,16 @@ that can never be captured is always worth it. In tuning, counting dice alone
 beat Easy in 65% of simulated games; valuing those dice at 5 raised it to
 99% or more. Any value of 5 and above chooses the same moves. Giving 5s a
 bonus too (a 5 can only be captured together with a 1) made the agent weaker.
+
+`SearchAgent` assumes the opponent always replies with its best move. It
+searches depth 1, then 2, then 3 and so on, trying moves best first by their
+immediate score so alpha-beta pruning skips more of the tree, and plays the best
+move of the deepest search it finished within the budget. The first depth is
+always finished, so even a budget of 0 plays like `GreedyAgent`. A win scores
+less the later it comes, so of two wins it takes the quicker one. In 20
+simulated games each, a budget of 300 positions beat `GreedyAgent` every
+time, and a budget of 10,000 beat one of 1,000 in 15. The app uses
+`SearchAgent.defaultNodeBudget`, 20,000.
 
 Every agent runs one shared contract suite,
 `test/src/agents/game_agent_contract.dart`, and
