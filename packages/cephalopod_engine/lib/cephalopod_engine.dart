@@ -21,6 +21,7 @@ export 'src/agents/greedy_agent.dart';
 export 'src/agents/move_generator.dart';
 export 'src/agents/position_evaluator.dart';
 export 'src/agents/random_agent.dart';
+export 'src/agents/search_agent.dart';
 export 'src/models/board.dart';
 export 'src/models/die.dart';
 export 'src/models/game_config.dart';
