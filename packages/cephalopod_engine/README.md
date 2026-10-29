@@ -78,9 +78,21 @@ final move = easy.chooseMove(rules.newGame());
 | Agent | Level | Plays |
 | --- | --- | --- |
 | `RandomAgent` | Easy | Any legal move, uniformly at random |
+| `GreedyAgent` | Medium | The move whose result `PositionEvaluator` scores best, ties at random |
+
+`PositionEvaluator` scores a position for one player by counting dice: 1 for
+each die that could still be captured and 5 for each that never can be (a 6 in
+the standard game), plus for the player's dice and minus for the opponent's.
+A won game scores 1,000. A capture removes at most 4 dice, so making a die
+that can never be captured is always worth it. In tuning, counting dice alone
+beat Easy in 65% of simulated games; valuing those dice at 5 raised it to
+99% or more. Any value of 5 and above chooses the same moves. Giving 5s a
+bonus too (a 5 can only be captured together with a 1) made the agent weaker.
 
 Every agent runs one shared contract suite,
-`test/src/agents/game_agent_contract.dart`.
+`test/src/agents/game_agent_contract.dart`, and
+`test/src/agents/agent_strength_test.dart` checks in seeded matches that each
+level beats the one below it.
 
 ## Rules covered
 
