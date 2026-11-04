@@ -1,8 +1,8 @@
 import 'dart:math';
 
+import 'package:cephalopod_engine/src/agents/apply_legal_move.dart';
 import 'package:cephalopod_engine/src/agents/game_agent.dart';
 import 'package:cephalopod_engine/src/agents/move_generator.dart';
-import 'package:cephalopod_engine/src/agents/play_listed_move.dart';
 import 'package:cephalopod_engine/src/agents/position_evaluator.dart';
 import 'package:cephalopod_engine/src/models/game_state.dart';
 import 'package:cephalopod_engine/src/models/game_status.dart';
@@ -10,25 +10,41 @@ import 'package:cephalopod_engine/src/models/move.dart';
 import 'package:cephalopod_engine/src/models/player.dart';
 import 'package:collection/collection.dart';
 
-/// The Hard opponent: looks several moves ahead, assuming the opponent always
-/// replies with its best move, and plays the move that leads to the best
-/// position it can force, as the [PositionEvaluator] scores it.
+/// The Hard opponent: it thinks ahead the way a careful player does. "If I
+/// play here, their best reply is there, and then my best answer is...".
 ///
-/// It searches one move deeper at a time (iterative deepening) with
-/// alpha-beta pruning, and stops once it has generated `nodeBudget`
-/// positions. It then plays the best move of the deepest search it finished.
-/// Counting positions instead of time makes its move depend only on the
-/// position and the seed, so a slower device thinks longer rather than
-/// playing worse (docs/adr/0014).
+/// It assumes the opponent always picks the reply that hurts it most, and
+/// plays the move that still ends up best. The [PositionEvaluator] scores the
+/// positions it reaches.
 ///
-/// Moves are searched best first by their immediate score, which lets
-/// alpha-beta skip more of the tree. Equally good moves keep a random order,
-/// shuffled with `random`. Of two wins it takes the quicker one.
+/// Every extra move ahead multiplies the positions to check by up to 25, the
+/// number of squares, so three ideas keep the work small:
+///
+/// - **One move deeper at a time.** It cannot know in advance how far ahead
+///   it can afford to look. So it makes a pass looking 1 move ahead, then a
+///   new pass looking 2 ahead, then 3, until it has generated `nodeBudget`
+///   positions. It plays the best move of the last pass it finished, because
+///   a pass cut short has not compared every move. Textbooks call this
+///   iterative deepening.
+/// - **Skipping moves that cannot win.** Say one move is known to score 3.
+///   While checking a second move it finds a reply that leaves it only 1. The
+///   opponent would play that reply, so the second move cannot beat the first,
+///   however good its other replies are, and it stops looking at it. Textbooks
+///   call this alpha-beta pruning.
+/// - **Good moves first.** The sooner it finds a good move, the more it can
+///   skip, so it tries moves in order of how good they look so far. Equally
+///   good moves keep a random order, shuffled with `random`.
+///
+/// It counts positions instead of seconds, so its move depends only on the
+/// position and the seed: a slower device thinks longer rather than playing
+/// worse (docs/adr/0014). Of two wins it takes the quicker one.
 final class SearchAgent implements GameAgent {
   /// An agent that asks `moves` for the legal moves and what they lead to,
-  /// scores positions with `evaluator`, breaks ties with `random`, and
-  /// generates at most `nodeBudget` positions per move after the first
-  /// depth.
+  /// scores positions with `evaluator`, and breaks ties with `random`.
+  ///
+  /// `nodeBudget` is how many positions it may generate for each move it
+  /// chooses. Its first pass ignores the budget, so it always looks at least
+  /// one move ahead.
   ///
   /// Throws a [RangeError] when `nodeBudget` is negative.
   SearchAgent({
@@ -65,12 +81,13 @@ final class SearchAgent implements GameAgent {
   }
 }
 
-/// A position one move away: the `move`, the `state` it leads to and its
-/// `score` for the player who made the move.
-typedef _Child = ({Move move, GameState state, int score});
+/// A move being considered: the `move`, the `state` it leads to, and its
+/// `score` for the player who makes it.
+typedef _Candidate = ({Move move, GameState state, int score});
 
-/// One search, for one move. It counts the positions it generates; once the
-/// budget is spent, every step returns `null` and the search unwinds.
+/// The work of choosing one move. It counts the positions it generates. Once
+/// the budget is spent, every step returns `null`, which makes the step that
+/// called it give up too, all the way back to [bestMove].
 final class _Search {
   _Search({
     required this._moves,
@@ -82,123 +99,157 @@ final class _Search {
   final PositionEvaluator _evaluator;
   final int _budget;
 
-  /// Larger than any score, so it bounds every search window.
+  /// Higher than any real score, as its negative is lower than any. The search
+  /// starts from these to mean "no limit yet", because any real score beats
+  /// them.
   static const int _infinity = PositionEvaluator.winScore + 1;
 
   /// The positions generated so far.
   int _generated = 0;
 
-  /// Whether the budget applies yet. The first depth is always finished, so
-  /// even a budget of 0 plays as well as looking one move ahead.
-  bool _limited = false;
+  /// Whether the budget applies yet. The first pass always finishes, so even a
+  /// budget of 0 plays as well as looking one move ahead.
+  bool _budgetApplies = false;
 
-  /// How many moves deep the current iteration searches.
+  /// How many moves ahead the current pass looks.
   int _depth = 1;
 
-  /// Whether the current iteration stopped some line before the game ended.
-  /// When none did, it saw every ending, and searching deeper changes
-  /// nothing.
-  bool _cutOff = false;
+  /// Whether the current pass stopped looking at some line of play before that
+  /// game ended. When none stopped, it saw every possible ending, so looking
+  /// further would change nothing.
+  bool _stoppedEarly = false;
 
   /// The best move for [player] in [state].
   Move bestMove(GameState state, Player player, Random random) {
     final legal = [..._moves.legalMoves(state)]..shuffle(random);
+    // Looking 1 move ahead is just playing each move and scoring the result.
     // The budget does not apply yet, so this cannot run out.
-    var ranked = _expand(state, player, legal)!;
-    _limited = true;
+    var ranked = _playAll(state, player, legal)!;
+    _budgetApplies = true;
+    // The line above was the pass that looks 1 move ahead, so the next looks 2.
     for (_depth = 2; ; _depth++) {
-      _cutOff = false;
-      final deeper = _searchRoot(ranked, player);
+      _stoppedEarly = false;
+      final deeper = _rescore(ranked, player);
       if (deeper == null) break;
       ranked = deeper;
-      if (!_cutOff) break;
+      if (!_stoppedEarly) break;
     }
     return ranked.first.move;
   }
 
-  /// [ranked], the moves of [player] at the root, scored [_depth] moves
-  /// deep and sorted best first; `null` when the budget runs out first.
-  List<_Child>? _searchRoot(List<_Child> ranked, Player player) {
+  /// One pass: the moves in [ranked] scored again for [player], this time
+  /// looking [_depth] moves ahead, best first. `null` when the budget runs out
+  /// first.
+  List<_Candidate>? _rescore(List<_Candidate> ranked, Player player) {
     final opponent = _opponentOf(player);
-    var alpha = -_infinity;
-    final searched = <_Child>[];
-    for (final child in ranked) {
-      final reply = _negamax(
-        child.state,
+    var bestSoFar = -_infinity;
+    final rescored = <_Candidate>[];
+    for (final candidate in ranked) {
+      final reply = _lookAhead(
+        candidate.state,
         opponent,
         _depth - 1,
         -_infinity,
-        -alpha,
+        -bestSoFar,
       );
       if (reply == null) return null;
       final score = -reply;
-      searched.add((move: child.move, state: child.state, score: score));
-      alpha = max(alpha, score);
+      rescored.add((
+        move: candidate.move,
+        state: candidate.state,
+        score: score,
+      ));
+      bestSoFar = max(bestSoFar, score);
     }
-    mergeSort(searched, compare: _bestFirst);
-    return searched;
+    mergeSort(rescored, compare: _bestFirst);
+    return rescored;
   }
 
   /// The score of [state] for [player], who moves next in it, looking
-  /// [depth] more moves ahead. Only scores between [alpha] and [beta] are
-  /// exact; outside them the opponent would avoid this line anyway, so the
-  /// search stops early and returns a bound. `null` once the budget runs
-  /// out.
-  int? _negamax(
+  /// [movesLeft] more moves ahead. `null` once the budget runs out.
+  ///
+  /// It tries each move and calls itself to find the opponent's best answer.
+  /// One player's gain is the other's loss, so the opponent's score, negated,
+  /// is [player]'s. That lets one method play both sides. Textbooks call this
+  /// negamax.
+  ///
+  /// Two limits let it skip moves that cannot matter:
+  ///
+  /// - [floor] is what [player] can already get by choosing differently
+  ///   earlier, so anything lower will not be chosen.
+  /// - [ceiling] is the most the opponent will allow. They too can choose
+  ///   differently earlier, so once [player] reaches it the opponent avoids
+  ///   this position, and the remaining moves here need no look.
+  ///
+  /// Only a score between the two is exact. Outside them the result just shows
+  /// which side it fell on, which is all the caller needs.
+  int? _lookAhead(
     GameState state,
     Player player,
-    int depth,
-    int alpha,
-    int beta,
+    int movesLeft,
+    int floor,
+    int ceiling,
   ) {
     if (state.status is Finished) {
-      return _finalScore(state, player, _depth - depth);
+      return _finalScore(state, player, _depth - movesLeft);
     }
-    if (depth == 0) {
-      _cutOff = true;
+    if (movesLeft == 0) {
+      _stoppedEarly = true;
       return _evaluator.score(state, player);
     }
-    final children = _expand(state, player, _moves.legalMoves(state));
-    if (children == null) return null;
+    final candidates = _playAll(state, player, _moves.legalMoves(state));
+    if (candidates == null) return null;
     final opponent = _opponentOf(player);
     var best = -_infinity;
-    var low = alpha;
-    for (final child in children) {
-      final reply = _negamax(child.state, opponent, depth - 1, -beta, -low);
+    var secured = floor;
+    for (final candidate in candidates) {
+      // Seen from the opponent's side, scores are negated, so the limits swap.
+      final reply = _lookAhead(
+        candidate.state,
+        opponent,
+        movesLeft - 1,
+        -ceiling,
+        -secured,
+      );
       if (reply == null) return null;
       best = max(best, -reply);
-      low = max(low, best);
-      if (low >= beta) break;
+      secured = max(secured, best);
+      if (secured >= ceiling) break;
     }
     return best;
   }
 
-  /// The positions [legal] lead to from [state], best first for [player],
-  /// who plays them; `null` once the budget runs out.
-  List<_Child>? _expand(GameState state, Player player, List<Move> legal) {
-    final children = <_Child>[];
+  /// Plays each of the [legal] moves of [player] from [state] and scores the
+  /// result, best first. `null` once the budget runs out.
+  List<_Candidate>? _playAll(
+    GameState state,
+    Player player,
+    List<Move> legal,
+  ) {
+    final candidates = <_Candidate>[];
     for (final move in legal) {
-      if (_limited && _generated >= _budget) return null;
+      if (_budgetApplies && _generated >= _budget) return null;
       _generated++;
-      final next = _moves.playListed(state, move);
+      final next = _moves.applyLegal(state, move);
       final score = _evaluator.score(next, player);
-      children.add((move: move, state: next, score: score));
+      candidates.add((move: move, state: next, score: score));
     }
-    mergeSort(children, compare: _bestFirst);
-    return children;
+    mergeSort(candidates, compare: _bestFirst);
+    return candidates;
   }
 
-  /// The score of the finished game [state] for [player], reached [ply]
-  /// moves after the root. A win counts for less the later it comes, and a
-  /// loss for less the longer it is put off.
-  int _finalScore(GameState state, Player player, int ply) {
+  /// The score of the finished game [state] for [player], reached
+  /// [movesPlayed] moves from now. A win counts for less the later it comes,
+  /// and a loss for less the longer it is put off.
+  int _finalScore(GameState state, Player player, int movesPlayed) {
     final score = _evaluator.score(state, player);
-    return score > 0 ? score - ply : score + ply;
+    return score > 0 ? score - movesPlayed : score + movesPlayed;
   }
 
-  /// Orders children by score, highest first. `mergeSort` is stable, so
-  /// equal scores keep their shuffled order.
-  static int _bestFirst(_Child a, _Child b) => b.score.compareTo(a.score);
+  /// Orders candidates by score, highest first. `mergeSort` keeps the order of
+  /// equal items, so equal scores stay in their shuffled order.
+  static int _bestFirst(_Candidate a, _Candidate b) =>
+      b.score.compareTo(a.score);
 
   static Player _opponentOf(Player player) => switch (player) {
     Player.black => Player.white,

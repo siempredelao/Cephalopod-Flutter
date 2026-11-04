@@ -1,8 +1,8 @@
 import 'dart:math';
 
+import 'package:cephalopod_engine/src/agents/apply_legal_move.dart';
 import 'package:cephalopod_engine/src/agents/game_agent.dart';
 import 'package:cephalopod_engine/src/agents/move_generator.dart';
-import 'package:cephalopod_engine/src/agents/play_listed_move.dart';
 import 'package:cephalopod_engine/src/agents/position_evaluator.dart';
 import 'package:cephalopod_engine/src/models/game_state.dart';
 import 'package:cephalopod_engine/src/models/game_status.dart';
@@ -37,7 +37,7 @@ final class GreedyAgent implements GameAgent {
     int? bestScore;
     var best = <Move>[];
     for (final move in _moves.legalMoves(state)) {
-      final next = _moves.playListed(state, move);
+      final next = _moves.applyLegal(state, move);
       final score = _evaluator.score(next, status.toMove);
       if (bestScore == null || score > bestScore) {
         bestScore = score;
