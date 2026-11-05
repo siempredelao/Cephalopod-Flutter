@@ -21,6 +21,17 @@ void main() {
     return GreedyAgent(moves: rules, evaluator: evaluator, random: random);
   }
 
+  // A small budget keeps the test fast; the app's Hard level searches with
+  // SearchAgent.defaultNodeBudget, 20 times more.
+  GameAgent hard(Random random) {
+    return SearchAgent(
+      moves: rules,
+      evaluator: evaluator,
+      random: random,
+      nodeBudget: 1000,
+    );
+  }
+
   /// Plays a game between [black] and [white] and returns the winner.
   Player play(GameAgent black, GameAgent white) {
     var state = rules.newGame();
@@ -52,5 +63,9 @@ void main() {
 
   test('Medium beats Easy in at least 16 of 20 games', () {
     expect(winsOf(medium, easy, games: 20), greaterThanOrEqualTo(16));
+  });
+
+  test('Hard beats Medium in at least 8 of 10 games', () {
+    expect(winsOf(hard, medium, games: 10), greaterThanOrEqualTo(8));
   });
 }
