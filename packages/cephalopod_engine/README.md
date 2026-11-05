@@ -92,6 +92,8 @@ bonus too (a 5 can only be captured together with a 1) made the agent weaker.
 
 `SearchAgent` thinks ahead like a careful player: it assumes the opponent always
 picks the reply that hurts it most, and plays the move that still ends up best.
+Its *node budget*, `nodeBudget`, is how many positions it may generate to choose
+one move ([ADR 0014](../../docs/adr/0014-game-agents-in-the-engine.md)).
 It looks 1 move ahead, then 2, then 3 and so on, and plays the best move of the
 last pass it finished within the budget. It stops checking a move as soon as it
 finds a reply that makes that move worse than one it already has, and it tries

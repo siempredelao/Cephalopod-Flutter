@@ -17,6 +17,13 @@ import 'package:collection/collection.dart';
 /// plays the move that still ends up best. The [PositionEvaluator] scores the
 /// positions it reaches.
 ///
+/// **The node budget.** A node is one position the search generates by
+/// playing a move, real or imagined. The node budget, `nodeBudget`, is how
+/// many it may generate to choose one move; the count starts again for the
+/// next one. Counting positions instead of seconds makes its move depend only
+/// on the position and the seed, so a slower device thinks longer rather
+/// than playing worse (docs/adr/0014).
+///
 /// Every extra move ahead multiplies the positions to check by the number of
 /// legal moves: one per empty square, plus one more for each extra way a die
 /// there can capture. That is 25 on an empty board. In simulated random games
@@ -38,16 +45,15 @@ import 'package:collection/collection.dart';
 ///   skip, so it tries moves in order of how good they look so far. Equally
 ///   good moves keep a random order, shuffled with `random`.
 ///
-/// It counts positions instead of seconds, so its move depends only on the
-/// position and the seed: a slower device thinks longer rather than playing
-/// worse (docs/adr/0014). Of two wins it takes the quicker one.
+/// The first pass, looking 1 move ahead, always finishes whatever the
+/// budget, so even a budget of 0 plays like the Medium agent. Of two wins it
+/// takes the quicker one.
 final class SearchAgent implements GameAgent {
   /// An agent that asks `moves` for the legal moves and what they lead to,
   /// scores positions with `evaluator`, and breaks ties with `random`.
   ///
-  /// `nodeBudget` is how many positions it may generate for each move it
-  /// chooses. Its first pass ignores the budget, so it always looks at least
-  /// one move ahead.
+  /// `nodeBudget` is the node budget (see [SearchAgent]): how many positions it
+  /// may generate to choose each move.
   ///
   /// Throws a [RangeError] when `nodeBudget` is negative.
   SearchAgent({
@@ -59,9 +65,9 @@ final class SearchAgent implements GameAgent {
     RangeError.checkNotNegative(_nodeBudget, 'nodeBudget');
   }
 
-  /// The positions the app's Hard level may generate per move: deep enough
-  /// to see a few moves ahead on a 5 × 5 board, small enough to answer in a
-  /// fraction of a second.
+  /// The node budget of the app's Hard level: deep enough to see a few moves
+  /// ahead on a 5 × 5 board, small enough to answer in a fraction of a
+  /// second.
   static const int defaultNodeBudget = 20000;
 
   final MoveGenerator _moves;
@@ -100,6 +106,8 @@ final class _Search {
 
   final MoveGenerator _moves;
   final PositionEvaluator _evaluator;
+
+  /// The node budget (see [SearchAgent]).
   final int _budget;
 
   /// Higher than any real score, as its negative is lower than any. The search

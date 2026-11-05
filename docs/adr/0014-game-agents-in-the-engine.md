@@ -23,9 +23,12 @@ interface, `GameAgent`, with a single method: `Move chooseMove(GameState)`.
 - **Injected randomness.** Agents that choose at random take a
   `dart:math` `Random`. Tests pass a seeded one; the app passes an unseeded
   one so games vary.
-- **Bounded by work, not time.** A searching agent stops after a fixed number
-  of positions, not after a number of milliseconds. Its move then depends only
-  on the position and the seed.
+- **Bounded by work, not time.** A searching agent has a *node budget*: how
+  many positions (nodes) it may generate, by playing a move real or imagined,
+  to choose one move. It stops when the budget is spent, not after a number
+  of milliseconds, so its move depends only on the position and the seed. Its
+  first pass, looking one move ahead, always finishes, so even a budget of 0
+  plays as well as the Medium level.
 - **Synchronous.** `chooseMove` returns a `Move`, not a `Future`. The app
   runs it off the UI isolate, so the engine stays free of async code.
 - **One contract.** Every agent runs the same test suite: only legal moves,
