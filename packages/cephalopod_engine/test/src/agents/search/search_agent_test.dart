@@ -4,7 +4,7 @@ import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:cephalopod_engine/testing.dart';
 import 'package:test/test.dart';
 
-import 'game_agent_contract.dart';
+import '../game_agent_contract.dart';
 
 void main() {
   /// A Hard agent with a small budget, so the contract games stay fast.
