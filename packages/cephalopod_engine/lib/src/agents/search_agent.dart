@@ -152,7 +152,7 @@ final class _Search {
   /// looking [_depth] moves ahead, best first. `null` when the budget runs out
   /// first.
   List<_Candidate>? _rescore(List<_Candidate> ranked, Player player) {
-    final opponent = _opponentOf(player);
+    final opponent = _moves.opponentOf(player);
     var bestSoFar = -_infinity;
     final rescored = <_Candidate>[];
     for (final candidate in ranked) {
@@ -210,7 +210,7 @@ final class _Search {
     }
     final candidates = _playAll(state, player, _moves.legalMoves(state));
     if (candidates == null) return null;
-    final opponent = _opponentOf(player);
+    final opponent = _moves.opponentOf(player);
     var best = -_infinity;
     var secured = floor;
     for (final candidate in candidates) {
@@ -261,9 +261,4 @@ final class _Search {
   /// equal items, so equal scores stay in their shuffled order.
   static int _bestFirst(_Candidate a, _Candidate b) =>
       b.score.compareTo(a.score);
-
-  static Player _opponentOf(Player player) => switch (player) {
-    Player.black => Player.white,
-    Player.white => Player.black,
-  };
 }

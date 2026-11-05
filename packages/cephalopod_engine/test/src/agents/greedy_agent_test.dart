@@ -84,4 +84,7 @@ final class _RefusingRules implements MoveGenerator {
   @override
   Result<GameState, IllegalMove> apply(GameState state, Move move) =>
       Err(GameOver());
+
+  @override
+  Player opponentOf(Player player) => _rules.opponentOf(player);
 }

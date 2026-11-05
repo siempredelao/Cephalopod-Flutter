@@ -119,6 +119,7 @@ final class CephalopodRules implements MoveGenerator {
   }
 
   /// The player who moves after [player]: turns alternate (rule R1).
+  @override
   Player opponentOf(Player player) => switch (player) {
     Player.black => Player.white,
     Player.white => Player.black,
