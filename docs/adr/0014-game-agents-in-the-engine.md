@@ -44,6 +44,16 @@ The levels, delivered one per pull request:
 | Medium | `GreedyAgent` | The move with the best position after it, ties at random |
 | Hard | `SearchAgent` | Alpha-beta search a few moves deep, within a node budget |
 
+`SearchAgent` is split by job: `NodeBudget` counts positions, `MoveRanker`
+orders moves and `SearchPass` runs one pass at a fixed depth. When the budget
+runs out, the pass returns early and `SearchAgent` throws it away after one
+check of `NodeBudget.ranOut`, so neither `null` nor an exception travels
+through the recursion. Only `SearchAgent` is exported from the package: the
+other classes are internal, and their tests import their `src/` files. This
+is the first engine code kept out of the public API on purpose. The rules'
+services (`CaptureFinder`, `MoveValidator`, `BoardGeometry`) are still
+exported though the app does not use them, and could be hidden the same way.
+
 ## Consequences
 
 - A new opponent is a new class; the bloc and the use cases do not change

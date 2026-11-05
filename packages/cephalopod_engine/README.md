@@ -104,6 +104,17 @@ comes, so of two wins it takes the quicker one. In 20 simulated games each, a
 budget of 300 positions beat `GreedyAgent` every time, and a budget of 10,000
 beat one of 1,000 in 15. The app uses `SearchAgent.defaultNodeBudget`, 20,000.
 
+The search is split by job under `lib/src/agents/search/`. Only `SearchAgent`
+is exported; the other classes are internal, and their tests import their
+`src/` files.
+
+| Class | Job |
+| --- | --- |
+| `SearchAgent` | Runs the first pass, then passes one move deeper until the budget runs out or every ending is seen |
+| `NodeBudget` | Counts the positions generated, keeps the first pass free and says when it ran out |
+| `MoveRanker` | Plays moves and sorts the results best first, so alpha-beta skips more |
+| `SearchPass` | One pass at a fixed depth: negamax with alpha-beta and the quicker-win bonus |
+
 Every agent runs one shared contract suite,
 `test/src/agents/game_agent_contract.dart`, and
 `test/src/agents/agent_strength_test.dart` checks in seeded matches that each
