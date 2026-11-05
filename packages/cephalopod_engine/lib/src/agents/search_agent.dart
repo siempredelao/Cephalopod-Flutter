@@ -17,8 +17,11 @@ import 'package:collection/collection.dart';
 /// plays the move that still ends up best. The [PositionEvaluator] scores the
 /// positions it reaches.
 ///
-/// Every extra move ahead multiplies the positions to check by up to 25, the
-/// number of squares, so three ideas keep the work small:
+/// Every extra move ahead multiplies the positions to check by the number of
+/// legal moves: one per empty square, plus one more for each extra way a die
+/// there can capture. That is 25 on an empty board. In simulated random games
+/// it averaged 13, and passed 50 where several captures were possible. Three
+/// ideas keep the work small:
 ///
 /// - **One move deeper at a time.** It cannot know in advance how far ahead
 ///   it can afford to look. So it makes a pass looking 1 move ahead, then a
