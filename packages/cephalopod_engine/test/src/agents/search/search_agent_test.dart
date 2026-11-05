@@ -53,6 +53,38 @@ void main() {
       expect(agent.chooseMove(state), Move(target, captures: twoWhite));
     });
 
+    test('generates exactly its budget when it cannot finish a pass', () {
+      // Looking 2 moves ahead on an empty board takes 25 + 25 × 24 positions.
+      final counting = _CountingRules(rules);
+
+      search(counting, Random(0), nodeBudget: 500).chooseMove(rules.newGame());
+
+      expect(counting.generated, 500);
+    });
+
+    test('with no budget, still generates the free first pass', () {
+      final counting = _CountingRules(rules);
+
+      search(counting, Random(0), nodeBudget: 0).chooseMove(rules.newGame());
+
+      expect(counting.generated, 25);
+    });
+
+    test('stops looking deeper once it has seen every ending', () {
+      // No capture is possible, so the game ends after the last two moves:
+      // 2 positions one move ahead, then 1 more after each.
+      final lastTwo = stateFromAscii('''
+        b1 w4 b1
+        w4 .  b4
+        b4 w4 .
+      ''', toMove: Player.black);
+      final counting = _CountingRules(rules);
+
+      search(counting, Random(0), nodeBudget: 1000000).chooseMove(lastTwo);
+
+      expect(counting.generated, 4);
+    });
+
     test('rejects a negative budget', () {
       expect(() => search(rules, Random(0), nodeBudget: -1), throwsRangeError);
     });
@@ -78,6 +110,28 @@ final class _RefusingRules implements MoveGenerator {
   @override
   Result<GameState, IllegalMove> apply(GameState state, Move move) =>
       Err(GameOver());
+
+  @override
+  Player opponentOf(Player player) => _rules.opponentOf(player);
+}
+
+/// The real rules, counting every position an agent generates with them.
+final class _CountingRules implements MoveGenerator {
+  _CountingRules(this._rules);
+
+  final CephalopodRules _rules;
+
+  /// How many moves have been played through [apply].
+  int generated = 0;
+
+  @override
+  List<Move> legalMoves(GameState state) => _rules.legalMoves(state);
+
+  @override
+  Result<GameState, IllegalMove> apply(GameState state, Move move) {
+    generated++;
+    return _rules.apply(state, move);
+  }
 
   @override
   Player opponentOf(Player player) => _rules.opponentOf(player);
