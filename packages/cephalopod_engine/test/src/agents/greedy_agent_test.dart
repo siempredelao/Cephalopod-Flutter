@@ -7,10 +7,10 @@ import 'package:test/test.dart';
 import 'game_agent_contract.dart';
 
 void main() {
-  GreedyAgent greedy(MoveGenerator moves, Random random) {
+  GreedyAgent greedy(MoveGenerator moveGenerator, Random random) {
     return GreedyAgent(
-      moves: moves,
-      evaluator: PositionEvaluator(),
+      moveGenerator: moveGenerator,
+      positionEvaluator: PositionEvaluator(),
       random: random,
     );
   }

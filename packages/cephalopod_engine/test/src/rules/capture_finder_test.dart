@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 void main() {
   final geometry = BoardGeometry();
-  final finder = CaptureFinder(geometry: geometry);
+  final finder = CaptureFinder(boardGeometry: geometry);
   const center = Position(2, 2);
 
   List<Set<Position>> optionsAt(String grid, Position target) =>

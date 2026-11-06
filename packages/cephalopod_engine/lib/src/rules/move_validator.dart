@@ -12,11 +12,11 @@ import 'package:collection/collection.dart';
 /// refused as occupied rather than as a bad capture. Adding a rule means one
 /// more check in the list.
 final class MoveValidator {
-  /// A validator that checks squares with `geometry` and capture options
+  /// A validator that checks squares with `boardGeometry` and capture options
   /// with `captureFinder`.
-  MoveValidator({required this._geometry, required this._captureFinder});
+  MoveValidator({required this._boardGeometry, required this._captureFinder});
 
-  final BoardGeometry _geometry;
+  final BoardGeometry _boardGeometry;
   final CaptureFinder _captureFinder;
 
   late final List<IllegalMove? Function(GameState, Move)> _checks = [
@@ -35,7 +35,7 @@ final class MoveValidator {
       _checks.map((check) => check(state, move)).nonNulls.firstOrNull;
 
   IllegalMove? _isOnTheBoard(GameState state, Move move) {
-    if (_geometry.contains(move.position, state.board.size)) return null;
+    if (_boardGeometry.contains(move.position, state.board.size)) return null;
     return OutsideBoard(move.position);
   }
 

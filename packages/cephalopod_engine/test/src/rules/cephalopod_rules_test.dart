@@ -63,12 +63,12 @@ void main() {
 
   test('plays with the parts it is given', () {
     final geometry = BoardGeometry();
-    final captureFinder = CaptureFinder(geometry: geometry);
+    final captureFinder = CaptureFinder(boardGeometry: geometry);
     final wired = CephalopodRules(
-      geometry: geometry,
+      boardGeometry: geometry,
       captureFinder: captureFinder,
-      validator: MoveValidator(
-        geometry: geometry,
+      moveValidator: MoveValidator(
+        boardGeometry: geometry,
         captureFinder: captureFinder,
       ),
       referee: Referee(),
