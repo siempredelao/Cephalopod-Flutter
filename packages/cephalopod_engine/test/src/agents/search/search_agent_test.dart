@@ -11,13 +11,13 @@ void main() {
   SearchAgent search(
     MoveGenerator moveGenerator,
     Random random, {
-    int nodeBudget = 200,
+    int nodeLimit = 200,
   }) {
     return SearchAgent(
       moveGenerator: moveGenerator,
       positionEvaluator: PositionEvaluator(),
       random: random,
-      nodeBudget: nodeBudget,
+      nodeLimit: nodeLimit,
     );
   }
 
@@ -42,13 +42,13 @@ void main() {
     final twoWhiteOneBlack = {...twoWhite, const Position(3, 3)};
 
     test('looks past the best immediate move to the reply', () {
-      final agent = search(rules, Random(0), nodeBudget: 5000);
+      final agent = search(rules, Random(0), nodeLimit: 5000);
 
       expect(agent.chooseMove(state), Move(target, captures: twoWhiteOneBlack));
     });
 
     test('with no budget, still looks one move ahead like Medium', () {
-      final agent = search(rules, Random(0), nodeBudget: 0);
+      final agent = search(rules, Random(0), nodeLimit: 0);
 
       expect(agent.chooseMove(state), Move(target, captures: twoWhite));
     });
@@ -57,7 +57,7 @@ void main() {
       // Looking 2 moves ahead on an empty board takes 25 + 25 × 24 positions.
       final counting = _CountingRules(rules);
 
-      search(counting, Random(0), nodeBudget: 500).chooseMove(rules.newGame());
+      search(counting, Random(0), nodeLimit: 500).chooseMove(rules.newGame());
 
       expect(counting.generated, 500);
     });
@@ -65,7 +65,7 @@ void main() {
     test('with no budget, still generates the free first pass', () {
       final counting = _CountingRules(rules);
 
-      search(counting, Random(0), nodeBudget: 0).chooseMove(rules.newGame());
+      search(counting, Random(0), nodeLimit: 0).chooseMove(rules.newGame());
 
       expect(counting.generated, 25);
     });
@@ -80,13 +80,13 @@ void main() {
       ''', toMove: Player.black);
       final counting = _CountingRules(rules);
 
-      search(counting, Random(0), nodeBudget: 1000000).chooseMove(lastTwo);
+      search(counting, Random(0), nodeLimit: 1000000).chooseMove(lastTwo);
 
       expect(counting.generated, 4);
     });
 
     test('rejects a negative budget', () {
-      expect(() => search(rules, Random(0), nodeBudget: -1), throwsRangeError);
+      expect(() => search(rules, Random(0), nodeLimit: -1), throwsRangeError);
     });
 
     test('throws a StateError when the rules refuse a move they listed', () {

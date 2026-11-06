@@ -22,13 +22,13 @@ void main() {
   }
 
   // A small budget keeps the test fast; the app's Hard level searches with
-  // SearchAgent.defaultNodeBudget, 20 times more.
+  // SearchAgent.defaultNodeLimit, 20 times more.
   GameAgent hard(Random random) {
     return SearchAgent(
       moveGenerator: rules,
       positionEvaluator: evaluator,
       random: random,
-      nodeBudget: 1000,
+      nodeLimit: 1000,
     );
   }
 

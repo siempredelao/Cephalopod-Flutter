@@ -37,17 +37,17 @@ final class SearchAgent implements GameAgent {
   /// lead to, scores positions with `positionEvaluator`, and breaks ties with
   /// `random`.
   ///
-  /// `nodeBudget` is how many positions it may generate to choose each move
-  /// (see [NodeBudget]).
+  /// `nodeLimit` is how many positions it may generate to choose each move:
+  /// the limit of its [NodeBudget].
   ///
-  /// Throws a [RangeError] when `nodeBudget` is negative.
+  /// Throws a [RangeError] when `nodeLimit` is negative.
   SearchAgent({
     required this._moveGenerator,
     required this._positionEvaluator,
     required this._random,
-    this._nodeBudget = defaultNodeBudget,
+    this._nodeLimit = defaultNodeLimit,
   }) {
-    RangeError.checkNotNegative(_nodeBudget, 'nodeBudget');
+    RangeError.checkNotNegative(_nodeLimit, 'nodeLimit');
   }
 
   final MoveGenerator _moveGenerator;
@@ -55,12 +55,12 @@ final class SearchAgent implements GameAgent {
   final Random _random;
 
   /// How many positions it may generate to choose each move.
-  final int _nodeBudget;
+  final int _nodeLimit;
 
-  /// The node budget of the app's Hard level: deep enough to see a few moves
+  /// The node limit of the app's Hard level: deep enough to see a few moves
   /// ahead on a 5 × 5 board, small enough to answer in a fraction of a
   /// second.
-  static const int defaultNodeBudget = 20000;
+  static const int defaultNodeLimit = 20000;
 
   @override
   Move chooseMove(GameState state) {
@@ -69,7 +69,7 @@ final class SearchAgent implements GameAgent {
       throw ArgumentError.value(state, 'state', 'The game is over');
     }
     final player = status.toMove;
-    final budget = NodeBudget(_nodeBudget);
+    final budget = NodeBudget(_nodeLimit);
     final ranker = MoveRanker(
       moveGenerator: _moveGenerator,
       positionEvaluator: _positionEvaluator,
