@@ -10,27 +10,22 @@ import 'package:cephalopod_engine/cephalopod_engine.dart';
 ///
 /// ```json
 /// {
-///   "schemaVersion": 2,
+///   "schemaVersion": 1,
 ///   "config": {"boardSize": 5, "firstPlayer": "black", …},
 ///   "opponent": {"type": "computer", "difficulty": "hard", "player": "white"},
 ///   "moves": [{"row": 0, "col": 1, "captures": [[0, 0], [0, 2]]}]
 /// }
 /// ```
 ///
-/// A friend is `{"type": "friend"}`. Saves from version 1, written before
-/// the computer opponent existed, have no `opponent` and are read as games
-/// against a friend.
+/// A friend is `{"type": "friend"}`.
 ///
 /// Reading never throws: anything malformed gives `null`, so a corrupted
 /// save starts a fresh game instead of crashing the app. Whether the moves
 /// are legal is for `CephalopodRules.replay` to decide.
 final class SavedGameJsonCodec {
-  /// The format version written into every save. Saves with this version or
-  /// [_versionWithoutOpponent] are read; any other is not.
-  static const int schemaVersion = 2;
-
-  /// The version from before saves had an opponent.
-  static const int _versionWithoutOpponent = 1;
+  /// The format version written into every save. A save with another
+  /// version is not read.
+  static const int schemaVersion = 1;
 
   String encode(SavedGame savedGame) {
     final config = savedGame.record.config;
@@ -58,11 +53,8 @@ final class SavedGameJsonCodec {
       return null;
     }
     if (data is! Map<String, Object?>) return null;
-    final opponent = switch (data['schemaVersion']) {
-      _versionWithoutOpponent => const FriendOpponent(),
-      schemaVersion => _decodeOpponent(data['opponent']),
-      _ => null,
-    };
+    if (data['schemaVersion'] != schemaVersion) return null;
+    final opponent = _decodeOpponent(data['opponent']);
     final config = _decodeConfig(data['config']);
     final moves = _decodeMoves(data['moves']);
     if (opponent == null || config == null || moves == null) return null;

@@ -12,7 +12,7 @@ const String _friend = '{"type": "friend"}';
 
 /// A save in the JSON format, with any part replaced to break it.
 String _save({
-  Object? version = 2,
+  Object? version = 1,
   String config = _config,
   String opponent = _friend,
   String moves = '[]',
@@ -40,7 +40,7 @@ void main() {
 
       expect(
         codec.encode(savedGame),
-        '{"schemaVersion":2,'
+        '{"schemaVersion":1,'
         '"config":{"boardSize":5,"firstPlayer":"black",'
         '"maxCaptureSum":6,"minCaptureDice":2},'
         '"opponent":{"type":"computer","difficulty":"hard","player":"white"},'
@@ -65,26 +65,16 @@ void main() {
       expect(codec.decode(_save()), (record: GameRecord(), opponent: friend));
     });
 
-    test('reads a version 1 save, which has no opponent, as a friend', () {
-      const save =
-          '{"schemaVersion": 1, "config": $_config, '
-          '"moves": [{"row": 2, "col": 2, "captures": []}]}';
-
-      expect(codec.decode(save), (
-        record: GameRecord(moves: [Move(center)]),
-        opponent: friend,
-      ));
-    });
-
     test('reads nothing from a save it does not understand', () {
       final saves = [
         'not json',
         '[]',
-        _save(version: 3),
-        _save(version: '"2"'),
+        _save(version: 2),
+        _save(version: '"1"'),
         _save(config: 'null'),
         _save(config: '{"boardSize": 5}'),
         _save(config: _config.replaceFirst('black', 'red')),
+        '{"schemaVersion": 1, "config": $_config, "moves": []}',
         _save(opponent: 'null'),
         _save(opponent: '{"type": "stranger"}'),
         _save(opponent: '{"type": "computer", "player": "white"}'),
