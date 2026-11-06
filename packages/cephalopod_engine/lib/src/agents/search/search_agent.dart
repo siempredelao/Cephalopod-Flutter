@@ -69,32 +69,32 @@ final class SearchAgent implements GameAgent {
       throw ArgumentError.value(state, 'state', 'The game is over');
     }
     final player = status.toMove;
-    final budget = NodeBudget(_nodeLimit);
-    final ranker = MoveRanker(
+    final nodeBudget = NodeBudget(_nodeLimit);
+    final moveRanker = MoveRanker(
       moveGenerator: _moveGenerator,
       positionEvaluator: _positionEvaluator,
     );
     final legalMoves = [..._moveGenerator.legalMoves(state)]..shuffle(_random);
     // The first pass looks 1 move ahead: it plays each move and scores the
     // result. The budget does not apply yet, so it always finishes.
-    var rankedMoveCandidates = ranker.playAll(
+    var rankedMoveCandidates = moveRanker.playAll(
       state,
       player,
       legalMoves,
-      budget,
+      nodeBudget,
     );
-    budget.enforce();
+    nodeBudget.enforce();
     for (var depth = 2; ; depth++) {
       final pass = SearchPass(
         moveGenerator: _moveGenerator,
         positionEvaluator: _positionEvaluator,
-        moveRanker: ranker,
-        nodeBudget: budget,
+        moveRanker: moveRanker,
+        nodeBudget: nodeBudget,
         depth: depth,
       );
       final result = pass.scoreMoves(rankedMoveCandidates, player);
       // A pass cut short has not compared every move, so it is thrown away.
-      if (budget.ranOut) break;
+      if (nodeBudget.ranOut) break;
       rankedMoveCandidates = result.rankedMoveCandidates;
       // Every line of play ended within this pass, so looking deeper would
       // change nothing.
