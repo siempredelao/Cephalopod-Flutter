@@ -57,17 +57,11 @@ void main() {
     test('starts and saves a new game under the config', () async {
       const config = GameConfig(boardSize: 3);
 
-      final game = await startNewGame(config: config);
+      final game = await startNewGame(config: config, opponent: friend);
 
       expect(game.state, rules.newGame(config));
       expect(game.record, GameRecord(config: config));
       expect(await repository.load(), saved(game));
-    });
-
-    test('plays against a friend unless told otherwise', () async {
-      final game = await startNewGame();
-
-      expect(game.opponent, friend);
     });
 
     test('saves the opponent with the game', () async {
@@ -78,9 +72,10 @@ void main() {
     });
 
     test('replaces the saved game', () async {
-      final old = await play(await startNewGame(), Move(center));
+      final start = await startNewGame(opponent: friend);
+      final old = await play(start, Move(center));
 
-      final game = await startNewGame();
+      final game = await startNewGame(opponent: friend);
 
       expect(game.record.moves, isEmpty);
       expect(await repository.load(), isNot(saved(old)));
@@ -89,7 +84,7 @@ void main() {
 
   group('PlayMove', () {
     test('plays the move and saves the game with it', () async {
-      final start = await startNewGame();
+      final start = await startNewGame(opponent: friend);
 
       final game = await play(start, Move(center));
 
@@ -108,7 +103,8 @@ void main() {
     });
 
     test('R2: refuses an illegal move and saves nothing', () async {
-      final game = await play(await startNewGame(), Move(center));
+      final start = await startNewGame(opponent: friend);
+      final game = await play(start, Move(center));
 
       final result = await playMove(game, Move(center));
 
@@ -130,13 +126,13 @@ void main() {
     });
 
     test('leaves a game with no moves as it is', () async {
-      final start = await startNewGame();
+      final start = await startNewGame(opponent: friend);
 
       expect(await undoMove(start), start);
     });
 
     test('fails loudly on a record its moves could not build', () async {
-      final start = await startNewGame();
+      final start = await startNewGame(opponent: friend);
       final moves = [Move(center), Move(center), Move(top)];
       final forged = (
         record: GameRecord(moves: moves),
@@ -182,20 +178,20 @@ void main() {
     });
 
     test('says no for a new game with no moves yet', () async {
-      await startNewGame();
+      await startNewGame(opponent: friend);
 
       expect(await hasGameToContinue(), isFalse);
     });
 
     test('says yes once a move is played', () async {
-      await play(await startNewGame(), Move(center));
+      await play(await startNewGame(opponent: friend), Move(center));
 
       expect(await hasGameToContinue(), isTrue);
     });
 
     test('R8: says no once the game is over', () async {
       const oneSquare = GameConfig(boardSize: 1);
-      final start = await startNewGame(config: oneSquare);
+      final start = await startNewGame(config: oneSquare, opponent: friend);
       await play(start, Move(const Position(0, 0)));
 
       expect(await hasGameToContinue(), isFalse);

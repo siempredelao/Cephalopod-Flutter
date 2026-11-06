@@ -78,14 +78,20 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
 
   Future<void> _start(GameConfig config, Emitter<GameViewState> emit) async {
     _undone.clear();
-    _show(await _startNewGame(config: config), emit);
+    // Until the new-game screen lets the person pick the computer.
+    const opponent = FriendOpponent();
+    _show(await _startNewGame(config: config, opponent: opponent), emit);
   }
 
   Future<void> _resume(Emitter<GameViewState> emit) async {
-    final config = _gameRecord.config;
-    final game = await _resumeGame() ?? await _startNewGame(config: config);
+    final game = await _resumeGame() ?? await _restart();
     _undone.clear();
     _show(game, emit);
+  }
+
+  /// A new game like the one on screen: same config, same opponent.
+  Future<CurrentGame> _restart() {
+    return _startNewGame(config: _gameRecord.config, opponent: _opponent);
   }
 
   Future<void> _onSquareTapped(

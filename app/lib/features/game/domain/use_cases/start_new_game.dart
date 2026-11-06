@@ -10,11 +10,10 @@ final class StartNewGame {
   final CephalopodRules _cephalopodRules;
   final GameRepository _gameRepository;
 
-  /// A new game under [config] against [opponent], already saved. A friend
-  /// is the opponent unless another is given.
+  /// A new game against [opponent] under [config], already saved.
   Future<CurrentGame> call({
+    required Opponent opponent,
     GameConfig config = GameConfig.standard,
-    Opponent opponent = const FriendOpponent(),
   }) async {
     final record = GameRecord(config: config);
     final state = _cephalopodRules.newGame(config);
