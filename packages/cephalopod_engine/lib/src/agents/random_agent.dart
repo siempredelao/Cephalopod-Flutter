@@ -12,11 +12,11 @@ import 'package:cephalopod_engine/src/models/move.dart';
 /// for its opponent. That makes it a fair first opponent and a baseline the
 /// stronger agents must beat.
 final class RandomAgent implements GameAgent {
-  /// An agent that asks `moveGenerator` for the legal moves and picks one with
+  /// An agent that asks `moves` for the legal moves and picks one with
   /// `random`. Seed `random` for repeatable games.
-  RandomAgent({required this._moveGenerator, required this._random});
+  RandomAgent({required this._moves, required this._random});
 
-  final MoveGenerator _moveGenerator;
+  final MoveGenerator _moves;
   final Random _random;
 
   @override
@@ -24,7 +24,7 @@ final class RandomAgent implements GameAgent {
     if (state.status is! InProgress) {
       throw ArgumentError.value(state, 'state', 'The game is over');
     }
-    final legal = _moveGenerator.legalMoves(state);
+    final legal = _moves.legalMoves(state);
     return legal[_random.nextInt(legal.length)];
   }
 }

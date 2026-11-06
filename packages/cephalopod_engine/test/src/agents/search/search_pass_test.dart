@@ -9,7 +9,10 @@ void main() {
   group('SearchPass.scoreMoves', () {
     final rules = CephalopodRules();
     final evaluator = PositionEvaluator();
-    final ranker = MoveRanker(moveGenerator: rules, evaluator: evaluator);
+    final ranker = MoveRanker(
+      moveGenerator: rules,
+      positionEvaluator: evaluator,
+    );
 
     /// Runs one pass for Black, to move in [state], looking [depth] moves
     /// ahead, with a budget it cannot run out of.
@@ -20,9 +23,9 @@ void main() {
       final first = ranker.playAll(state, player, legal, budget);
       final pass = SearchPass(
         moveGenerator: rules,
-        evaluator: evaluator,
-        ranker: ranker,
-        budget: budget,
+        positionEvaluator: evaluator,
+        moveRanker: ranker,
+        nodeBudget: budget,
         depth: depth,
       );
       return pass.scoreMoves(first, player);

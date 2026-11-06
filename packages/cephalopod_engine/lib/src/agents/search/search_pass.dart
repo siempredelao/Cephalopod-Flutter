@@ -34,20 +34,21 @@ typedef SearchPassResult = ({
 /// quicker one, and it puts off a loss as long as it can.
 final class SearchPass {
   /// A pass that looks `depth` moves ahead. It asks `moveGenerator` for the
-  /// legal moves and who plays next, has `ranker` play and order them, scores
-  /// the positions it stops at with `evaluator`, and spends `budget`.
+  /// legal moves and who plays next, has `moveRanker` play and order them,
+  /// scores the positions it stops at with `positionEvaluator`, and spends
+  /// `nodeBudget`.
   SearchPass({
     required this._moveGenerator,
-    required this._evaluator,
-    required this._ranker,
-    required this._budget,
+    required this._positionEvaluator,
+    required this._moveRanker,
+    required this._nodeBudget,
     required this._depth,
   });
 
   final MoveGenerator _moveGenerator;
-  final PositionEvaluator _evaluator;
-  final MoveRanker _ranker;
-  final NodeBudget _budget;
+  final PositionEvaluator _positionEvaluator;
+  final MoveRanker _moveRanker;
+  final NodeBudget _nodeBudget;
 
   /// How many moves ahead the pass looks: 2 means the player's move and the
   /// opponent's reply.
@@ -116,7 +117,7 @@ final class SearchPass {
     int ceiling,
   ) {
     // The pass will be thrown away, so stop as quickly as possible.
-    if (_budget.ranOut) return 0;
+    if (_nodeBudget.ranOut) return 0;
     if (state.status is Finished) {
       return _finalScore(state, player, movesAhead);
     }
@@ -124,10 +125,15 @@ final class SearchPass {
     // it is scored as it stands.
     if (movesAhead == _depth) {
       _sawEveryEnding = false;
-      return _evaluator.score(state, player);
+      return _positionEvaluator.score(state, player);
     }
     final legalMoves = _moveGenerator.legalMoves(state);
-    final candidates = _ranker.playAll(state, player, legalMoves, _budget);
+    final candidates = _moveRanker.playAll(
+      state,
+      player,
+      legalMoves,
+      _nodeBudget,
+    );
     final opponent = _moveGenerator.opponentOf(player);
     var best = -_infinity;
     var secured = floor;
@@ -151,7 +157,7 @@ final class SearchPass {
   /// [movesAhead] moves from now. A win counts for less the later it comes,
   /// and a loss for less the longer it is put off.
   int _finalScore(GameState state, Player player, int movesAhead) {
-    final score = _evaluator.score(state, player);
+    final score = _positionEvaluator.score(state, player);
     return score > 0 ? score - movesAhead : score + movesAhead;
   }
 }

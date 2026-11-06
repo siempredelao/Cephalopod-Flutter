@@ -34,7 +34,7 @@ import 'package:cephalopod_engine/src/models/move.dart';
 /// The first pass is free, so even a budget of 0 plays like the Medium agent.
 final class SearchAgent implements GameAgent {
   /// An agent that asks `moveGenerator` for the legal moves and what they
-  /// lead to, scores positions with `evaluator`, and breaks ties with
+  /// lead to, scores positions with `positionEvaluator`, and breaks ties with
   /// `random`.
   ///
   /// `nodeBudget` is how many positions it may generate to choose each move
@@ -43,7 +43,7 @@ final class SearchAgent implements GameAgent {
   /// Throws a [RangeError] when `nodeBudget` is negative.
   SearchAgent({
     required this._moveGenerator,
-    required this._evaluator,
+    required this._positionEvaluator,
     required this._random,
     this._nodeBudget = defaultNodeBudget,
   }) {
@@ -51,7 +51,7 @@ final class SearchAgent implements GameAgent {
   }
 
   final MoveGenerator _moveGenerator;
-  final PositionEvaluator _evaluator;
+  final PositionEvaluator _positionEvaluator;
   final Random _random;
 
   /// How many positions it may generate to choose each move.
@@ -72,7 +72,7 @@ final class SearchAgent implements GameAgent {
     final budget = NodeBudget(_nodeBudget);
     final ranker = MoveRanker(
       moveGenerator: _moveGenerator,
-      evaluator: _evaluator,
+      positionEvaluator: _positionEvaluator,
     );
     final legalMoves = [..._moveGenerator.legalMoves(state)]..shuffle(_random);
     // The first pass looks 1 move ahead: it plays each move and scores the
@@ -87,9 +87,9 @@ final class SearchAgent implements GameAgent {
     for (var depth = 2; ; depth++) {
       final pass = SearchPass(
         moveGenerator: _moveGenerator,
-        evaluator: _evaluator,
-        ranker: ranker,
-        budget: budget,
+        positionEvaluator: _positionEvaluator,
+        moveRanker: ranker,
+        nodeBudget: budget,
         depth: depth,
       );
       final result = pass.scoreMoves(rankedMoveCandidates, player);

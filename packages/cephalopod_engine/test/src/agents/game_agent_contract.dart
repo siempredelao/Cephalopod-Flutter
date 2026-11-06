@@ -8,10 +8,7 @@ import '../../helpers/result.dart';
 
 /// Builds the agent under test from the rules it sees and its source of
 /// randomness.
-typedef AgentFactory = GameAgent Function(
-  MoveGenerator moveGenerator,
-  Random random,
-);
+typedef AgentFactory = GameAgent Function(MoveGenerator moves, Random random);
 
 /// The tests every [GameAgent] passes, whatever its strategy, so the app can
 /// swap one difficulty for another (docs/architecture.md, Liskov

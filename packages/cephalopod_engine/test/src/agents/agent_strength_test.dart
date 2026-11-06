@@ -15,16 +15,10 @@ void main() {
   final rules = CephalopodRules();
   final evaluator = PositionEvaluator();
 
-  GameAgent easy(Random random) {
-    return RandomAgent(moveGenerator: rules, random: random);
-  }
+  GameAgent easy(Random random) => RandomAgent(moves: rules, random: random);
 
   GameAgent medium(Random random) {
-    return GreedyAgent(
-      moveGenerator: rules,
-      evaluator: evaluator,
-      random: random,
-    );
+    return GreedyAgent(moves: rules, evaluator: evaluator, random: random);
   }
 
   // A small budget keeps the test fast; the app's Hard level searches with
@@ -32,7 +26,7 @@ void main() {
   GameAgent hard(Random random) {
     return SearchAgent(
       moveGenerator: rules,
-      evaluator: evaluator,
+      positionEvaluator: evaluator,
       random: random,
       nodeBudget: 1000,
     );

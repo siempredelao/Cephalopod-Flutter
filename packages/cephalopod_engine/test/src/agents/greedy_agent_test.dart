@@ -7,9 +7,9 @@ import 'package:test/test.dart';
 import 'game_agent_contract.dart';
 
 void main() {
-  GreedyAgent greedy(MoveGenerator moveGenerator, Random random) {
+  GreedyAgent greedy(MoveGenerator moves, Random random) {
     return GreedyAgent(
-      moveGenerator: moveGenerator,
+      moves: moves,
       evaluator: PositionEvaluator(),
       random: random,
     );
@@ -74,17 +74,17 @@ void main() {
 /// Rules that list the real legal moves but refuse to play any of them: a
 /// broken [MoveGenerator], to check the agent reports it.
 final class _RefusingRules implements MoveGenerator {
-  _RefusingRules(this._rules);
+  _RefusingRules(this._cephalopodRules);
 
-  final CephalopodRules _rules;
+  final CephalopodRules _cephalopodRules;
 
   @override
-  List<Move> legalMoves(GameState state) => _rules.legalMoves(state);
+  List<Move> legalMoves(GameState state) => _cephalopodRules.legalMoves(state);
 
   @override
   Result<GameState, IllegalMove> apply(GameState state, Move move) =>
       Err(GameOver());
 
   @override
-  Player opponentOf(Player player) => _rules.opponentOf(player);
+  Player opponentOf(Player player) => _cephalopodRules.opponentOf(player);
 }

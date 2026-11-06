@@ -16,16 +16,15 @@ import 'package:cephalopod_engine/src/models/move.dart';
 /// takes every profitable capture and builds dice that cannot be captured,
 /// but it can leave dice for the opponent to capture next turn.
 final class GreedyAgent implements GameAgent {
-  /// An agent that asks `moveGenerator` for the legal moves and what they
-  /// lead to, scores each result with `evaluator`, and breaks ties with
-  /// `random`.
+  /// An agent that asks `moves` for the legal moves and what they lead to,
+  /// scores each result with `evaluator`, and breaks ties with `random`.
   GreedyAgent({
-    required this._moveGenerator,
+    required this._moves,
     required this._evaluator,
     required this._random,
   });
 
-  final MoveGenerator _moveGenerator;
+  final MoveGenerator _moves;
   final PositionEvaluator _evaluator;
   final Random _random;
 
@@ -37,8 +36,8 @@ final class GreedyAgent implements GameAgent {
     }
     int? bestScore;
     var best = <Move>[];
-    for (final move in _moveGenerator.legalMoves(state)) {
-      final next = _moveGenerator.applyLegal(state, move);
+    for (final move in _moves.legalMoves(state)) {
+      final next = _moves.applyLegal(state, move);
       final score = _evaluator.score(next, status.toMove);
       if (bestScore == null || score > bestScore) {
         bestScore = score;

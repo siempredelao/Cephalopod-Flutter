@@ -9,7 +9,7 @@ void main() {
     final rules = CephalopodRules();
     final ranker = MoveRanker(
       moveGenerator: rules,
-      evaluator: PositionEvaluator(),
+      positionEvaluator: PositionEvaluator(),
     );
 
     // Black's only capture takes both white dice; every other move places a

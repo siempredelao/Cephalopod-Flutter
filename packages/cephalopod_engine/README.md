@@ -71,7 +71,7 @@ the same game ([ADR 0014](../../docs/adr/0014-game-agents-in-the-engine.md)).
 
 ```dart
 final rules = CephalopodRules();
-final easy = RandomAgent(moveGenerator: rules, random: Random(42));
+final easy = RandomAgent(moves: rules, random: Random(42));
 final move = easy.chooseMove(rules.newGame());
 ```
 
