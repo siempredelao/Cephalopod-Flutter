@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:cephalopod/features/game/domain/models/current_game.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/domain/use_cases/play_move.dart';
+import 'package:cephalopod/features/game/domain/use_cases/request_agent_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/resume_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/start_new_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/undo_move.dart';
@@ -14,7 +15,7 @@ import 'package:collection/collection.dart';
 /// The game screen's view model: turns taps into engine moves and works out
 /// what the screen shows. The rules stay in the engine; this class only asks
 /// it which moves are legal, and plays, undoes and saves them through the
-/// use cases.
+/// use cases. Against the computer, it lets the computer play its turns.
 class GameBloc extends Bloc<GameEvent, GameViewState> {
   GameBloc({
     required this._cephalopodRules,
@@ -22,6 +23,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     required this._playMove,
     required this._undoMove,
     required this._resumeGame,
+    required this._requestAgentMove,
     GameConfig config = GameConfig.standard,
   }) : super(_startOf(_cephalopodRules.newGame(config))) {
     _gameRecord = GameRecord(config: config);
@@ -35,6 +37,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   final PlayMove _playMove;
   final UndoMove _undoMove;
   final ResumeGame _resumeGame;
+  final RequestAgentMove _requestAgentMove;
 
   /// The moves played so far, as saved. The position they reach is
   /// `state.game`.
@@ -45,6 +48,14 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
 
   /// Moves taken back, most recent last, for redo. A new move clears them.
   final List<Move> _undone = [];
+
+  /// How many moves one undo or redo covers: one against a friend; against
+  /// the computer, the person's move and the computer's reply, so the
+  /// person is to move again.
+  int get _movesPerUndo => switch (_opponent) {
+    FriendOpponent() => 1,
+    ComputerOpponent() => 2,
+  };
 
   static GameViewState _startOf(GameState game) =>
       GameViewState(game: game, phase: const TurnPhase.awaitingPlacement());
@@ -74,6 +85,8 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
       case RedoRequested():
         await _redo(emit);
     }
+    // Whatever the event led to, the computer plays when it is its turn.
+    await _letComputerPlay(emit);
   }
 
   Future<void> _start(GameConfig config, Emitter<GameViewState> emit) async {
@@ -103,7 +116,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
         await _place(square, emit);
       case final ChoosingCapture phase:
         _pick(phase, square, emit);
-      case GameEnded():
+      case ComputerThinking() || GameEnded():
         return;
     }
   }
@@ -183,23 +196,35 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     }
   }
 
-  /// Takes back the last move, if there is one, and remembers it for redo.
-  /// A finished game stays finished.
+  /// Takes back the last [_movesPerUndo] moves, when the screen allows it,
+  /// and remembers them for redo. A finished game stays finished.
   Future<void> _undo(Emitter<GameViewState> emit) async {
-    final moves = _gameRecord.moves;
-    if (moves.isEmpty || state.phase is GameEnded) return;
-    final game = await _undoMove(_currentGame);
-    _undone.add(moves.last);
+    if (!state.canUndo) return;
+    var game = _currentGame;
+    for (var i = 0; i < _movesPerUndo; i++) {
+      _undone.add(game.record.moves.last);
+      game = await _undoMove(game);
+    }
     _show(game, emit);
   }
 
-  /// Plays again the last move taken back, if there is one.
+  /// Plays again the last [_movesPerUndo] moves taken back, if there are
+  /// any.
   Future<void> _redo(Emitter<GameViewState> emit) async {
     if (_undone.isEmpty) return;
-    final move = _undone.removeLast();
-    if (await _playMove(_currentGame, move) case Ok(:final value)) {
-      _show(value, emit);
+    var game = _currentGame;
+    for (var i = 0; i < _movesPerUndo && _undone.isNotEmpty; i++) {
+      final move = _undone.removeLast();
+      if (await _playMove(game, move) case Ok(:final value)) game = value;
     }
+    _show(game, emit);
+  }
+
+  /// Lets the computer play while the screen shows it thinking. Other
+  /// events wait until it has played.
+  Future<void> _letComputerPlay(Emitter<GameViewState> emit) async {
+    if (state.phase is! ComputerThinking) return;
+    _show(await _requestAgentMove(_currentGame), emit);
   }
 
   /// Shows [game], the result of a use case, and keeps its record and
@@ -207,20 +232,26 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   void _show(CurrentGame game, Emitter<GameViewState> emit) {
     _gameRecord = game.record;
     _opponent = game.opponent;
-    final inProgress = game.state.status is InProgress;
+    final phase = _phaseOf(game);
+    final moves = game.record.moves;
     emit(
       GameViewState(
         game: game.state,
-        phase: _phaseOf(game.state),
-        lastMove: game.record.moves.lastOrNull,
-        canUndo: inProgress && game.record.moves.isNotEmpty,
+        phase: phase,
+        lastMove: moves.lastOrNull,
+        canUndo: phase is AwaitingPlacement && moves.length >= _movesPerUndo,
         canRedo: _undone.isNotEmpty,
       ),
     );
   }
 
-  static TurnPhase _phaseOf(GameState game) => switch (game.status) {
-    final Finished result => TurnPhase.gameEnded(result),
-    InProgress() => const TurnPhase.awaitingPlacement(),
-  };
+  TurnPhase _phaseOf(CurrentGame game) {
+    if (_requestAgentMove.isComputerTurn(game)) {
+      return const TurnPhase.computerThinking();
+    }
+    return switch (game.state.status) {
+      final Finished result => TurnPhase.gameEnded(result),
+      InProgress() => const TurnPhase.awaitingPlacement(),
+    };
+  }
 }

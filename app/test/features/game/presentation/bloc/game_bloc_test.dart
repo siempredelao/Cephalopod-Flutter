@@ -1,5 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:cephalopod/features/game/data/in_memory_game_repository.dart';
+import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
@@ -369,5 +370,89 @@ void main() {
       expect(await repository.load(), savedNewGame);
       await bloc.close();
     });
+  });
+
+  group('GameBloc against the computer', () {
+    late InMemoryGameRepository repository;
+    final start = rules.newGame();
+    final afterCenter = after(start, Move(center));
+    final reply = rules.legalMoves(afterCenter).first;
+    final thinking = GameViewState(
+      game: afterCenter,
+      phase: const TurnPhase.computerThinking(),
+      lastMove: Move(center),
+    );
+    final replied = GameViewState(
+      game: after(afterCenter, reply),
+      phase: const TurnPhase.awaitingPlacement(),
+      lastMove: reply,
+      canUndo: true,
+    );
+
+    setUp(() => repository = InMemoryGameRepository());
+
+    /// Saves a new game against the computer playing [player], for the bloc
+    /// to resume. The test bloc's computer plays its first legal move.
+    Future<void> saveGameAgainst(Player player) {
+      final computer = ComputerOpponent(
+        difficulty: Difficulty.easy,
+        player: player,
+      );
+      return repository.save((record: GameRecord(), opponent: computer));
+    }
+
+    GameBloc buildResuming() => createTestGameBloc(repository: repository);
+
+    blocTest<GameBloc, GameViewState>(
+      'plays first when it plays Black, thinking meanwhile',
+      setUp: () => saveGameAgainst(Player.black),
+      build: buildResuming,
+      act: (bloc) => bloc.add(const GameResumed()),
+      expect: () {
+        final opening = rules.legalMoves(start).first;
+        return [
+          placing(start).copyWith(phase: const TurnPhase.computerThinking()),
+          GameViewState(
+            game: after(start, opening),
+            phase: const TurnPhase.awaitingPlacement(),
+            lastMove: opening,
+          ),
+        ];
+      },
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      "replies to the person's move, and saves both",
+      setUp: () => saveGameAgainst(Player.white),
+      build: buildResuming,
+      act: (bloc) => bloc
+        ..add(const GameResumed())
+        ..add(const SquareTapped(center)),
+      // Resuming a game with no moves emits the starting position again:
+      // a bloc's first emission is never skipped as a duplicate.
+      expect: () => [placing(start), thinking, replied],
+      verify: (_) async {
+        final saved = await repository.load();
+        expect(saved?.record.moves, [Move(center), reply]);
+      },
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      "undo takes back the reply and the person's move; redo plays both",
+      setUp: () => saveGameAgainst(Player.white),
+      build: buildResuming,
+      act: (bloc) => bloc
+        ..add(const GameResumed())
+        ..add(const SquareTapped(center))
+        ..add(const UndoRequested())
+        ..add(const RedoRequested()),
+      expect: () => [
+        placing(start),
+        thinking,
+        replied,
+        placing(start).copyWith(canRedo: true),
+        replied,
+      ],
+    );
   });
 }

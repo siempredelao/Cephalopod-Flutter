@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cephalopod/features/game/data/in_memory_game_repository.dart';
 import 'package:cephalopod/features/game/domain/models/current_game.dart';
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
@@ -11,6 +13,8 @@ import 'package:cephalopod/features/game/domain/use_cases/start_new_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/undo_move.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../../../../helpers/computer_turns.dart';
 
 /// The game use cases, run against the real engine and an in-memory
 /// repository: what each one returns, and what it leaves saved.
@@ -203,16 +207,28 @@ void main() {
     final agentMove = Move(top);
     late _FixedAgent agent;
     late List<Difficulty> difficulties;
+    late int backgroundRuns;
     late RequestAgentMove requestAgentMove;
+
+    /// Runs the agent here, and counts the runs.
+    Future<R> countingRunner<M, R>(
+      FutureOr<R> Function(M message) callback,
+      M message,
+    ) {
+      backgroundRuns++;
+      return runHere(callback, message);
+    }
 
     setUp(() {
       agent = _FixedAgent(agentMove);
       difficulties = [];
+      backgroundRuns = 0;
       requestAgentMove = RequestAgentMove(
         agentFactory: (difficulty) {
           difficulties.add(difficulty);
           return agent;
         },
+        backgroundRunner: countingRunner,
         playMove: playMove,
       );
     });
@@ -232,6 +248,21 @@ void main() {
       expect(agent.positions, [game.state]);
       expect(next.record.moves, [Move(center), agentMove]);
       expect(await repository.load(), saved(next));
+    });
+
+    test('lets the agent choose in the background', () async {
+      await requestAgentMove(await computerToMove());
+
+      expect(backgroundRuns, 1);
+    });
+
+    test("knows when it is the computer's turn", () async {
+      final start = await startNewGame(opponent: computer);
+      final againstFriend = await computerToMove(friend);
+
+      expect(requestAgentMove.isComputerTurn(start), isFalse);
+      expect(requestAgentMove.isComputerTurn(await computerToMove()), isTrue);
+      expect(requestAgentMove.isComputerTurn(againstFriend), isFalse);
     });
 
     test("asks for the agent of the computer's difficulty", () async {

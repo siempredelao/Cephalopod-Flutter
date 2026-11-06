@@ -20,7 +20,9 @@ class GameBoard extends StatelessWidget {
   });
 
   final GameViewState state;
-  final ValueChanged<Position> onSquareTapped;
+
+  /// Told which square was tapped; `null` while the board takes no taps.
+  final ValueChanged<Position>? onSquareTapped;
 
   /// Whether the square of the last move stands out.
   final bool highlightLastMove;
@@ -66,6 +68,7 @@ class GameBoard extends StatelessWidget {
 
   Widget _square(Position square, Board board) {
     final die = board.dice[square];
+    final onSquareTapped = this.onSquareTapped;
     return Padding(
       padding: const EdgeInsets.all(_gap / 2),
       child: BoardSquare(
@@ -73,7 +76,7 @@ class GameBoard extends StatelessWidget {
         die: die,
         mark: _markOf(square),
         label: _labelOf(square, die),
-        onTap: () => onSquareTapped(square),
+        onTap: onSquareTapped == null ? null : () => onSquareTapped(square),
       ),
     );
   }

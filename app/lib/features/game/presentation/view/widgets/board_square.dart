@@ -19,7 +19,9 @@ class BoardSquare extends StatelessWidget {
   final Die? die;
   final SquareMark mark;
   final String label;
-  final VoidCallback onTap;
+
+  /// Called when the square is tapped; `null` when it takes no taps.
+  final VoidCallback? onTap;
 
   static const double _ringWidth = 3;
   static const double _ringGlow = 8;
@@ -43,6 +45,7 @@ class BoardSquare extends StatelessWidget {
     return Semantics(
       label: label,
       button: true,
+      enabled: onTap != null,
       onTap: onTap,
       excludeSemantics: true,
       child: GestureDetector(
