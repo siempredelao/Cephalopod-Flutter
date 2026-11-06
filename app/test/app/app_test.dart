@@ -4,7 +4,10 @@ import 'package:cephalopod/app/router.dart';
 import 'package:cephalopod/features/about/about_module.dart';
 import 'package:cephalopod/features/about/presentation/view/about_page.dart';
 import 'package:cephalopod/features/game/data/in_memory_game_repository.dart';
+import 'package:cephalopod/features/game/domain/models/difficulty.dart';
+import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/game_module.dart';
+import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
@@ -77,6 +80,21 @@ void main() {
 
       expect(find.byType(GamePage), findsOneWidget);
       expect(find.byType(DieFace), findsOneWidget);
+    });
+
+    testWidgets('opens a game against the opponent a link names', (
+      tester,
+    ) async {
+      const computer = ComputerOpponent(
+        difficulty: Difficulty.hard,
+        player: Player.white,
+      );
+
+      await pumpApp(tester, location: '/game?computer=white&difficulty=hard');
+
+      final opening = tester.widget<GamePage>(find.byType(GamePage)).opening;
+      expect(opening, isA<GameStarted>());
+      expect((opening as GameStarted).opponent, computer);
     });
 
     testWidgets('goes back home from a deep link to a game', (tester) async {

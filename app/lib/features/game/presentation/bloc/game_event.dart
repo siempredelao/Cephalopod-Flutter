@@ -1,3 +1,4 @@
+import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
 /// Something the player did on the game screen.
@@ -10,12 +11,21 @@ sealed class GameEvent {
   const GameEvent();
 }
 
-/// Start a new game under [config], replacing the current one and the
-/// saved game.
+/// Start a new game against [opponent] under [config], replacing the
+/// current one and the saved game.
 final class GameStarted extends GameEvent {
-  const GameStarted([this.config = GameConfig.standard]);
+  const GameStarted({
+    required this.opponent,
+    this.config = GameConfig.standard,
+  });
 
+  final Opponent opponent;
   final GameConfig config;
+}
+
+/// Start again, against the same opponent and under the same rules.
+final class GameRestarted extends GameEvent {
+  const GameRestarted();
 }
 
 /// Pick up the saved game, or start a new one when there is none.
