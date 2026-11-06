@@ -75,6 +75,13 @@ jobs:
           distribution: temurin
           java-version: "17"
 
+      # A cold Gradle build spends most of its time downloading Gradle, its
+      # plugins and libraries, and compiling the build scripts. This keeps
+      # them between runs. Runs on main write the cache; pull requests read
+      # the latest one main wrote.
+      - if: steps.platform.outputs.present == 'true' && matrix.platform == 'android'
+        uses: gradle/actions/setup-gradle@v6
+
       - if: steps.platform.outputs.present == 'true'
         uses: subosito/flutter-action@v2
         with:
@@ -82,11 +89,13 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
-      # Flutter's Gradle plugin makes every Android build install the NDK
-      # version it pins (FlutterExtension.ndkVersion), to strip debug symbols
-      # from the app's native libraries. The runner image does not ship that
-      # version, so it is cached rather than downloaded on every run. Read
-      # from the SDK, so a Flutter upgrade picks up its new version.
+      # Android builds need the NDK version Flutter pins
+      # (FlutterExtension.ndkVersion): Flutter's Gradle plugin installs it to
+      # strip debug symbols from the app's native libraries, and the jni
+      # package (used by shared_preferences_android) compiles its C code with
+      # it. The runner image does not ship that version, so it is cached
+      # rather than downloaded on every run. Read from the SDK, so a Flutter
+      # upgrade picks up its new version.
       - if: steps.platform.outputs.present == 'true' && matrix.platform == 'android'
         name: Find the NDK version Flutter pins
         id: ndk
