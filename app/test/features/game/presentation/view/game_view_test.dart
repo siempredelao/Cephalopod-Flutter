@@ -1,4 +1,11 @@
+import 'dart:async';
+
 import 'package:cephalopod/core/theme/board_colors.dart';
+import 'package:cephalopod/features/game/data/in_memory_game_repository.dart';
+import 'package:cephalopod/features/game/domain/models/difficulty.dart';
+import 'package:cephalopod/features/game/domain/models/opponent.dart';
+import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
+import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/view/game_view.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/capture_controls.dart';
@@ -14,13 +21,14 @@ void main() {
   Future<void> pumpGame(
     WidgetTester tester, {
     GameConfig config = GameConfig.standard,
+    GameBloc? bloc,
   }) async {
-    final bloc = createTestGameBloc(config: config);
-    addTearDown(bloc.close);
+    final gameBloc = bloc ?? createTestGameBloc(config: config);
+    addTearDown(gameBloc.close);
     await tester.pumpWidget(
       MaterialApp(
         theme: ThemeData(extensions: const [BoardColors.light]),
-        home: BlocProvider.value(value: bloc, child: const GameView()),
+        home: BlocProvider.value(value: gameBloc, child: const GameView()),
       ),
     );
   }
@@ -146,6 +154,42 @@ void main() {
         expect(find.byType(CaptureControls), findsNothing);
         expect(find.text('Player 1 to move'), findsOne);
       });
+    });
+
+    testWidgets('takes no taps while the computer thinks', (tester) async {
+      final repository = InMemoryGameRepository();
+      const computer = ComputerOpponent(
+        difficulty: Difficulty.hard,
+        player: Player.black,
+      );
+      await repository.save((record: GameRecord(), opponent: computer));
+      final doneThinking = Completer<void>();
+
+      // The computer chooses only once `doneThinking` completes.
+      Future<R> thinkUntilDone<M, R>(
+        FutureOr<R> Function(M message) callback,
+        M message,
+      ) async {
+        await doneThinking.future;
+        return callback(message);
+      }
+
+      final bloc = createTestGameBloc(
+        repository: repository,
+        backgroundRunner: thinkUntilDone,
+      )..add(const GameResumed());
+      await pumpGame(tester, bloc: bloc);
+      await tester.pumpAndSettle();
+
+      expect(find.text('The computer is thinking…'), findsOne);
+      final square = tester.widget<BoardSquare>(find.byType(BoardSquare).first);
+      expect(square.onTap, isNull);
+
+      doneThinking.complete();
+      await tester.pumpAndSettle();
+
+      expect(find.text('Player 2 to move'), findsOne);
+      expect(find.byType(DieFace), findsOne);
     });
   });
 }

@@ -1,8 +1,12 @@
+import 'dart:math';
+
 import 'package:cephalopod/core/navigation/app_route.dart';
 import 'package:cephalopod/core/navigation/feature_module.dart';
 import 'package:cephalopod/features/game/domain/game_repository.dart';
+import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/use_cases/has_game_to_continue.dart';
 import 'package:cephalopod/features/game/domain/use_cases/play_move.dart';
+import 'package:cephalopod/features/game/domain/use_cases/request_agent_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/resume_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/start_new_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/undo_move.dart';
@@ -10,6 +14,7 @@ import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
+import 'package:flutter/foundation.dart' show compute;
 import 'package:go_router/go_router.dart';
 
 /// Wires the game feature. Its use cases are built once, the first time
@@ -29,6 +34,8 @@ final class GameModule implements FeatureModule {
   final GameRepository _gameRepository;
   final bool Function() _highlightLastMove;
 
+  final PositionEvaluator _positionEvaluator = PositionEvaluator();
+
   late final StartNewGame _startNewGame = StartNewGame(
     cephalopodRules: _cephalopodRules,
     gameRepository: _gameRepository,
@@ -47,6 +54,14 @@ final class GameModule implements FeatureModule {
   );
   late final HasGameToContinue _hasGameToContinue = HasGameToContinue(
     resumeGame: _resumeGame,
+  );
+
+  /// The computer's moves are chosen with Flutter's `compute`, on another
+  /// isolate, so the screen stays responsive while the Hard level thinks.
+  late final RequestAgentMove _requestAgentMove = RequestAgentMove(
+    agentFactory: _agentFor,
+    backgroundRunner: compute,
+    playMove: _playMove,
   );
 
   /// Whether there is a saved game worth continuing. A plain function, so
@@ -83,6 +98,29 @@ final class GameModule implements FeatureModule {
       playMove: _playMove,
       undoMove: _undoMove,
       resumeGame: _resumeGame,
+      requestAgentMove: _requestAgentMove,
     );
+  }
+
+  /// Which agent plays each difficulty (docs/adr/0014), with a new `Random`
+  /// for every move, as `AgentFactory` asks.
+  GameAgent _agentFor(Difficulty difficulty) {
+    final random = Random();
+    return switch (difficulty) {
+      Difficulty.easy => RandomAgent(
+        moveGenerator: _cephalopodRules,
+        random: random,
+      ),
+      Difficulty.medium => GreedyAgent(
+        moveGenerator: _cephalopodRules,
+        positionEvaluator: _positionEvaluator,
+        random: random,
+      ),
+      Difficulty.hard => SearchAgent(
+        moveGenerator: _cephalopodRules,
+        positionEvaluator: _positionEvaluator,
+        random: random,
+      ),
+    };
   }
 }

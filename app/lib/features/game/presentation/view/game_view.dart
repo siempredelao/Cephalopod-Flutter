@@ -53,7 +53,7 @@ class GameView extends StatelessWidget {
             builder: (context, state) => Column(
               children: [
                 Text(
-                  _headlineOf(state.game.status),
+                  _headlineOf(state),
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: _spacing),
@@ -62,8 +62,7 @@ class GameView extends StatelessWidget {
                     child: GameBoard(
                       state: state,
                       highlightLastMove: highlightLastMove,
-                      onSquareTapped: (square) =>
-                          context.read<GameBloc>().add(SquareTapped(square)),
+                      onSquareTapped: _tapHandlerOf(context, state),
                     ),
                   ),
                 ),
@@ -84,6 +83,17 @@ class GameView extends StatelessWidget {
   static void _restart(GameBloc bloc) =>
       bloc.add(GameStarted(bloc.state.game.config));
 
+  /// What a tap on a square does: nothing while the computer thinks, because
+  /// a tap sent then would wait, and land after the computer's move.
+  static ValueChanged<Position>? _tapHandlerOf(
+    BuildContext context,
+    GameViewState state,
+  ) {
+    if (state.phase is ComputerThinking) return null;
+    final bloc = context.read<GameBloc>();
+    return (square) => bloc.add(SquareTapped(square));
+  }
+
   static Widget? _controlsFor(BuildContext context, GameViewState state) {
     final phase = state.phase;
     if (phase is! ChoosingCapture) return null;
@@ -97,10 +107,13 @@ class GameView extends StatelessWidget {
     );
   }
 
-  static String _headlineOf(GameStatus status) => switch (status) {
-    InProgress(:final toMove) => '${playerNameOf(toMove)} to move',
-    final Finished result => _resultOf(result),
-  };
+  static String _headlineOf(GameViewState state) {
+    if (state.phase is ComputerThinking) return 'The computer is thinking…';
+    return switch (state.game.status) {
+      InProgress(:final toMove) => '${playerNameOf(toMove)} to move',
+      final Finished result => _resultOf(result),
+    };
+  }
 
   /// Who won and by how much, winner first: "Player 2 wins 13 to 12".
   static String _resultOf(Finished result) {

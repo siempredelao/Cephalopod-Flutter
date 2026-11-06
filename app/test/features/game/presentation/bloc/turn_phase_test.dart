@@ -52,12 +52,14 @@ void main() {
       String describe(TurnPhase phase) => switch (phase) {
         AwaitingPlacement() => 'place a die',
         ChoosingCapture(:final options) => 'pick 1 of ${options.length}',
+        ComputerThinking() => 'wait',
         GameEnded(:final result) => '${result.winner.name} won',
       };
       const result = Finished(winner: Player.white, blackDice: 4, whiteDice: 5);
 
       expect(describe(TurnPhase.awaitingPlacement()), 'place a die');
       expect(describe(choosing()), 'pick 1 of 2');
+      expect(describe(TurnPhase.computerThinking()), 'wait');
       expect(describe(TurnPhase.gameEnded(result)), 'white won');
     });
   });

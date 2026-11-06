@@ -26,6 +26,9 @@ sealed class TurnPhase with _$TurnPhase {
     @Default(false) bool canConfirm,
   }) = ChoosingCapture;
 
+  /// The computer is choosing its move. The board takes no taps meanwhile.
+  const factory TurnPhase.computerThinking() = ComputerThinking;
+
   /// The board is full and [result] says who won.
   const factory TurnPhase.gameEnded(Finished result) = GameEnded;
 }
