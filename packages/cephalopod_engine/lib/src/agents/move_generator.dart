@@ -1,10 +1,11 @@
 import 'package:cephalopod_engine/src/models/game_state.dart';
 import 'package:cephalopod_engine/src/models/move.dart';
+import 'package:cephalopod_engine/src/models/player.dart';
 import 'package:cephalopod_engine/src/result.dart';
 import 'package:cephalopod_engine/src/rules/illegal_move.dart';
 
-/// What an agent needs from the rules: the legal moves in a position and the
-/// position a move leads to.
+/// What an agent needs from the rules: the legal moves in a position, the
+/// position a move leads to, and who moves after whom.
 ///
 /// `CephalopodRules` implements it. Agents depend on this narrow interface
 /// rather than on the whole rules, so they cannot start or replay games, and
@@ -16,4 +17,7 @@ abstract interface class MoveGenerator {
   /// Plays [move] in [state]: the next state, or the reason the move is
   /// illegal.
   Result<GameState, IllegalMove> apply(GameState state, Move move);
+
+  /// The player who moves after [player].
+  Player opponentOf(Player player);
 }

@@ -74,14 +74,17 @@ void main() {
 /// Rules that list the real legal moves but refuse to play any of them: a
 /// broken [MoveGenerator], to check the agent reports it.
 final class _RefusingRules implements MoveGenerator {
-  _RefusingRules(this._rules);
+  _RefusingRules(this._cephalopodRules);
 
-  final CephalopodRules _rules;
+  final CephalopodRules _cephalopodRules;
 
   @override
-  List<Move> legalMoves(GameState state) => _rules.legalMoves(state);
+  List<Move> legalMoves(GameState state) => _cephalopodRules.legalMoves(state);
 
   @override
   Result<GameState, IllegalMove> apply(GameState state, Move move) =>
       Err(GameOver());
+
+  @override
+  Player opponentOf(Player player) => _cephalopodRules.opponentOf(player);
 }

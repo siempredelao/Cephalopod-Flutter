@@ -39,9 +39,9 @@ final class CephalopodRules implements MoveGenerator {
     final sharedFinder =
         captureFinder ?? CaptureFinder(geometry: sharedGeometry);
     return CephalopodRules._(
-      geometry: sharedGeometry,
+      boardGeometry: sharedGeometry,
       captureFinder: sharedFinder,
-      validator:
+      moveValidator:
           validator ??
           MoveValidator(geometry: sharedGeometry, captureFinder: sharedFinder),
       referee: referee ?? Referee(),
@@ -49,15 +49,15 @@ final class CephalopodRules implements MoveGenerator {
   }
 
   CephalopodRules._({
-    required this._geometry,
+    required this._boardGeometry,
     required this._captureFinder,
-    required this._validator,
+    required this._moveValidator,
     required this._referee,
   });
 
-  final BoardGeometry _geometry;
+  final BoardGeometry _boardGeometry;
   final CaptureFinder _captureFinder;
-  final MoveValidator _validator;
+  final MoveValidator _moveValidator;
   final Referee _referee;
 
   /// The value a non-capturing die shows (rule R7).
@@ -119,6 +119,7 @@ final class CephalopodRules implements MoveGenerator {
   }
 
   /// The player who moves after [player]: turns alternate (rule R1).
+  @override
   Player opponentOf(Player player) => switch (player) {
     Player.black => Player.white,
     Player.white => Player.black,
@@ -134,7 +135,7 @@ final class CephalopodRules implements MoveGenerator {
     if (state.status is! InProgress) return const [];
     final board = state.board;
     return [
-      for (final square in _geometry.squares(board.size))
+      for (final square in _boardGeometry.squares(board.size))
         if (!board.dice.containsKey(square)) ..._movesAt(state, square),
     ];
   }
@@ -146,7 +147,7 @@ final class CephalopodRules implements MoveGenerator {
   Result<GameState, IllegalMove> apply(GameState state, Move move) {
     final status = state.status;
     if (status is! InProgress) return Err(GameOver());
-    if (_validator.violationOf(state, move) case final violation?) {
+    if (_moveValidator.violationOf(state, move) case final violation?) {
       return Err(violation);
     }
     return Ok(_play(state, move, status.toMove));
