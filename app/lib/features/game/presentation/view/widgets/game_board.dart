@@ -98,10 +98,10 @@ class GameBoard extends StatelessWidget {
     _ => SquareMark.none,
   };
 
-  static String _labelOf(Position square, Die? die) {
+  String _labelOf(Position square, Die? die) {
     final where = 'Row ${square.row + 1}, column ${square.col + 1}';
-    return die == null
-        ? '$where, empty'
-        : '$where, ${playerNameOf(die.owner)} die showing ${die.pips}';
+    if (die == null) return '$where, empty';
+    final owner = dieOwnerOf(die.owner, state.opponent);
+    return '$where, $owner die showing ${die.pips}';
   }
 }

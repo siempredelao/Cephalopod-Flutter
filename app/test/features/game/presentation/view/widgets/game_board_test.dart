@@ -1,4 +1,6 @@
 import 'package:cephalopod/core/theme/board_colors.dart';
+import 'package:cephalopod/features/game/domain/models/difficulty.dart';
+import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_view_state.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
@@ -91,6 +93,27 @@ void main() {
         findsOne,
       );
       expect(find.bySemanticsLabel('Row 1, column 3, empty'), findsOne);
+      semantics.dispose();
+    });
+
+    testWidgets("names the dice yours or the computer's against it", (
+      tester,
+    ) async {
+      final semantics = tester.ensureSemantics();
+      const computer = ComputerOpponent(
+        difficulty: Difficulty.easy,
+        player: Player.white,
+      );
+      await pumpBoard(tester, placing().copyWith(opponent: computer));
+
+      expect(
+        find.bySemanticsLabel("Row 1, column 2, the computer's die showing 1"),
+        findsOne,
+      );
+      expect(
+        find.bySemanticsLabel('Row 2, column 3, your die showing 5'),
+        findsOne,
+      );
       semantics.dispose();
     });
 

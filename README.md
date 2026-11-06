@@ -7,10 +7,11 @@ A Flutter implementation of **Cephalopod**, the two-player dice game invented by
 reference for clean architecture, SOLID and testing in Flutter: the rules live in
 a pure-Dart package, the app sits on top, and CI enforces the boundaries.
 
-**Status:** M3, persistence and undo. Two players can play a full game on one
-device, undo and redo moves, leave and continue later, and choose a system,
-light or dark theme, on top of a rules engine tested with 1,000 seeded random
-games checked move by move. Next is M4: an AI opponent.
+**Status:** M4, AI opponent. Play a friend on one device or the computer at
+three levels (Easy, Medium, Hard), undo and redo moves, leave and continue
+later, and choose a system, light or dark theme, on top of a rules engine
+tested with 1,000 seeded random games checked move by move. Next is M5:
+polish.
 
 ## The game
 
@@ -120,7 +121,7 @@ hooks: install [lefthook](https://lefthook.dev) and run `lefthook install`.
 - [x] **M2 · Playable MVP**: hot-seat game on one device
 - [x] **M3 · Persistence and undo**: resume, undo/redo, settings with a theme
   choice (system, light or dark)
-- [ ] **M4 · AI opponent**: three difficulty levels
+- [x] **M4 · AI opponent**: three difficulty levels
 - [ ] **M5 · Polish**: accessibility, English and Spanish, placement and capture
   animations, light and dark board palettes, rule-sheet link and app version on
   About, goldens

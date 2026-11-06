@@ -1,4 +1,5 @@
 import 'package:cephalopod/core/navigation/app_route.dart';
+import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_view_state.dart';
@@ -104,21 +105,32 @@ class GameView extends StatelessWidget {
     );
   }
 
+  /// What the game waits for, or how it ended. Against the computer, the
+  /// person is "you".
   static String _headlineOf(GameViewState state) {
     if (state.phase is ComputerThinking) return 'The computer is thinking…';
-    return switch (state.game.status) {
-      InProgress(:final toMove) => '${playerNameOf(toMove)} to move',
-      final Finished result => _resultOf(result),
+    return switch ((state.game.status, state.opponent)) {
+      (InProgress(), ComputerOpponent()) => 'Your turn',
+      (InProgress(:final toMove), FriendOpponent()) =>
+        '${playerNameOf(toMove)} to move',
+      (final Finished result, final opponent) => _resultOf(result, opponent),
     };
   }
 
-  /// Who won and by how much, winner first: "Player 2 wins 13 to 12".
-  static String _resultOf(Finished result) {
+  /// Who won and by how much, winner first: "Player 2 wins 13 to 12", or
+  /// against the computer "You win 13 to 12".
+  static String _resultOf(Finished result, Opponent opponent) {
     final (won, lost) = switch (result.winner) {
       Player.black => (result.blackDice, result.whiteDice),
       Player.white => (result.whiteDice, result.blackDice),
     };
-    return '${playerNameOf(result.winner)} wins $won to $lost';
+    final winner = switch (opponent) {
+      FriendOpponent() => '${playerNameOf(result.winner)} wins',
+      ComputerOpponent(:final player) when player == result.winner =>
+        'The computer wins',
+      ComputerOpponent() => 'You win',
+    };
+    return '$winner $won to $lost';
   }
 }
 
