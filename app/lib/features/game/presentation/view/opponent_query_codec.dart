@@ -3,7 +3,7 @@ import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
 /// Puts an [Opponent] into the game route's query parameters, and takes it
-/// back out, so a link can open a game against it.
+/// back out, so the new-game dialog, or a link, can open a game against it.
 ///
 /// A friend needs no parameters, so `/game` is a game between two people.
 /// The computer is `?computer=white&difficulty=hard`: the colour it plays,
