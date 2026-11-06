@@ -5,6 +5,7 @@ import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/domain/models/saved_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/has_game_to_continue.dart';
 import 'package:cephalopod/features/game/domain/use_cases/play_move.dart';
+import 'package:cephalopod/features/game/domain/use_cases/request_agent_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/resume_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/start_new_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/undo_move.dart';
@@ -197,4 +198,95 @@ void main() {
       expect(await hasGameToContinue(), isFalse);
     });
   });
+
+  group('RequestAgentMove', () {
+    final agentMove = Move(top);
+    late _FixedAgent agent;
+    late List<Difficulty> difficulties;
+    late RequestAgentMove requestAgentMove;
+
+    setUp(() {
+      agent = _FixedAgent(agentMove);
+      difficulties = [];
+      requestAgentMove = RequestAgentMove(
+        agentFactory: (difficulty) {
+          difficulties.add(difficulty);
+          return agent;
+        },
+        playMove: playMove,
+      );
+    });
+
+    /// A game against [opponent] after black's first move, so white is to
+    /// move: the computer's turn, if it plays white.
+    Future<CurrentGame> computerToMove([Opponent opponent = computer]) async {
+      final start = await startNewGame(opponent: opponent);
+      return play(start, Move(center));
+    }
+
+    test('plays and saves the move the agent chooses', () async {
+      final game = await computerToMove();
+
+      final next = await requestAgentMove(game);
+
+      expect(agent.positions, [game.state]);
+      expect(next.record.moves, [Move(center), agentMove]);
+      expect(await repository.load(), saved(next));
+    });
+
+    test("asks for the agent of the computer's difficulty", () async {
+      for (final difficulty in Difficulty.values) {
+        final opponent = ComputerOpponent(
+          difficulty: difficulty,
+          player: Player.white,
+        );
+        await requestAgentMove(await computerToMove(opponent));
+      }
+
+      expect(difficulties, Difficulty.values);
+    });
+
+    test('refuses a game against a friend', () async {
+      final game = await computerToMove(friend);
+
+      await expectLater(requestAgentMove(game), throwsArgumentError);
+    });
+
+    test("refuses when it is the person's turn", () async {
+      final start = await startNewGame(opponent: computer);
+
+      await expectLater(requestAgentMove(start), throwsArgumentError);
+    });
+
+    test('refuses a game that is over', () async {
+      const oneSquare = GameConfig(boardSize: 1);
+      final start = await startNewGame(config: oneSquare, opponent: computer);
+      final over = await play(start, Move(const Position(0, 0)));
+
+      await expectLater(requestAgentMove(over), throwsArgumentError);
+    });
+
+    test('throws when the agent breaks the rules, saving nothing', () async {
+      final game = await computerToMove();
+      agent = _FixedAgent(Move(center));
+
+      await expectLater(requestAgentMove(game), throwsStateError);
+      expect(await repository.load(), saved(game));
+    });
+  });
+}
+
+/// An agent that always chooses [move], and keeps each position it is
+/// asked about.
+final class _FixedAgent implements GameAgent {
+  _FixedAgent(this.move);
+
+  final Move move;
+  final List<GameState> positions = [];
+
+  @override
+  Move chooseMove(GameState state) {
+    positions.add(state);
+    return move;
+  }
 }
