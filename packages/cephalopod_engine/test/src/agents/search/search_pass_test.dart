@@ -11,9 +11,10 @@ void main() {
     final evaluator = PositionEvaluator();
     final ranker = MoveRanker(moves: rules, evaluator: evaluator);
 
-    /// Runs one pass for [player], to move in [state], looking [depth] moves
+    /// Runs one pass for Black, to move in [state], looking [depth] moves
     /// ahead, with a budget it cannot run out of.
-    PassResult search(GameState state, Player player, {required int depth}) {
+    SearchPassResult search(GameState state, {required int depth}) {
+      const player = Player.black;
       final budget = NodeBudget(1000000)..enforce();
       final legal = rules.legalMoves(state);
       final first = ranker.rank(state, player, legal, budget);
@@ -39,7 +40,7 @@ void main() {
         .  w1 w1 .  .
       ''', toMove: Player.black);
 
-      final result = search(state, Player.black, depth: 2);
+      final result = search(state, depth: 2);
 
       expect(
         result.rankedMoveCandidates.first.move,
@@ -62,13 +63,13 @@ void main() {
         b4 w4 .
       ''', toMove: Player.black);
 
-      final result = search(state, Player.black, depth: 2);
+      final result = search(state, depth: 2);
 
       expect(result.sawEveryEnding, isTrue);
     });
 
     test('reports it did not when the game goes on past its depth', () {
-      final result = search(rules.newGame(), Player.black, depth: 2);
+      final result = search(rules.newGame(), depth: 2);
 
       expect(result.sawEveryEnding, isFalse);
     });

@@ -11,7 +11,7 @@ import 'package:cephalopod_engine/src/models/player.dart';
 /// What a pass found: the moves, `rankedMoveCandidates` best first, and
 /// whether it `sawEveryEnding` within its depth, so that looking deeper would
 /// change nothing.
-typedef PassResult = ({
+typedef SearchPassResult = ({
   List<Candidate> rankedMoveCandidates,
   bool sawEveryEnding,
 });
@@ -65,7 +65,7 @@ final class SearchPass {
   ///
   /// When the budget runs out during the pass, the result is meaningless:
   /// check [NodeBudget.ranOut] before using it.
-  PassResult rerank(List<Candidate> rankedMoveCandidates, Player player) {
+  SearchPassResult rerank(List<Candidate> rankedMoveCandidates, Player player) {
     _sawEveryEnding = true;
     final opponent = _moves.opponentOf(player);
     var bestSoFar = -_infinity;
