@@ -42,7 +42,8 @@ class GameView extends StatelessWidget {
           IconButton(
             tooltip: 'New game',
             icon: const Icon(Icons.refresh),
-            onPressed: () => _restart(context.read<GameBloc>()),
+            onPressed: () =>
+                context.read<GameBloc>().add(const GameRestarted()),
           ),
         ],
       ),
@@ -78,10 +79,6 @@ class GameView extends StatelessWidget {
       ),
     );
   }
-
-  /// Starts again under the same rules, for example on the same board size.
-  static void _restart(GameBloc bloc) =>
-      bloc.add(GameStarted(bloc.state.game.config));
 
   /// What a tap on a square does: nothing while the computer thinks, because
   /// a tap sent then would wait, and land after the computer's move.

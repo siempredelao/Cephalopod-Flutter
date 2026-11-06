@@ -70,8 +70,10 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
 
   Future<void> _onEvent(GameEvent event, Emitter<GameViewState> emit) async {
     switch (event) {
-      case GameStarted(:final config):
-        await _start(config, emit);
+      case GameStarted(:final opponent, :final config):
+        await _start(opponent, config, emit);
+      case GameRestarted():
+        await _start(_opponent, _gameRecord.config, emit);
       case GameResumed():
         await _resume(emit);
       case SquareTapped(:final position):
@@ -89,10 +91,12 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     await _letComputerPlay(emit);
   }
 
-  Future<void> _start(GameConfig config, Emitter<GameViewState> emit) async {
+  Future<void> _start(
+    Opponent opponent,
+    GameConfig config,
+    Emitter<GameViewState> emit,
+  ) async {
     _undone.clear();
-    // Until the new-game screen lets the person pick the computer.
-    const opponent = FriendOpponent();
     _show(await _startNewGame(config: config, opponent: opponent), emit);
   }
 

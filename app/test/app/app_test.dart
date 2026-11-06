@@ -4,9 +4,13 @@ import 'package:cephalopod/app/router.dart';
 import 'package:cephalopod/features/about/about_module.dart';
 import 'package:cephalopod/features/about/presentation/view/about_page.dart';
 import 'package:cephalopod/features/game/data/in_memory_game_repository.dart';
+import 'package:cephalopod/features/game/domain/models/difficulty.dart';
+import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/game_module.dart';
+import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
+import 'package:cephalopod/features/game/presentation/view/new_game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
 import 'package:cephalopod/features/home/home_module.dart';
@@ -45,6 +49,21 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  /// From home, opens the new-game screen and starts a game against a
+  /// friend.
+  Future<void> startNewGame(WidgetTester tester) async {
+    await tester.tap(find.widgetWithText(FilledButton, 'New game'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Start'));
+    await tester.pumpAndSettle();
+  }
+
+  /// The opponent the game on screen was started against.
+  Opponent? opponentOnScreen(WidgetTester tester) {
+    final opening = tester.widget<GamePage>(find.byType(GamePage)).opening;
+    return opening is GameStarted ? opening.opponent : null;
+  }
+
   group('App', () {
     testWidgets('starts on the home page', (tester) async {
       await pumpApp(tester);
@@ -52,22 +71,56 @@ void main() {
       expect(find.byType(HomePage), findsOneWidget);
     });
 
-    testWidgets('opens a new game from home', (tester) async {
+    testWidgets('opens a new game against a friend from home', (tester) async {
       await pumpApp(tester);
 
+      await startNewGame(tester);
+
+      expect(find.byType(GamePage), findsOneWidget);
+      expect(opponentOnScreen(tester), const FriendOpponent());
+    });
+
+    testWidgets('opens a new game against the computer', (tester) async {
+      // Hard, with the person moving first and the computer playing White.
+      const computer = ComputerOpponent(
+        difficulty: Difficulty.hard,
+        player: Player.white,
+      );
+      await pumpApp(tester);
       await tester.tap(find.widgetWithText(FilledButton, 'New game'));
       await tester.pumpAndSettle();
 
-      expect(find.byType(GamePage), findsOneWidget);
+      await tester.tap(find.text('The computer'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Hard'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Start'));
+      await tester.pumpAndSettle();
+
+      expect(opponentOnScreen(tester), computer);
+    });
+
+    testWidgets('comes back to the new-game screen after a game', (
+      tester,
+    ) async {
+      await pumpApp(tester);
+      await startNewGame(tester);
+
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(NewGamePage), findsOneWidget);
     });
 
     testWidgets('offers to continue a game left unfinished', (tester) async {
       await pumpApp(tester);
       expect(find.text('Continue'), findsNothing);
 
-      await tester.tap(find.widgetWithText(FilledButton, 'New game'));
-      await tester.pumpAndSettle();
+      await startNewGame(tester);
       await tester.tap(find.byType(BoardSquare).first);
+      await tester.pumpAndSettle();
+      // Back from the game, then from the new-game screen.
+      await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
       await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
@@ -139,8 +192,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
-      await tester.tap(find.widgetWithText(FilledButton, 'New game'));
-      await tester.pumpAndSettle();
+      await startNewGame(tester);
 
       final page = tester.widget<GamePage>(find.byType(GamePage));
       expect(page.highlightLastMove, isFalse);

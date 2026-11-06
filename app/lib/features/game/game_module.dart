@@ -11,8 +11,11 @@ import 'package:cephalopod/features/game/domain/use_cases/resume_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/start_new_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/undo_move.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
+import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
+import 'package:cephalopod/features/game/presentation/view/new_game_page.dart';
+import 'package:cephalopod/features/game/presentation/view/opponent_query_codec.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter/foundation.dart' show compute;
 import 'package:go_router/go_router.dart';
@@ -35,6 +38,7 @@ final class GameModule implements FeatureModule {
   final bool Function() _highlightLastMove;
 
   final PositionEvaluator _positionEvaluator = PositionEvaluator();
+  final OpponentQueryCodec _opponentQueryCodec = const OpponentQueryCodec();
 
   late final StartNewGame _startNewGame = StartNewGame(
     cephalopodRules: _cephalopodRules,
@@ -69,10 +73,16 @@ final class GameModule implements FeatureModule {
   /// one.
   Future<bool> hasGameToContinue() => _hasGameToContinue();
 
-  /// The game route starts a new game, or picks up the saved one with
+  /// The new-game route chooses an opponent and opens the game route, which
+  /// starts a game against it, or picks up the saved one with
   /// `?resume=true`, which Home offers when there is one.
   @override
   List<RouteBase> get routes => [
+    GoRoute(
+      path: 'new-game',
+      name: AppRoute.newGame.name,
+      builder: (_, _) => const NewGamePage(),
+    ),
     GoRoute(
       path: 'game',
       name: AppRoute.game.name,
@@ -80,7 +90,7 @@ final class GameModule implements FeatureModule {
       // the highlight setting once, when it opens.
       builder: (_, state) => GamePage(
         createBloc: _createBloc,
-        resume: state.uri.queryParameters['resume'] == 'true',
+        opening: _openingOf(state.uri.queryParameters),
         highlightLastMove: _highlightLastMove(),
       ),
     ),
@@ -90,6 +100,12 @@ final class GameModule implements FeatureModule {
       builder: (_, _) => const HowToPlayPage(),
     ),
   ];
+
+  /// The game route's first event, from its query parameters.
+  GameEvent _openingOf(Map<String, String> parameters) {
+    if (parameters['resume'] == 'true') return const GameResumed();
+    return GameStarted(opponent: _opponentQueryCodec.decode(parameters));
+  }
 
   GameBloc _createBloc() {
     return GameBloc(

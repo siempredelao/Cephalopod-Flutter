@@ -4,7 +4,10 @@ enum AppRoute {
   /// The start screen.
   home,
 
-  /// A game between two players taking turns on one device.
+  /// Choosing who to play against, before a game starts.
+  newGame,
+
+  /// A game, against a friend on the same device or the computer.
   game,
 
   /// How to play, one rule per page with a board that shows it.
