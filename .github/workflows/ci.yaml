@@ -81,6 +81,10 @@ jobs:
       # the latest one main wrote.
       - if: steps.platform.outputs.present == 'true' && matrix.platform == 'android'
         uses: gradle/actions/setup-gradle@v6
+        with:
+          # TEMPORARY: lets this pull request write its own cache, so a
+          # re-run shows the warm build time. Removed before merging.
+          cache-read-only: false
 
       - if: steps.platform.outputs.present == 'true'
         uses: subosito/flutter-action@v2
