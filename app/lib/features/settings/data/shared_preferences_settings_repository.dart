@@ -6,9 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// A [SettingsRepository] that keeps each setting under its own key with
 /// shared_preferences (docs/adr/0012).
 final class SharedPreferencesSettingsRepository implements SettingsRepository {
-  SharedPreferencesSettingsRepository({required this._preferences});
+  SharedPreferencesSettingsRepository({required this._sharedPreferencesAsync});
 
-  final SharedPreferencesAsync _preferences;
+  final SharedPreferencesAsync _sharedPreferencesAsync;
 
   static const String _themeKey = 'theme';
   static const String _highlightKey = 'highlightLastMove';
@@ -17,8 +17,8 @@ final class SharedPreferencesSettingsRepository implements SettingsRepository {
   /// version does not know, keeps its default.
   @override
   Future<AppSettings> load() async {
-    final theme = await _preferences.getString(_themeKey);
-    final highlight = await _preferences.getBool(_highlightKey);
+    final theme = await _sharedPreferencesAsync.getString(_themeKey);
+    final highlight = await _sharedPreferencesAsync.getBool(_highlightKey);
     return (
       theme: ThemePreference.values.asNameMap()[theme] ?? defaultSettings.theme,
       highlightLastMove: highlight ?? defaultSettings.highlightLastMove,
@@ -27,7 +27,10 @@ final class SharedPreferencesSettingsRepository implements SettingsRepository {
 
   @override
   Future<void> save(AppSettings settings) async {
-    await _preferences.setString(_themeKey, settings.theme.name);
-    await _preferences.setBool(_highlightKey, settings.highlightLastMove);
+    await _sharedPreferencesAsync.setString(_themeKey, settings.theme.name);
+    await _sharedPreferencesAsync.setBool(
+      _highlightKey,
+      settings.highlightLastMove,
+    );
   }
 }

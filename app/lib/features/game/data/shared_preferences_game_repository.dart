@@ -8,12 +8,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// platform the app ships to, the web included (docs/adr/0012).
 final class SharedPreferencesGameRepository implements GameRepository {
   SharedPreferencesGameRepository({
-    required this._preferences,
-    required this._codec,
+    required this._sharedPreferencesAsync,
+    required this._gameRecordJsonCodec,
   });
 
-  final SharedPreferencesAsync _preferences;
-  final GameRecordJsonCodec _codec;
+  final SharedPreferencesAsync _sharedPreferencesAsync;
+  final GameRecordJsonCodec _gameRecordJsonCodec;
 
   static const String _key = 'game';
 
@@ -21,15 +21,18 @@ final class SharedPreferencesGameRepository implements GameRepository {
   /// a game this version can read.
   @override
   Future<GameRecord?> load() async {
-    final json = await _preferences.getString(_key);
-    return json == null ? null : _codec.decode(json);
+    final json = await _sharedPreferencesAsync.getString(_key);
+    return json == null ? null : _gameRecordJsonCodec.decode(json);
   }
 
   @override
   Future<void> save(GameRecord record) {
-    return _preferences.setString(_key, _codec.encode(record));
+    return _sharedPreferencesAsync.setString(
+      _key,
+      _gameRecordJsonCodec.encode(record),
+    );
   }
 
   @override
-  Future<void> clear() => _preferences.remove(_key);
+  Future<void> clear() => _sharedPreferencesAsync.remove(_key);
 }

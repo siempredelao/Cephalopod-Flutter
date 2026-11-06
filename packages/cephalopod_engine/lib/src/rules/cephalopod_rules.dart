@@ -30,20 +30,19 @@ final class CephalopodRules implements MoveGenerator {
   /// Any part can be passed in; the rest are created here, sharing one
   /// [BoardGeometry] and one [CaptureFinder].
   factory CephalopodRules({
-    BoardGeometry? geometry,
+    BoardGeometry? boardGeometry,
     CaptureFinder? captureFinder,
-    MoveValidator? validator,
+    MoveValidator? moveValidator,
     Referee? referee,
   }) {
-    final sharedGeometry = geometry ?? BoardGeometry();
-    final sharedFinder =
-        captureFinder ?? CaptureFinder(geometry: sharedGeometry);
+    final geometry = boardGeometry ?? BoardGeometry();
+    final finder = captureFinder ?? CaptureFinder(boardGeometry: geometry);
     return CephalopodRules._(
-      boardGeometry: sharedGeometry,
-      captureFinder: sharedFinder,
+      boardGeometry: geometry,
+      captureFinder: finder,
       moveValidator:
-          validator ??
-          MoveValidator(geometry: sharedGeometry, captureFinder: sharedFinder),
+          moveValidator ??
+          MoveValidator(boardGeometry: geometry, captureFinder: finder),
       referee: referee ?? Referee(),
     );
   }

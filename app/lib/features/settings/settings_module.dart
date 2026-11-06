@@ -11,13 +11,15 @@ import 'package:go_router/go_router.dart';
 /// widget provides it to every screen, so the theme follows it and the
 /// settings page changes it.
 final class SettingsModule implements FeatureModule {
-  SettingsModule({required this._repository});
+  SettingsModule({required this._settingsRepository});
 
-  final SettingsRepository _repository;
+  final SettingsRepository _settingsRepository;
 
   /// The player's settings for the whole app. It starts with the defaults;
   /// call `load` on it to swap in the saved ones.
-  late final SettingsCubit cubit = SettingsCubit(repository: _repository);
+  late final SettingsCubit cubit = SettingsCubit(
+    settingsRepository: _settingsRepository,
+  );
 
   /// Whether the board should mark the last move, as the settings say now.
   /// A plain function, so the composition root can hand it to features that

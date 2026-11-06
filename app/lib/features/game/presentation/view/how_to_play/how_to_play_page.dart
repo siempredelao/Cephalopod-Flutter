@@ -17,14 +17,14 @@ class HowToPlayPage extends StatefulWidget {
 class _HowToPlayPageState extends State<HowToPlayPage> {
   static const Duration _turnDuration = Duration(milliseconds: 300);
 
-  final PageController _pages = PageController();
+  final PageController _pageController = PageController();
   int _current = 0;
 
   bool get _onLastStep => _current == tutorialSteps.length - 1;
 
   @override
   void dispose() {
-    _pages.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -34,7 +34,7 @@ class _HowToPlayPageState extends State<HowToPlayPage> {
       Navigator.of(context).maybePop();
       return;
     }
-    _pages.nextPage(duration: _turnDuration, curve: Curves.easeInOut);
+    _pageController.nextPage(duration: _turnDuration, curve: Curves.easeInOut);
   }
 
   @override
@@ -46,7 +46,7 @@ class _HowToPlayPageState extends State<HowToPlayPage> {
           children: [
             Expanded(
               child: PageView(
-                controller: _pages,
+                controller: _pageController,
                 onPageChanged: (page) => setState(() => _current = page),
                 children: [
                   for (final step in tutorialSteps) _StepView(step: step),

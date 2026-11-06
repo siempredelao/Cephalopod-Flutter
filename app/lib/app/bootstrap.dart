@@ -24,16 +24,18 @@ void bootstrap(Flavor flavor) {
   final preferences = SharedPreferencesAsync();
 
   final settings = SettingsModule(
-    repository: SharedPreferencesSettingsRepository(preferences: preferences),
+    settingsRepository: SharedPreferencesSettingsRepository(
+      sharedPreferencesAsync: preferences,
+    ),
   );
   // Shows the defaults for the moment the saved settings take to load.
   unawaited(settings.cubit.load());
 
   final game = GameModule(
-    rules: CephalopodRules(),
-    repository: SharedPreferencesGameRepository(
-      preferences: preferences,
-      codec: GameRecordJsonCodec(),
+    cephalopodRules: CephalopodRules(),
+    gameRepository: SharedPreferencesGameRepository(
+      sharedPreferencesAsync: preferences,
+      gameRecordJsonCodec: GameRecordJsonCodec(),
     ),
     highlightLastMove: settings.highlightLastMove,
   );

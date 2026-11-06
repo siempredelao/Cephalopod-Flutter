@@ -5,8 +5,8 @@ import 'package:test/test.dart';
 void main() {
   final geometry = BoardGeometry();
   final validator = MoveValidator(
-    geometry: geometry,
-    captureFinder: CaptureFinder(geometry: geometry),
+    boardGeometry: geometry,
+    captureFinder: CaptureFinder(boardGeometry: geometry),
   );
   const top = Position(0, 2);
   const leftOfTop = Position(0, 1);

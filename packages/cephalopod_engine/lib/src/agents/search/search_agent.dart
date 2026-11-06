@@ -95,14 +95,17 @@ final class SearchAgent implements GameAgent {
         nodeBudget: nodeBudget,
         depth: depth,
       );
-      final result = searchPass.scoreMoves(rankedMoveCandidates, player);
+      final searchPassResult = searchPass.scoreMoves(
+        rankedMoveCandidates,
+        player,
+      );
       // A pass cut short has not compared every move, so it is thrown away.
       if (nodeBudget.ranOut) break;
 
-      rankedMoveCandidates = result.rankedMoveCandidates;
+      rankedMoveCandidates = searchPassResult.rankedMoveCandidates;
       // Every line of play ended within this pass, so looking deeper would
       // change nothing.
-      if (result.sawEveryEnding) break;
+      if (searchPassResult.sawEveryEnding) break;
     }
 
     return rankedMoveCandidates.first.move;

@@ -10,7 +10,7 @@ void main() {
   late SettingsCubit cubit;
 
   Future<void> pumpSettings(WidgetTester tester) async {
-    cubit = SettingsCubit(repository: InMemorySettingsRepository());
+    cubit = SettingsCubit(settingsRepository: InMemorySettingsRepository());
     addTearDown(cubit.close);
     await tester.pumpWidget(
       MaterialApp(

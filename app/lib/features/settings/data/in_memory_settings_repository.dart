@@ -5,13 +5,13 @@ import 'package:cephalopod/features/settings/domain/settings_repository.dart';
 /// are lost when the app closes. For tests, and as the reference the
 /// contract tests hold other implementations to.
 final class InMemorySettingsRepository implements SettingsRepository {
-  AppSettings _settings = defaultSettings;
+  AppSettings _appSettings = defaultSettings;
 
   @override
-  Future<AppSettings> load() async => _settings;
+  Future<AppSettings> load() async => _appSettings;
 
   @override
   Future<void> save(AppSettings settings) async {
-    _settings = settings;
+    _appSettings = settings;
   }
 }
