@@ -13,7 +13,7 @@ void main() {
     SharedPreferencesAsyncPlatform.instance =
         InMemorySharedPreferencesAsync.empty();
     return SharedPreferencesSettingsRepository(
-      preferences: SharedPreferencesAsync(),
+      sharedPreferencesAsync: SharedPreferencesAsync(),
     );
   }
 

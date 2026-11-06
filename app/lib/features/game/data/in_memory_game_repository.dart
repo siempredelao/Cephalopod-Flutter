@@ -5,18 +5,18 @@ import 'package:cephalopod_engine/cephalopod_engine.dart';
 /// when the app closes. For tests, and as the reference the contract tests
 /// hold other implementations to.
 final class InMemoryGameRepository implements GameRepository {
-  GameRecord? _record;
+  GameRecord? _gameRecord;
 
   @override
-  Future<GameRecord?> load() async => _record;
+  Future<GameRecord?> load() async => _gameRecord;
 
   @override
   Future<void> save(GameRecord record) async {
-    _record = record;
+    _gameRecord = record;
   }
 
   @override
   Future<void> clear() async {
-    _record = null;
+    _gameRecord = null;
   }
 }

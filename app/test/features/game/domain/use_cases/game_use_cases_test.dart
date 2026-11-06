@@ -23,10 +23,13 @@ void main() {
 
   setUp(() {
     repository = InMemoryGameRepository();
-    startNewGame = StartNewGame(rules: rules, repository: repository);
-    playMove = PlayMove(rules: rules, repository: repository);
-    undoMove = UndoMove(rules: rules, repository: repository);
-    resumeGame = ResumeGame(rules: rules, repository: repository);
+    startNewGame = StartNewGame(
+      cephalopodRules: rules,
+      gameRepository: repository,
+    );
+    playMove = PlayMove(cephalopodRules: rules, gameRepository: repository);
+    undoMove = UndoMove(cephalopodRules: rules, gameRepository: repository);
+    resumeGame = ResumeGame(cephalopodRules: rules, gameRepository: repository);
   });
 
   /// [game] after [move], which the test expects to be legal.

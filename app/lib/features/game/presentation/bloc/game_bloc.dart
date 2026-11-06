@@ -16,20 +16,20 @@ import 'package:collection/collection.dart';
 /// use cases.
 class GameBloc extends Bloc<GameEvent, GameViewState> {
   GameBloc({
-    required this._rules,
+    required this._cephalopodRules,
     required this._startNewGame,
     required this._playMove,
     required this._undoMove,
     required this._resumeGame,
     GameConfig config = GameConfig.standard,
-  }) : super(_startOf(_rules.newGame(config))) {
-    _record = GameRecord(config: config);
+  }) : super(_startOf(_cephalopodRules.newGame(config))) {
+    _gameRecord = GameRecord(config: config);
     // Events wait for storage, so they run one at a time, in order: each
     // sees the game the one before it left.
     on<GameEvent>(_onEvent, transformer: _inOrder);
   }
 
-  final CephalopodRules _rules;
+  final CephalopodRules _cephalopodRules;
   final StartNewGame _startNewGame;
   final PlayMove _playMove;
   final UndoMove _undoMove;
@@ -37,7 +37,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
 
   /// The moves played so far, as saved. The position they reach is
   /// `state.game`.
-  late GameRecord _record;
+  late GameRecord _gameRecord;
 
   /// Moves taken back, most recent last, for redo. A new move clears them.
   final List<Move> _undone = [];
@@ -73,7 +73,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   }
 
   Future<void> _resume(Emitter<GameViewState> emit) async {
-    final game = await _resumeGame() ?? await _startNewGame(_record.config);
+    final game = await _resumeGame() ?? await _startNewGame(_gameRecord.config);
     _undone.clear();
     _show(game, emit);
   }
@@ -97,7 +97,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// chooses which capture to make (rule R5).
   Future<void> _place(Position square, Emitter<GameViewState> emit) async {
     final moves = [
-      for (final move in _rules.legalMoves(state.game))
+      for (final move in _cephalopodRules.legalMoves(state.game))
         if (move.position == square) move,
     ];
     switch (moves) {
@@ -161,7 +161,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// Plays [move], which comes from the engine's legal moves, and saves the
   /// game. A new move replaces any moves taken back.
   Future<void> _play(Move move, Emitter<GameViewState> emit) async {
-    final game = (record: _record, state: state.game);
+    final game = (record: _gameRecord, state: state.game);
     if (await _playMove(game, move) case Ok(:final value)) {
       _undone.clear();
       _show(value, emit);
@@ -171,9 +171,9 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// Takes back the last move, if there is one, and remembers it for redo.
   /// A finished game stays finished.
   Future<void> _undo(Emitter<GameViewState> emit) async {
-    final moves = _record.moves;
+    final moves = _gameRecord.moves;
     if (moves.isEmpty || state.phase is GameEnded) return;
-    final game = await _undoMove((record: _record, state: state.game));
+    final game = await _undoMove((record: _gameRecord, state: state.game));
     _undone.add(moves.last);
     _show(game, emit);
   }
@@ -182,7 +182,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   Future<void> _redo(Emitter<GameViewState> emit) async {
     if (_undone.isEmpty) return;
     final move = _undone.removeLast();
-    final game = (record: _record, state: state.game);
+    final game = (record: _gameRecord, state: state.game);
     if (await _playMove(game, move) case Ok(:final value)) {
       _show(value, emit);
     }
@@ -191,7 +191,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// Shows [game], the result of a use case, and keeps its record for the
   /// next move.
   void _show(CurrentGame game, Emitter<GameViewState> emit) {
-    _record = game.record;
+    _gameRecord = game.record;
     final inProgress = game.state.status is InProgress;
     emit(
       GameViewState(

@@ -25,11 +25,13 @@ void main() {
     String location = '/',
   }) async {
     // Wired as bootstrap wires it, with storage in memory.
-    final settings = SettingsModule(repository: InMemorySettingsRepository());
+    final settings = SettingsModule(
+      settingsRepository: InMemorySettingsRepository(),
+    );
     addTearDown(settings.cubit.close);
     final game = GameModule(
-      rules: CephalopodRules(),
-      repository: InMemoryGameRepository(),
+      cephalopodRules: CephalopodRules(),
+      gameRepository: InMemoryGameRepository(),
       highlightLastMove: settings.highlightLastMove,
     );
     final router = createRouter(

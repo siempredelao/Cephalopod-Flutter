@@ -4,10 +4,10 @@ import 'package:cephalopod_engine/cephalopod_engine.dart';
 
 /// Plays a move and saves the game with it.
 final class PlayMove {
-  PlayMove({required this._rules, required this._repository});
+  PlayMove({required this._cephalopodRules, required this._gameRepository});
 
-  final CephalopodRules _rules;
-  final GameRepository _repository;
+  final CephalopodRules _cephalopodRules;
+  final GameRepository _gameRepository;
 
   /// [game] after [move], already saved; or why [move] is illegal, in which
   /// case nothing is saved.
@@ -15,13 +15,13 @@ final class PlayMove {
     CurrentGame game,
     Move move,
   ) async {
-    switch (_rules.apply(game.state, move)) {
+    switch (_cephalopodRules.apply(game.state, move)) {
       case Ok(:final value):
         final record = GameRecord(
           config: game.record.config,
           moves: [...game.record.moves, move],
         );
-        await _repository.save(record);
+        await _gameRepository.save(record);
         return Ok((record: record, state: value));
       case Err(:final error):
         return Err(error);

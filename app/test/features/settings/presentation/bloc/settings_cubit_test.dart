@@ -12,7 +12,7 @@ void main() {
 
   setUp(() => repository = InMemorySettingsRepository());
 
-  SettingsCubit build() => SettingsCubit(repository: repository);
+  SettingsCubit build() => SettingsCubit(settingsRepository: repository);
 
   group('SettingsCubit', () {
     test('starts with the default settings', () {

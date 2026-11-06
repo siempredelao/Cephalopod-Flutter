@@ -20,30 +20,30 @@ final class GameModule implements FeatureModule {
   /// feature's cubit, because features may not import each other. The
   /// composition root wires it to the settings module.
   GameModule({
-    required this._rules,
-    required this._repository,
+    required this._cephalopodRules,
+    required this._gameRepository,
     required this._highlightLastMove,
   });
 
-  final CephalopodRules _rules;
-  final GameRepository _repository;
+  final CephalopodRules _cephalopodRules;
+  final GameRepository _gameRepository;
   final bool Function() _highlightLastMove;
 
   late final StartNewGame _startNewGame = StartNewGame(
-    rules: _rules,
-    repository: _repository,
+    cephalopodRules: _cephalopodRules,
+    gameRepository: _gameRepository,
   );
   late final PlayMove _playMove = PlayMove(
-    rules: _rules,
-    repository: _repository,
+    cephalopodRules: _cephalopodRules,
+    gameRepository: _gameRepository,
   );
   late final UndoMove _undoMove = UndoMove(
-    rules: _rules,
-    repository: _repository,
+    cephalopodRules: _cephalopodRules,
+    gameRepository: _gameRepository,
   );
   late final ResumeGame _resumeGame = ResumeGame(
-    rules: _rules,
-    repository: _repository,
+    cephalopodRules: _cephalopodRules,
+    gameRepository: _gameRepository,
   );
   late final HasGameToContinue _hasGameToContinue = HasGameToContinue(
     resumeGame: _resumeGame,
@@ -78,7 +78,7 @@ final class GameModule implements FeatureModule {
 
   GameBloc _createBloc() {
     return GameBloc(
-      rules: _rules,
+      cephalopodRules: _cephalopodRules,
       startNewGame: _startNewGame,
       playMove: _playMove,
       undoMove: _undoMove,

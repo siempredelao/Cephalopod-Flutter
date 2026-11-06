@@ -15,12 +15,15 @@ GameBloc createTestGameBloc({
 }) {
   final rules = CephalopodRules();
   final games = repository ?? InMemoryGameRepository();
-  final startNewGame = StartNewGame(rules: rules, repository: games);
-  final playMove = PlayMove(rules: rules, repository: games);
-  final undoMove = UndoMove(rules: rules, repository: games);
-  final resumeGame = ResumeGame(rules: rules, repository: games);
+  final startNewGame = StartNewGame(
+    cephalopodRules: rules,
+    gameRepository: games,
+  );
+  final playMove = PlayMove(cephalopodRules: rules, gameRepository: games);
+  final undoMove = UndoMove(cephalopodRules: rules, gameRepository: games);
+  final resumeGame = ResumeGame(cephalopodRules: rules, gameRepository: games);
   return GameBloc(
-    rules: rules,
+    cephalopodRules: rules,
     startNewGame: startNewGame,
     playMove: playMove,
     undoMove: undoMove,

@@ -4,10 +4,10 @@ import 'package:cephalopod_engine/cephalopod_engine.dart';
 
 /// Picks up the saved game.
 final class ResumeGame {
-  ResumeGame({required this._rules, required this._repository});
+  ResumeGame({required this._cephalopodRules, required this._gameRepository});
 
-  final CephalopodRules _rules;
-  final GameRepository _repository;
+  final CephalopodRules _cephalopodRules;
+  final GameRepository _gameRepository;
 
   /// The saved game, rebuilt by replaying its moves; `null` when there is
   /// none.
@@ -16,13 +16,13 @@ final class ResumeGame {
   /// `null` and is cleared, so the next game starts fresh instead of failing
   /// again (docs/adr/0003).
   Future<CurrentGame?> call() async {
-    final record = await _repository.load();
+    final record = await _gameRepository.load();
     if (record == null) return null;
-    switch (_rules.replay(record)) {
+    switch (_cephalopodRules.replay(record)) {
       case Ok(:final value):
         return (record: record, state: value);
       case Err():
-        await _repository.clear();
+        await _gameRepository.clear();
         return null;
     }
   }

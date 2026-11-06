@@ -13,8 +13,8 @@ void main() {
     SharedPreferencesAsyncPlatform.instance =
         InMemorySharedPreferencesAsync.empty();
     return SharedPreferencesGameRepository(
-      preferences: SharedPreferencesAsync(),
-      codec: GameRecordJsonCodec(),
+      sharedPreferencesAsync: SharedPreferencesAsync(),
+      gameRecordJsonCodec: GameRecordJsonCodec(),
     );
   }
 

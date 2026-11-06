@@ -9,11 +9,11 @@ import 'package:cephalopod/features/settings/domain/settings_repository.dart';
 /// Starts with [defaultSettings]; [load] swaps in the saved ones. Every
 /// change is saved as it is made.
 class SettingsCubit extends Cubit<AppSettings> {
-  SettingsCubit({required this._repository}) : super(defaultSettings);
+  SettingsCubit({required this._settingsRepository}) : super(defaultSettings);
 
-  final SettingsRepository _repository;
+  final SettingsRepository _settingsRepository;
 
-  Future<void> load() async => emit(await _repository.load());
+  Future<void> load() async => emit(await _settingsRepository.load());
 
   Future<void> chooseTheme(ThemePreference theme) {
     return _change((theme: theme, highlightLastMove: state.highlightLastMove));
@@ -26,6 +26,6 @@ class SettingsCubit extends Cubit<AppSettings> {
 
   Future<void> _change(AppSettings settings) async {
     emit(settings);
-    await _repository.save(settings);
+    await _settingsRepository.save(settings);
   }
 }
