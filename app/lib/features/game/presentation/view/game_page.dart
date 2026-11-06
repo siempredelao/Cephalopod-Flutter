@@ -4,13 +4,12 @@ import 'package:cephalopod/features/game/presentation/view/game_view.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// The game screen's entry point: gets a `GameBloc` from [createBloc], starts
-/// a new game or, with [resume], picks up the saved one, and hands the bloc
-/// to [GameView].
+/// The game screen's entry point: gets a `GameBloc` from [createBloc], sends
+/// it [opening], and hands the bloc to [GameView].
 class GamePage extends StatelessWidget {
   const GamePage({
     required this.createBloc,
-    this.resume = false,
+    required this.opening,
     this.highlightLastMove = true,
     super.key,
   });
@@ -18,17 +17,18 @@ class GamePage extends StatelessWidget {
   /// Builds the screen's bloc. The composition root wires it to the device's
   /// storage; tests wire it to memory.
   final GameBloc Function() createBloc;
-  final bool resume;
+
+  /// The first event: `GameStarted` for a new game against an opponent, or
+  /// `GameResumed` to pick up the saved one.
+  final GameEvent opening;
 
   /// Whether the board marks the last move, as the player's settings say.
   final bool highlightLastMove;
 
-  GameEvent get _opening => resume ? const GameResumed() : const GameStarted();
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => createBloc()..add(_opening),
+      create: (_) => createBloc()..add(opening),
       child: GameView(highlightLastMove: highlightLastMove),
     );
   }

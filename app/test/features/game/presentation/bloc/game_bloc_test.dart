@@ -243,7 +243,22 @@ void main() {
       'starting a new game drops the current one',
       build: build,
       seed: () => choosing(selected: {left}, sum: 1),
-      act: (bloc) => bloc.add(const GameStarted(GameConfig(boardSize: 3))),
+      act: (bloc) => bloc.add(
+        const GameStarted(
+          opponent: FriendOpponent(),
+          config: GameConfig(boardSize: 3),
+        ),
+      ),
+      expect: () => [placing(rules.newGame(const GameConfig(boardSize: 3)))],
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      'restarting keeps the rules of the game on screen',
+      build: () => createTestGameBloc(config: const GameConfig(boardSize: 3)),
+      act: (bloc) => bloc
+        ..add(const SquareTapped(Position(1, 1)))
+        ..add(const GameRestarted()),
+      skip: 1,
       expect: () => [placing(rules.newGame(const GameConfig(boardSize: 3)))],
     );
   });
@@ -364,7 +379,7 @@ void main() {
       final record = GameRecord(moves: [Move(center)]);
       await repository.save((record: record, opponent: friend));
 
-      final bloc = buildSaving()..add(const GameStarted());
+      final bloc = buildSaving()..add(const GameStarted(opponent: friend));
       await settle();
 
       expect(await repository.load(), savedNewGame);
@@ -453,6 +468,22 @@ void main() {
         placing(start).copyWith(canRedo: true),
         replied,
       ],
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      'restarting keeps playing the computer',
+      setUp: () => saveGameAgainst(Player.white),
+      build: buildResuming,
+      act: (bloc) => bloc
+        ..add(const GameResumed())
+        ..add(const SquareTapped(center))
+        ..add(const GameRestarted()),
+      expect: () => [placing(start), thinking, replied, placing(start)],
+      verify: (_) async {
+        final saved = await repository.load();
+        expect(saved?.opponent, isA<ComputerOpponent>());
+        expect(saved?.record.moves, isEmpty);
+      },
     );
   });
 }
