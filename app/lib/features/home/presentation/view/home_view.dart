@@ -10,14 +10,29 @@ import 'package:material_ui/material_ui.dart';
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
-  /// Opens a game, new or [resume]d, and asks the cubit again whether there
-  /// is one to continue once the player is back.
-  Future<void> _openGame(BuildContext context, {required bool resume}) async {
+  /// Picks up the saved game, and asks the cubit again whether there is one
+  /// to continue once the player is back.
+  Future<void> _continue(BuildContext context) async {
     final cubit = context.read<HomeCubit>();
     await context.pushNamed(
       AppRoute.game.name,
-      queryParameters: {if (resume) 'resume': 'true'},
+      queryParameters: {'resume': 'true'},
     );
+    await cubit.refresh();
+  }
+
+  /// Asks who to play in the new-game dialog, opens the game it closes with,
+  /// and asks the cubit again once the player is back. A cancelled dialog
+  /// opens nothing.
+  ///
+  /// The dialog gives back the game's location, so Home opens it without
+  /// knowing the game feature.
+  Future<void> _newGame(BuildContext context) async {
+    final cubit = context.read<HomeCubit>();
+    final router = GoRouter.of(context);
+    final game = await router.pushNamed<String>(AppRoute.newGame.name);
+    if (game == null) return;
+    await router.push<void>(game);
     await cubit.refresh();
   }
 
@@ -43,17 +58,17 @@ class HomeView extends StatelessWidget {
                   const SizedBox(height: 32),
                   if (canContinue) ...[
                     FilledButton(
-                      onPressed: () => _openGame(context, resume: true),
+                      onPressed: () => _continue(context),
                       child: const Text('Continue'),
                     ),
                     const SizedBox(height: 12),
                     FilledButton.tonal(
-                      onPressed: () => _openGame(context, resume: false),
+                      onPressed: () => _newGame(context),
                       child: const Text('New game'),
                     ),
                   ] else
                     FilledButton(
-                      onPressed: () => _openGame(context, resume: false),
+                      onPressed: () => _newGame(context),
                       child: const Text('New game'),
                     ),
                   const SizedBox(height: 12),
