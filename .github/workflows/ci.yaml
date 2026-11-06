@@ -82,6 +82,32 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
+      # Flutter's Gradle plugin makes every Android build install the NDK
+      # version it pins (FlutterExtension.ndkVersion), to strip debug symbols
+      # from the app's native libraries. The runner image does not ship that
+      # version, so it is cached rather than downloaded on every run. Read
+      # from the SDK, so a Flutter upgrade picks up its new version.
+      - if: steps.platform.outputs.present == 'true' && matrix.platform == 'android'
+        name: Find the NDK version Flutter pins
+        id: ndk
+        run: |
+          flutter_root="$(dirname "$(dirname "$(command -v flutter)")")"
+          file="$flutter_root/packages/flutter_tools/gradle/src/main/kotlin/FlutterExtension.kt"
+          version="$(sed -n 's/.*val ndkVersion: String = "\([0-9.]*\)".*/\1/p' "$file")"
+          if [ -z "$version" ]; then
+            echo "::error file=$file::Could not read ndkVersion; update this step."
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "path=$ANDROID_HOME/ndk/$version" >> "$GITHUB_OUTPUT"
+
+      - if: steps.platform.outputs.present == 'true' && matrix.platform == 'android'
+        name: Cache the NDK
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.ndk.outputs.path }}
+          key: android-ndk-${{ runner.os }}-${{ steps.ndk.outputs.version }}
+
       # Generated code is not committed (docs/adr/0011), so create it first.
       - if: steps.platform.outputs.present == 'true'
         name: Generate code
