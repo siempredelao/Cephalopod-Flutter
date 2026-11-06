@@ -90,7 +90,6 @@ final class SearchAgent implements GameAgent {
     for (var depth = 2; ; depth++) {
       final searchPass = SearchPass(
         moveGenerator: _moveGenerator,
-        positionEvaluator: _positionEvaluator,
         moveRanker: moveRanker,
         nodeBudget: nodeBudget,
         depth: depth,
