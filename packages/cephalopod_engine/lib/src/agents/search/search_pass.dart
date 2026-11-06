@@ -73,9 +73,11 @@ final class SearchPass {
     Player player,
   ) {
     _sawEveryEnding = true;
+
     final opponent = _moveGenerator.opponentOf(player);
     var bestSoFar = -_infinity;
     final rescored = <Candidate>[];
+
     for (final candidate in rankedMoveCandidates) {
       final reply = _lookAhead(
         candidate.state,
@@ -84,15 +86,20 @@ final class SearchPass {
         -_infinity,
         -bestSoFar,
       );
+
       final score = -reply;
+
       rescored.add((
         move: candidate.move,
         state: candidate.state,
         score: score,
       ));
+
       bestSoFar = max(bestSoFar, score);
     }
+
     rescored.sortBestFirst();
+
     return (rankedMoveCandidates: rescored, sawEveryEnding: _sawEveryEnding);
   }
 
@@ -118,15 +125,18 @@ final class SearchPass {
   ) {
     // The pass will be thrown away, so stop as quickly as possible.
     if (_nodeBudget.ranOut) return 0;
+
     if (state.status is Finished) {
       return _finalScore(state, player, movesAhead);
     }
+
     // Both count moves: this position is as far ahead as the pass looks, so
     // it is scored as it stands.
     if (movesAhead == _depth) {
       _sawEveryEnding = false;
       return _positionEvaluator.score(state, player);
     }
+
     final legalMoves = _moveGenerator.legalMoves(state);
     final candidates = _moveRanker.playAll(
       state,
@@ -137,6 +147,7 @@ final class SearchPass {
     final opponent = _moveGenerator.opponentOf(player);
     var best = -_infinity;
     var secured = floor;
+
     for (final candidate in candidates) {
       // Seen from the opponent's side, scores are negated, so the limits swap.
       final reply = _lookAhead(
@@ -148,8 +159,10 @@ final class SearchPass {
       );
       best = max(best, -reply);
       secured = max(secured, best);
+
       if (secured >= ceiling) break;
     }
+
     return best;
   }
 

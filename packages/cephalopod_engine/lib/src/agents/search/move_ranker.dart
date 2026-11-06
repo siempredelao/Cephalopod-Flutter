@@ -38,13 +38,18 @@ final class MoveRanker {
     NodeBudget budget,
   ) {
     final candidates = <Candidate>[];
+
     for (final move in legalMoves) {
       if (!budget.trySpend()) break;
+
       final nextState = _moveGenerator.applyLegal(state, move);
       final score = _positionEvaluator.score(nextState, player);
+
       candidates.add((move: move, state: nextState, score: score));
     }
+
     candidates.sortBestFirst();
+
     return candidates;
   }
 }

@@ -48,6 +48,7 @@ final class NodeBudget {
       _ranOut = true;
       return false;
     }
+
     _spent++;
     return true;
   }
