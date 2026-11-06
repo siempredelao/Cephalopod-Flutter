@@ -60,12 +60,16 @@ final class SearchPass {
   /// Whether every line of play so far ended before the depth ran out.
   bool _sawEveryEnding = true;
 
-  /// The moves of [player] in [rankedMoveCandidates], best first, scored again
-  /// by looking the pass's depth ahead.
+  /// Scores each of [rankedMoveCandidates], the moves of [player], by looking
+  /// the pass's depth ahead, and returns them best first. Trying them in the
+  /// order of the previous pass lets it skip the most.
   ///
   /// When the budget runs out during the pass, the result is meaningless:
   /// check [NodeBudget.ranOut] before using it.
-  SearchPassResult rerank(List<Candidate> rankedMoveCandidates, Player player) {
+  SearchPassResult scoreMoves(
+    List<Candidate> rankedMoveCandidates,
+    Player player,
+  ) {
     _sawEveryEnding = true;
     final opponent = _moves.opponentOf(player);
     var bestSoFar = -_infinity;
@@ -122,7 +126,7 @@ final class SearchPass {
       return _evaluator.score(state, player);
     }
     final legalMoves = _moves.legalMoves(state);
-    final candidates = _ranker.rank(state, player, legalMoves, _budget);
+    final candidates = _ranker.playAll(state, player, legalMoves, _budget);
     final opponent = _moves.opponentOf(player);
     var best = -_infinity;
     var secured = floor;

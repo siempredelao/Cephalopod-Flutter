@@ -5,7 +5,7 @@ import 'package:cephalopod_engine/testing.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('MoveRanker.rank', () {
+  group('MoveRanker.playAll', () {
     final rules = CephalopodRules();
     final ranker = MoveRanker(moves: rules, evaluator: PositionEvaluator());
 
@@ -23,14 +23,14 @@ void main() {
     );
 
     test('puts the move that leads to the best position first', () {
-      final ranked = ranker.rank(state, Player.black, legal, NodeBudget(0));
+      final ranked = ranker.playAll(state, Player.black, legal, NodeBudget(0));
 
       expect(ranked.first.move, capture);
       expect(ranked.first.score, 1);
     });
 
     test('keeps the given order for equally good moves', () {
-      final ranked = ranker.rank(state, Player.black, legal, NodeBudget(0));
+      final ranked = ranker.playAll(state, Player.black, legal, NodeBudget(0));
 
       expect(
         ranked.skip(1).map((candidate) => candidate.move),
@@ -41,7 +41,7 @@ void main() {
     test('stops when the budget refuses a position', () {
       final budget = NodeBudget(2)..enforce();
 
-      final ranked = ranker.rank(state, Player.black, legal, budget);
+      final ranked = ranker.playAll(state, Player.black, legal, budget);
 
       expect(ranked, hasLength(2));
       expect(budget.ranOut, isTrue);

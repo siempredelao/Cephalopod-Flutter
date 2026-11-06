@@ -6,7 +6,7 @@ import 'package:cephalopod_engine/testing.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('SearchPass.rerank', () {
+  group('SearchPass.scoreMoves', () {
     final rules = CephalopodRules();
     final evaluator = PositionEvaluator();
     final ranker = MoveRanker(moves: rules, evaluator: evaluator);
@@ -17,7 +17,7 @@ void main() {
       const player = Player.black;
       final budget = NodeBudget(1000000)..enforce();
       final legal = rules.legalMoves(state);
-      final first = ranker.rank(state, player, legal, budget);
+      final first = ranker.playAll(state, player, legal, budget);
       final pass = SearchPass(
         depth: depth,
         moves: rules,
@@ -25,7 +25,7 @@ void main() {
         ranker: ranker,
         budget: budget,
       );
-      return pass.rerank(first, player);
+      return pass.scoreMoves(first, player);
     }
 
     test('looking 2 moves ahead, avoids a capture that leaves a reply', () {

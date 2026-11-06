@@ -31,7 +31,7 @@ final class MoveRanker {
   /// Each position spends one node of [budget]. When the budget refuses one,
   /// it stops and returns the moves played so far; the budget then says it
   /// [NodeBudget.ranOut], and the pass that asked must be thrown away.
-  List<Candidate> rank(
+  List<Candidate> playAll(
     GameState state,
     Player player,
     List<Move> legalMoves,

@@ -71,7 +71,12 @@ final class SearchAgent implements GameAgent {
     final legalMoves = [..._moves.legalMoves(state)]..shuffle(_random);
     // The first pass looks 1 move ahead: it plays each move and scores the
     // result. The budget does not apply yet, so it always finishes.
-    var rankedMoveCandidates = ranker.rank(state, player, legalMoves, budget);
+    var rankedMoveCandidates = ranker.playAll(
+      state,
+      player,
+      legalMoves,
+      budget,
+    );
     budget.enforce();
     for (var depth = 2; ; depth++) {
       final pass = SearchPass(
@@ -81,7 +86,7 @@ final class SearchAgent implements GameAgent {
         ranker: ranker,
         budget: budget,
       );
-      final result = pass.rerank(rankedMoveCandidates, player);
+      final result = pass.scoreMoves(rankedMoveCandidates, player);
       // A pass cut short has not compared every move, so it is thrown away.
       if (budget.ranOut) break;
       rankedMoveCandidates = result.rankedMoveCandidates;
