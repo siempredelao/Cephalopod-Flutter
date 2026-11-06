@@ -32,21 +32,22 @@ typedef SearchPassResult = ({
 ///
 /// A win counts for less the later it comes, so of two wins it takes the
 /// quicker one, and it puts off a loss as long as it can.
+///
+/// It never scores a position itself. `MoveRanker.playAll` scores each
+/// position as it plays the move, and the pass reuses that score wherever the
+/// game ends or the pass looks no further.
 final class SearchPass {
   /// A pass that looks `depth` moves ahead. It asks `moveGenerator` for the
-  /// legal moves and who plays next, has `moveRanker` play and order them,
-  /// scores the positions it stops at with `positionEvaluator`, and spends
-  /// `nodeBudget`.
+  /// legal moves and who plays next, has `moveRanker` play, score and order
+  /// them, and spends `nodeBudget`.
   SearchPass({
     required this._moveGenerator,
-    required this._positionEvaluator,
     required this._moveRanker,
     required this._nodeBudget,
     required this._depth,
   });
 
   final MoveGenerator _moveGenerator;
-  final PositionEvaluator _positionEvaluator;
   final MoveRanker _moveRanker;
   final NodeBudget _nodeBudget;
 
@@ -79,15 +80,7 @@ final class SearchPass {
     final rescored = <Candidate>[];
 
     for (final candidate in rankedMoveCandidates) {
-      final reply = _lookAhead(
-        candidate.state,
-        opponent,
-        1,
-        -_infinity,
-        -bestSoFar,
-      );
-
-      final score = -reply;
+      final score = _scoreOf(candidate, opponent, 1, bestSoFar, _infinity);
 
       rescored.add((
         move: candidate.move,
@@ -103,8 +96,46 @@ final class SearchPass {
     return (rankedMoveCandidates: rescored, sawEveryEnding: _sawEveryEnding);
   }
 
+  /// How good [candidate] is for the player who made its move, which leaves
+  /// [nextPlayer] to move, [movesAhead] moves ahead of the position the pass
+  /// started from. [floor] and [ceiling] are as in [_lookAhead], seen from
+  /// the player who made the move.
+  ///
+  /// `playAll` already scored the position the move leads to. When the game
+  /// ends there, or the pass looks no further, that score is the answer, so
+  /// the same position is not scored again.
+  int _scoreOf(
+    Candidate candidate,
+    Player nextPlayer,
+    int movesAhead,
+    int floor,
+    int ceiling,
+  ) {
+    if (candidate.state.status is Finished) {
+      return _finalScore(candidate.score, movesAhead);
+    }
+
+    // Both count moves: this position is as far ahead as the pass looks, so
+    // it counts as it stands.
+    if (movesAhead == _depth) {
+      _sawEveryEnding = false;
+      return candidate.score;
+    }
+
+    // Seen from the other side, scores are negated, so the limits swap.
+    return -_lookAhead(
+      candidate.state,
+      nextPlayer,
+      movesAhead,
+      -ceiling,
+      -floor,
+    );
+  }
+
   /// The score of [state] for [player], who moves next in it, [movesAhead]
-  /// moves ahead of the position the pass started from.
+  /// moves ahead of the position the pass started from. Only called for
+  /// positions the pass looks past: the game goes on, and [movesAhead] is
+  /// below the depth.
   ///
   /// Two limits let it skip moves that cannot matter:
   ///
@@ -126,17 +157,6 @@ final class SearchPass {
     // The pass will be thrown away, so stop as quickly as possible.
     if (_nodeBudget.ranOut) return 0;
 
-    if (state.status is Finished) {
-      return _finalScore(state, player, movesAhead);
-    }
-
-    // Both count moves: this position is as far ahead as the pass looks, so
-    // it is scored as it stands.
-    if (movesAhead == _depth) {
-      _sawEveryEnding = false;
-      return _positionEvaluator.score(state, player);
-    }
-
     final legalMoves = _moveGenerator.legalMoves(state);
     final candidates = _moveRanker.playAll(
       state,
@@ -149,15 +169,14 @@ final class SearchPass {
     var secured = floor;
 
     for (final candidate in candidates) {
-      // Seen from the opponent's side, scores are negated, so the limits swap.
-      final reply = _lookAhead(
-        candidate.state,
+      final score = _scoreOf(
+        candidate,
         opponent,
         movesAhead + 1,
-        -ceiling,
-        -secured,
+        secured,
+        ceiling,
       );
-      best = max(best, -reply);
+      best = max(best, score);
       secured = max(secured, best);
 
       if (secured >= ceiling) break;
@@ -166,11 +185,10 @@ final class SearchPass {
     return best;
   }
 
-  /// The score of the finished game [state] for [player], reached
-  /// [movesAhead] moves from now. A win counts for less the later it comes,
-  /// and a loss for less the longer it is put off.
-  int _finalScore(GameState state, Player player, int movesAhead) {
-    final score = _positionEvaluator.score(state, player);
+  /// [score], the score of a finished game, adjusted for being [movesAhead]
+  /// moves from now: a win counts for less the later it comes, and a loss
+  /// for less the longer it is put off.
+  int _finalScore(int score, int movesAhead) {
     return score > 0 ? score - movesAhead : score + movesAhead;
   }
 }

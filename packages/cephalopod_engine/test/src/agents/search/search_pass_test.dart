@@ -23,7 +23,6 @@ void main() {
       final first = ranker.playAll(state, player, legal, budget);
       final pass = SearchPass(
         moveGenerator: rules,
-        positionEvaluator: evaluator,
         moveRanker: ranker,
         nodeBudget: budget,
         depth: depth,

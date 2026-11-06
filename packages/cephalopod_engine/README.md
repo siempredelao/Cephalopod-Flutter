@@ -112,8 +112,8 @@ is exported; the other classes are internal, and their tests import their
 | --- | --- |
 | `SearchAgent` | Runs the first pass, then passes one move deeper until the budget runs out or every ending is seen |
 | `NodeBudget` | Counts the positions generated, keeps the first pass free and says when it ran out |
-| `MoveRanker` | Plays moves and sorts the results best first, so alpha-beta skips more |
-| `SearchPass` | One pass at a fixed depth: negamax with alpha-beta and the quicker-win bonus |
+| `MoveRanker` | Plays moves, scores each result and sorts them best first, so alpha-beta skips more. The only place positions are scored |
+| `SearchPass` | One pass at a fixed depth: negamax with alpha-beta and the quicker-win bonus. Reuses `MoveRanker`'s score where the game ends or the pass looks no further |
 
 Every agent runs one shared contract suite,
 `test/src/agents/game_agent_contract.dart`, and
