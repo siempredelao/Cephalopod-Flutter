@@ -10,15 +10,24 @@ import 'package:material_ui/material_ui.dart';
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
-  /// Opens a game, new or [resume]d, and asks the cubit again whether there
-  /// is one to continue once the player is back.
-  Future<void> _openGame(BuildContext context, {required bool resume}) async {
+  /// Opens [route], which leads to a game, and asks the cubit again whether
+  /// there is one to continue once the player is back.
+  Future<void> _open(
+    BuildContext context,
+    AppRoute route, {
+    Map<String, String> queryParameters = const {},
+  }) async {
     final cubit = context.read<HomeCubit>();
-    await context.pushNamed(
-      AppRoute.game.name,
-      queryParameters: {if (resume) 'resume': 'true'},
-    );
+    await context.pushNamed(route.name, queryParameters: queryParameters);
     await cubit.refresh();
+  }
+
+  Future<void> _continue(BuildContext context) {
+    return _open(context, AppRoute.game, queryParameters: {'resume': 'true'});
+  }
+
+  Future<void> _newGame(BuildContext context) {
+    return _open(context, AppRoute.newGame);
   }
 
   @override
@@ -43,17 +52,17 @@ class HomeView extends StatelessWidget {
                   const SizedBox(height: 32),
                   if (canContinue) ...[
                     FilledButton(
-                      onPressed: () => _openGame(context, resume: true),
+                      onPressed: () => _continue(context),
                       child: const Text('Continue'),
                     ),
                     const SizedBox(height: 12),
                     FilledButton.tonal(
-                      onPressed: () => _openGame(context, resume: false),
+                      onPressed: () => _newGame(context),
                       child: const Text('New game'),
                     ),
                   ] else
                     FilledButton(
-                      onPressed: () => _openGame(context, resume: false),
+                      onPressed: () => _newGame(context),
                       child: const Text('New game'),
                     ),
                   const SizedBox(height: 12),

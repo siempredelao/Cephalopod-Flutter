@@ -14,6 +14,7 @@ import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
+import 'package:cephalopod/features/game/presentation/view/new_game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/opponent_query_codec.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter/foundation.dart' show compute;
@@ -72,11 +73,17 @@ final class GameModule implements FeatureModule {
   /// one.
   Future<bool> hasGameToContinue() => _hasGameToContinue();
 
-  /// The game route starts a new game against the opponent in its query
-  /// (`OpponentQueryCodec`), or picks up the saved one with `?resume=true`,
-  /// which Home offers when there is one.
+  /// The new-game route chooses an opponent and opens the game route, which
+  /// starts a game against the opponent in its query (`OpponentQueryCodec`),
+  /// or picks up the saved one with `?resume=true`, which Home offers when
+  /// there is one.
   @override
   List<RouteBase> get routes => [
+    GoRoute(
+      path: 'new-game',
+      name: AppRoute.newGame.name,
+      builder: (_, _) => const NewGamePage(),
+    ),
     GoRoute(
       path: 'game',
       name: AppRoute.game.name,
