@@ -19,11 +19,11 @@ void main() {
       final legal = rules.legalMoves(state);
       final first = ranker.playAll(state, player, legal, budget);
       final pass = SearchPass(
-        depth: depth,
         moves: rules,
         evaluator: evaluator,
         ranker: ranker,
         budget: budget,
+        depth: depth,
       );
       return pass.scoreMoves(first, player);
     }

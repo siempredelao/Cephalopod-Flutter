@@ -37,20 +37,21 @@ final class SearchPass {
   /// moves and who plays next, has `ranker` play and order them, scores the
   /// positions it stops at with `evaluator`, and spends `budget`.
   SearchPass({
-    required this._depth,
     required this._moves,
     required this._evaluator,
     required this._ranker,
     required this._budget,
+    required this._depth,
   });
 
-  /// How many moves ahead the pass looks: 2 means the player's move and the
-  /// opponent's reply.
-  final int _depth;
   final MoveGenerator _moves;
   final PositionEvaluator _evaluator;
   final MoveRanker _ranker;
   final NodeBudget _budget;
+
+  /// How many moves ahead the pass looks: 2 means the player's move and the
+  /// opponent's reply.
+  final int _depth;
 
   /// Higher than any real score, as its negative is lower than any. The search
   /// starts from these to mean "no limit yet", because any real score beats

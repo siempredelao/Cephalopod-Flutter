@@ -49,15 +49,17 @@ final class SearchAgent implements GameAgent {
     RangeError.checkNotNegative(_nodeBudget, 'nodeBudget');
   }
 
+  final MoveGenerator _moves;
+  final PositionEvaluator _evaluator;
+  final Random _random;
+
+  /// How many positions it may generate to choose each move.
+  final int _nodeBudget;
+
   /// The node budget of the app's Hard level: deep enough to see a few moves
   /// ahead on a 5 × 5 board, small enough to answer in a fraction of a
   /// second.
   static const int defaultNodeBudget = 20000;
-
-  final MoveGenerator _moves;
-  final PositionEvaluator _evaluator;
-  final Random _random;
-  final int _nodeBudget;
 
   @override
   Move chooseMove(GameState state) {
@@ -80,11 +82,11 @@ final class SearchAgent implements GameAgent {
     budget.enforce();
     for (var depth = 2; ; depth++) {
       final pass = SearchPass(
-        depth: depth,
         moves: _moves,
         evaluator: _evaluator,
         ranker: ranker,
         budget: budget,
+        depth: depth,
       );
       final result = pass.scoreMoves(rankedMoveCandidates, player);
       // A pass cut short has not compared every move, so it is thrown away.
