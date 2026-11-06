@@ -4,7 +4,7 @@ import 'package:cephalopod/app/app.dart';
 import 'package:cephalopod/app/flavor.dart';
 import 'package:cephalopod/app/router.dart';
 import 'package:cephalopod/features/about/about_module.dart';
-import 'package:cephalopod/features/game/data/game_record_json_codec.dart';
+import 'package:cephalopod/features/game/data/saved_game_json_codec.dart';
 import 'package:cephalopod/features/game/data/shared_preferences_game_repository.dart';
 import 'package:cephalopod/features/game/game_module.dart';
 import 'package:cephalopod/features/home/home_module.dart';
@@ -35,7 +35,7 @@ void bootstrap(Flavor flavor) {
     cephalopodRules: CephalopodRules(),
     gameRepository: SharedPreferencesGameRepository(
       sharedPreferencesAsync: preferences,
-      gameRecordJsonCodec: GameRecordJsonCodec(),
+      savedGameJsonCodec: SavedGameJsonCodec(),
     ),
     highlightLastMove: settings.highlightLastMove,
   );

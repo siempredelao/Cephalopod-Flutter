@@ -1,4 +1,6 @@
 import 'package:cephalopod/features/game/domain/game_repository.dart';
+import 'package:cephalopod/features/game/domain/models/difficulty.dart';
+import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -10,6 +12,7 @@ void testGameRepositoryContract(Future<GameRepository> Function() create) {
     const center = Position(2, 2);
     const top = Position(0, 2);
     final record = GameRecord(moves: [Move(center), Move(top)]);
+    final savedGame = (record: record, opponent: const FriendOpponent());
     late GameRepository repository;
 
     setUp(() async => repository = await create());
@@ -19,15 +22,29 @@ void testGameRepositoryContract(Future<GameRepository> Function() create) {
     });
 
     test('gives back the saved game', () async {
-      await repository.save(record);
+      await repository.save(savedGame);
 
-      expect(await repository.load(), record);
+      expect(await repository.load(), savedGame);
+    });
+
+    test('gives back the opponent it was saved with', () async {
+      const computer = ComputerOpponent(
+        difficulty: Difficulty.medium,
+        player: Player.black,
+      );
+      final againstComputer = (record: record, opponent: computer);
+      await repository.save(againstComputer);
+
+      expect(await repository.load(), againstComputer);
     });
 
     test('keeps only the latest save', () async {
       const config = GameConfig(boardSize: 3);
-      final other = GameRecord(config: config);
-      await repository.save(record);
+      final other = (
+        record: GameRecord(config: config),
+        opponent: const FriendOpponent(),
+      );
+      await repository.save(savedGame);
 
       await repository.save(other);
 
@@ -35,7 +52,7 @@ void testGameRepositoryContract(Future<GameRepository> Function() create) {
     });
 
     test('forgets the game when cleared', () async {
-      await repository.save(record);
+      await repository.save(savedGame);
 
       await repository.clear();
 

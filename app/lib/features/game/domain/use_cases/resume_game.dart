@@ -16,11 +16,15 @@ final class ResumeGame {
   /// `null` and is cleared, so the next game starts fresh instead of failing
   /// again (docs/adr/0003).
   Future<CurrentGame?> call() async {
-    final record = await _gameRepository.load();
-    if (record == null) return null;
-    switch (_cephalopodRules.replay(record)) {
+    final savedGame = await _gameRepository.load();
+    if (savedGame == null) return null;
+    switch (_cephalopodRules.replay(savedGame.record)) {
       case Ok(:final value):
-        return (record: record, state: value);
+        return (
+          record: savedGame.record,
+          opponent: savedGame.opponent,
+          state: value,
+        );
       case Err():
         await _gameRepository.clear();
         return null;

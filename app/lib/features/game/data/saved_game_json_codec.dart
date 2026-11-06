@@ -1,28 +1,39 @@
 import 'dart:convert';
 
+import 'package:cephalopod/features/game/domain/models/difficulty.dart';
+import 'package:cephalopod/features/game/domain/models/opponent.dart';
+import 'package:cephalopod/features/game/domain/models/saved_game.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
-/// Turns a [GameRecord] into the saved JSON format of docs/adr/0003, and
-/// back:
+/// Turns a [SavedGame] into the saved JSON format, and back: the move log
+/// of docs/adr/0003, plus the opponent.
 ///
 /// ```json
 /// {
-///   "schemaVersion": 1,
+///   "schemaVersion": 2,
 ///   "config": {"boardSize": 5, "firstPlayer": "black", …},
+///   "opponent": {"type": "computer", "difficulty": "hard", "player": "white"},
 ///   "moves": [{"row": 0, "col": 1, "captures": [[0, 0], [0, 2]]}]
 /// }
 /// ```
 ///
+/// A friend is `{"type": "friend"}`. Saves from version 1, written before
+/// the computer opponent existed, have no `opponent` and are read as games
+/// against a friend.
+///
 /// Reading never throws: anything malformed gives `null`, so a corrupted
 /// save starts a fresh game instead of crashing the app. Whether the moves
 /// are legal is for `CephalopodRules.replay` to decide.
-final class GameRecordJsonCodec {
-  /// The format version written into every save. A save with another
-  /// version is not read.
-  static const int schemaVersion = 1;
+final class SavedGameJsonCodec {
+  /// The format version written into every save. Saves with this version or
+  /// [_versionWithoutOpponent] are read; any other is not.
+  static const int schemaVersion = 2;
 
-  String encode(GameRecord record) {
-    final config = record.config;
+  /// The version from before saves had an opponent.
+  static const int _versionWithoutOpponent = 1;
+
+  String encode(SavedGame savedGame) {
+    final config = savedGame.record.config;
     final json = {
       'schemaVersion': schemaVersion,
       'config': {
@@ -31,14 +42,15 @@ final class GameRecordJsonCodec {
         'maxCaptureSum': config.maxCaptureSum,
         'minCaptureDice': config.minCaptureDice,
       },
-      'moves': [for (final move in record.moves) _encodeMove(move)],
+      'opponent': _encodeOpponent(savedGame.opponent),
+      'moves': [for (final move in savedGame.record.moves) _encodeMove(move)],
     };
     return jsonEncode(json);
   }
 
-  /// The record in [json], or `null` when it is not a save this version can
+  /// The game in [json], or `null` when it is not a save this version can
   /// read.
-  GameRecord? decode(String json) {
+  SavedGame? decode(String json) {
     final Object? data;
     try {
       data = jsonDecode(json);
@@ -46,11 +58,27 @@ final class GameRecordJsonCodec {
       return null;
     }
     if (data is! Map<String, Object?>) return null;
-    if (data['schemaVersion'] != schemaVersion) return null;
+    final opponent = switch (data['schemaVersion']) {
+      _versionWithoutOpponent => const FriendOpponent(),
+      schemaVersion => _decodeOpponent(data['opponent']),
+      _ => null,
+    };
     final config = _decodeConfig(data['config']);
     final moves = _decodeMoves(data['moves']);
-    if (config == null || moves == null) return null;
-    return GameRecord(config: config, moves: moves);
+    if (opponent == null || config == null || moves == null) return null;
+    final record = GameRecord(config: config, moves: moves);
+    return (record: record, opponent: opponent);
+  }
+
+  Map<String, Object?> _encodeOpponent(Opponent opponent) {
+    return switch (opponent) {
+      FriendOpponent() => {'type': 'friend'},
+      ComputerOpponent(:final difficulty, :final player) => {
+        'type': 'computer',
+        'difficulty': difficulty.name,
+        'player': player.name,
+      },
+    };
   }
 
   Map<String, Object?> _encodeMove(Move move) {
@@ -61,6 +89,22 @@ final class GameRecordJsonCodec {
         for (final square in move.captures) [square.row, square.col],
       ],
     };
+  }
+
+  Opponent? _decodeOpponent(Object? data) {
+    if (data is! Map<String, Object?>) return null;
+    return switch (data['type']) {
+      'friend' => const FriendOpponent(),
+      'computer' => _decodeComputer(data),
+      _ => null,
+    };
+  }
+
+  ComputerOpponent? _decodeComputer(Map<String, Object?> data) {
+    final difficulty = Difficulty.values.asNameMap()[data['difficulty']];
+    final player = Player.values.asNameMap()[data['player']];
+    if (difficulty == null || player == null) return null;
+    return ComputerOpponent(difficulty: difficulty, player: player);
   }
 
   GameConfig? _decodeConfig(Object? data) {

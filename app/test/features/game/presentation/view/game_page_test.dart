@@ -1,5 +1,6 @@
 import 'package:cephalopod/core/theme/board_colors.dart';
 import 'package:cephalopod/features/game/data/in_memory_game_repository.dart';
+import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/game_view.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
@@ -27,8 +28,8 @@ void main() {
 
     testWidgets('picks up the saved game when resuming', (tester) async {
       final repository = InMemoryGameRepository();
-      final saved = GameRecord(moves: [Move(const Position(2, 2))]);
-      await repository.save(saved);
+      final record = GameRecord(moves: [Move(const Position(2, 2))]);
+      await repository.save((record: record, opponent: const FriendOpponent()));
 
       await tester.pumpWidget(
         MaterialApp(

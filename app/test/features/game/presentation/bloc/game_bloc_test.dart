@@ -1,5 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:cephalopod/features/game/data/in_memory_game_repository.dart';
+import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_view_state.dart';
@@ -248,6 +249,8 @@ void main() {
 
   group('GameBloc saving and history', () {
     late InMemoryGameRepository repository;
+    const friend = FriendOpponent();
+    final savedNewGame = (record: GameRecord(), opponent: friend);
     final played = GameViewState(
       game: after(rules.newGame(), Move(center)),
       phase: const TurnPhase.awaitingPlacement(),
@@ -269,8 +272,8 @@ void main() {
         ..add(const SquareTapped(top));
       await settle();
 
-      final saved = GameRecord(moves: [Move(center), Move(top)]);
-      expect(await repository.load(), saved);
+      final record = GameRecord(moves: [Move(center), Move(top)]);
+      expect(await repository.load(), (record: record, opponent: friend));
       await bloc.close();
     });
 
@@ -327,8 +330,8 @@ void main() {
     );
 
     test('picks up the saved game', () async {
-      final saved = GameRecord(moves: [Move(center), Move(top)]);
-      await repository.save(saved);
+      final record = GameRecord(moves: [Move(center), Move(top)]);
+      await repository.save((record: record, opponent: friend));
       final first = after(rules.newGame(), Move(center));
       final second = after(first, Move(top));
 
@@ -352,18 +355,18 @@ void main() {
       await settle();
 
       expect(bloc.state, placing(rules.newGame()));
-      expect(await repository.load(), GameRecord());
+      expect(await repository.load(), savedNewGame);
       await bloc.close();
     });
 
     test('starting a game replaces the saved one', () async {
-      final saved = GameRecord(moves: [Move(center)]);
-      await repository.save(saved);
+      final record = GameRecord(moves: [Move(center)]);
+      await repository.save((record: record, opponent: friend));
 
       final bloc = buildSaving()..add(const GameStarted());
       await settle();
 
-      expect(await repository.load(), GameRecord());
+      expect(await repository.load(), savedNewGame);
       await bloc.close();
     });
   });

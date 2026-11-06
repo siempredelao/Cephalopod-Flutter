@@ -21,8 +21,9 @@ final class PlayMove {
           config: game.record.config,
           moves: [...game.record.moves, move],
         );
-        await _gameRepository.save(record);
-        return Ok((record: record, state: value));
+        final opponent = game.opponent;
+        await _gameRepository.save((record: record, opponent: opponent));
+        return Ok((record: record, opponent: opponent, state: value));
       case Err(:final error):
         return Err(error);
     }

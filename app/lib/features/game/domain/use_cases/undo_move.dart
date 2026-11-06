@@ -27,7 +27,8 @@ final class UndoMove {
       // one replay. Failing here means the record was built some other way.
       Err(:final error) => throw StateError('Cannot replay $record: $error'),
     };
-    await _gameRepository.save(record);
-    return (record: record, state: state);
+    final opponent = game.opponent;
+    await _gameRepository.save((record: record, opponent: opponent));
+    return (record: record, opponent: opponent, state: state);
   }
 }

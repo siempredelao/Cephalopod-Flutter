@@ -1,4 +1,4 @@
-import 'package:cephalopod/features/game/data/game_record_json_codec.dart';
+import 'package:cephalopod/features/game/data/saved_game_json_codec.dart';
 import 'package:cephalopod/features/game/data/shared_preferences_game_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,7 +14,7 @@ void main() {
         InMemorySharedPreferencesAsync.empty();
     return SharedPreferencesGameRepository(
       sharedPreferencesAsync: SharedPreferencesAsync(),
-      gameRecordJsonCodec: GameRecordJsonCodec(),
+      savedGameJsonCodec: SavedGameJsonCodec(),
     );
   }
 
