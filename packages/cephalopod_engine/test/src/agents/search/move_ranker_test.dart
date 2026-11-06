@@ -7,7 +7,10 @@ import 'package:test/test.dart';
 void main() {
   group('MoveRanker.playAll', () {
     final rules = CephalopodRules();
-    final ranker = MoveRanker(moves: rules, evaluator: PositionEvaluator());
+    final ranker = MoveRanker(
+      moveGenerator: rules,
+      evaluator: PositionEvaluator(),
+    );
 
     // Black's only capture takes both white dice; every other move places a
     // plain 1 and leaves White a die ahead.

@@ -33,15 +33,16 @@ import 'package:cephalopod_engine/src/models/move.dart';
 ///
 /// The first pass is free, so even a budget of 0 plays like the Medium agent.
 final class SearchAgent implements GameAgent {
-  /// An agent that asks `moves` for the legal moves and what they lead to,
-  /// scores positions with `evaluator`, and breaks ties with `random`.
+  /// An agent that asks `moveGenerator` for the legal moves and what they
+  /// lead to, scores positions with `evaluator`, and breaks ties with
+  /// `random`.
   ///
   /// `nodeBudget` is how many positions it may generate to choose each move
   /// (see [NodeBudget]).
   ///
   /// Throws a [RangeError] when `nodeBudget` is negative.
   SearchAgent({
-    required this._moves,
+    required this._moveGenerator,
     required this._evaluator,
     required this._random,
     this._nodeBudget = defaultNodeBudget,
@@ -49,7 +50,7 @@ final class SearchAgent implements GameAgent {
     RangeError.checkNotNegative(_nodeBudget, 'nodeBudget');
   }
 
-  final MoveGenerator _moves;
+  final MoveGenerator _moveGenerator;
   final PositionEvaluator _evaluator;
   final Random _random;
 
@@ -69,8 +70,11 @@ final class SearchAgent implements GameAgent {
     }
     final player = status.toMove;
     final budget = NodeBudget(_nodeBudget);
-    final ranker = MoveRanker(moves: _moves, evaluator: _evaluator);
-    final legalMoves = [..._moves.legalMoves(state)]..shuffle(_random);
+    final ranker = MoveRanker(
+      moveGenerator: _moveGenerator,
+      evaluator: _evaluator,
+    );
+    final legalMoves = [..._moveGenerator.legalMoves(state)]..shuffle(_random);
     // The first pass looks 1 move ahead: it plays each move and scores the
     // result. The budget does not apply yet, so it always finishes.
     var rankedMoveCandidates = ranker.playAll(
@@ -82,7 +86,7 @@ final class SearchAgent implements GameAgent {
     budget.enforce();
     for (var depth = 2; ; depth++) {
       final pass = SearchPass(
-        moves: _moves,
+        moveGenerator: _moveGenerator,
         evaluator: _evaluator,
         ranker: ranker,
         budget: budget,

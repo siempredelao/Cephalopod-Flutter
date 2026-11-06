@@ -9,12 +9,12 @@ import '../game_agent_contract.dart';
 void main() {
   /// A Hard agent with a small budget, so the contract games stay fast.
   SearchAgent search(
-    MoveGenerator moves,
+    MoveGenerator moveGenerator,
     Random random, {
     int nodeBudget = 200,
   }) {
     return SearchAgent(
-      moves: moves,
+      moveGenerator: moveGenerator,
       evaluator: PositionEvaluator(),
       random: random,
       nodeBudget: nodeBudget,

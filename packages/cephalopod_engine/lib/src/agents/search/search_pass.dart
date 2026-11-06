@@ -33,18 +33,18 @@ typedef SearchPassResult = ({
 /// A win counts for less the later it comes, so of two wins it takes the
 /// quicker one, and it puts off a loss as long as it can.
 final class SearchPass {
-  /// A pass that looks `depth` moves ahead. It asks `moves` for the legal
-  /// moves and who plays next, has `ranker` play and order them, scores the
-  /// positions it stops at with `evaluator`, and spends `budget`.
+  /// A pass that looks `depth` moves ahead. It asks `moveGenerator` for the
+  /// legal moves and who plays next, has `ranker` play and order them, scores
+  /// the positions it stops at with `evaluator`, and spends `budget`.
   SearchPass({
-    required this._moves,
+    required this._moveGenerator,
     required this._evaluator,
     required this._ranker,
     required this._budget,
     required this._depth,
   });
 
-  final MoveGenerator _moves;
+  final MoveGenerator _moveGenerator;
   final PositionEvaluator _evaluator;
   final MoveRanker _ranker;
   final NodeBudget _budget;
@@ -72,7 +72,7 @@ final class SearchPass {
     Player player,
   ) {
     _sawEveryEnding = true;
-    final opponent = _moves.opponentOf(player);
+    final opponent = _moveGenerator.opponentOf(player);
     var bestSoFar = -_infinity;
     final rescored = <Candidate>[];
     for (final candidate in rankedMoveCandidates) {
@@ -126,9 +126,9 @@ final class SearchPass {
       _sawEveryEnding = false;
       return _evaluator.score(state, player);
     }
-    final legalMoves = _moves.legalMoves(state);
+    final legalMoves = _moveGenerator.legalMoves(state);
     final candidates = _ranker.playAll(state, player, legalMoves, _budget);
-    final opponent = _moves.opponentOf(player);
+    final opponent = _moveGenerator.opponentOf(player);
     var best = -_infinity;
     var secured = floor;
     for (final candidate in candidates) {

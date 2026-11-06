@@ -17,11 +17,11 @@ typedef Candidate = ({Move move, GameState state, int score});
 /// skip (see `SearchPass`). The position right after a move is a cheap
 /// guess at how good the move is, so moves are ranked by it.
 final class MoveRanker {
-  /// A ranker that plays moves with `moves` and scores the results with
+  /// A ranker that plays moves with `moveGenerator` and scores the results with
   /// `evaluator`.
-  MoveRanker({required this._moves, required this._evaluator});
+  MoveRanker({required this._moveGenerator, required this._evaluator});
 
-  final MoveGenerator _moves;
+  final MoveGenerator _moveGenerator;
   final PositionEvaluator _evaluator;
 
   /// Plays each of the [legalMoves] of [player] in [state] and scores the
@@ -40,7 +40,7 @@ final class MoveRanker {
     final candidates = <Candidate>[];
     for (final move in legalMoves) {
       if (!budget.trySpend()) break;
-      final nextState = _moves.applyLegal(state, move);
+      final nextState = _moveGenerator.applyLegal(state, move);
       final score = _evaluator.score(nextState, player);
       candidates.add((move: move, state: nextState, score: score));
     }

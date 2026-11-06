@@ -6,14 +6,14 @@ import 'package:test/test.dart';
 import 'game_agent_contract.dart';
 
 void main() {
-  gameAgentContract(
-    (moves, random) => RandomAgent(moves: moves, random: random),
-  );
+  gameAgentContract((moveGenerator, random) {
+    return RandomAgent(moveGenerator: moveGenerator, random: random);
+  });
 
   group('RandomAgent.chooseMove', () {
     test('can choose any legal move', () {
       final rules = CephalopodRules();
-      final agent = RandomAgent(moves: rules, random: Random(0));
+      final agent = RandomAgent(moveGenerator: rules, random: Random(0));
       final state = rules.newGame();
 
       final chosen = {for (var i = 0; i < 500; i++) agent.chooseMove(state)};
