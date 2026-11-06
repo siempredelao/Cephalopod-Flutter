@@ -8,10 +8,13 @@ import 'package:cephalopod_engine/src/models/game_state.dart';
 import 'package:cephalopod_engine/src/models/game_status.dart';
 import 'package:cephalopod_engine/src/models/player.dart';
 
-/// What a pass found: the moves, `ranked` best first, and whether it
-/// `sawEveryEnding` within its depth, so that looking deeper would change
-/// nothing.
-typedef PassResult = ({List<Candidate> ranked, bool sawEveryEnding});
+/// What a pass found: the moves, `rankedMoveCandidates` best first, and
+/// whether it `sawEveryEnding` within its depth, so that looking deeper would
+/// change nothing.
+typedef PassResult = ({
+  List<Candidate> rankedMoveCandidates,
+  bool sawEveryEnding,
+});
 
 /// One pass of the search: it scores each move by looking a fixed number of
 /// moves ahead, assuming the opponent always picks the reply that hurts most.
@@ -41,6 +44,8 @@ final class SearchPass {
     required this._budget,
   });
 
+  /// How many moves ahead the pass looks: 2 means the player's move and the
+  /// opponent's reply.
   final int _depth;
   final MoveGenerator _moves;
   final PositionEvaluator _evaluator;
@@ -55,17 +60,17 @@ final class SearchPass {
   /// Whether every line of play so far ended before the depth ran out.
   bool _sawEveryEnding = true;
 
-  /// The moves of [player] in [ranked], best first, scored again by looking
-  /// the pass's depth ahead.
+  /// The moves of [player] in [rankedMoveCandidates], best first, scored again
+  /// by looking the pass's depth ahead.
   ///
   /// When the budget runs out during the pass, the result is meaningless:
   /// check [NodeBudget.ranOut] before using it.
-  PassResult rerank(List<Candidate> ranked, Player player) {
+  PassResult rerank(List<Candidate> rankedMoveCandidates, Player player) {
     _sawEveryEnding = true;
     final opponent = _moves.opponentOf(player);
     var bestSoFar = -_infinity;
     final rescored = <Candidate>[];
-    for (final candidate in ranked) {
+    for (final candidate in rankedMoveCandidates) {
       final reply = _lookAhead(
         candidate.state,
         opponent,
@@ -82,11 +87,11 @@ final class SearchPass {
       bestSoFar = max(bestSoFar, score);
     }
     rescored.sortBestFirst();
-    return (ranked: rescored, sawEveryEnding: _sawEveryEnding);
+    return (rankedMoveCandidates: rescored, sawEveryEnding: _sawEveryEnding);
   }
 
-  /// The score of [state] for [player], who moves next in it, [movesPlayed]
-  /// moves after the start of the pass.
+  /// The score of [state] for [player], who moves next in it, [movesAhead]
+  /// moves ahead of the position the pass started from.
   ///
   /// Two limits let it skip moves that cannot matter:
   ///
@@ -101,21 +106,23 @@ final class SearchPass {
   int _lookAhead(
     GameState state,
     Player player,
-    int movesPlayed,
+    int movesAhead,
     int floor,
     int ceiling,
   ) {
     // The pass will be thrown away, so stop as quickly as possible.
     if (_budget.ranOut) return 0;
     if (state.status is Finished) {
-      return _finalScore(state, player, movesPlayed);
+      return _finalScore(state, player, movesAhead);
     }
-    if (movesPlayed == _depth) {
+    // Both count moves: this position is as far ahead as the pass looks, so
+    // it is scored as it stands.
+    if (movesAhead == _depth) {
       _sawEveryEnding = false;
       return _evaluator.score(state, player);
     }
-    final legal = _moves.legalMoves(state);
-    final candidates = _ranker.rank(state, player, legal, _budget);
+    final legalMoves = _moves.legalMoves(state);
+    final candidates = _ranker.rank(state, player, legalMoves, _budget);
     final opponent = _moves.opponentOf(player);
     var best = -_infinity;
     var secured = floor;
@@ -124,7 +131,7 @@ final class SearchPass {
       final reply = _lookAhead(
         candidate.state,
         opponent,
-        movesPlayed + 1,
+        movesAhead + 1,
         -ceiling,
         -secured,
       );
@@ -136,10 +143,10 @@ final class SearchPass {
   }
 
   /// The score of the finished game [state] for [player], reached
-  /// [movesPlayed] moves from now. A win counts for less the later it comes,
+  /// [movesAhead] moves from now. A win counts for less the later it comes,
   /// and a loss for less the longer it is put off.
-  int _finalScore(GameState state, Player player, int movesPlayed) {
+  int _finalScore(GameState state, Player player, int movesAhead) {
     final score = _evaluator.score(state, player);
-    return score > 0 ? score - movesPlayed : score + movesPlayed;
+    return score > 0 ? score - movesAhead : score + movesAhead;
   }
 }

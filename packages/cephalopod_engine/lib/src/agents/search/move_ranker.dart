@@ -24,9 +24,9 @@ final class MoveRanker {
   final MoveGenerator _moves;
   final PositionEvaluator _evaluator;
 
-  /// Plays each of the [legal] moves of [player] in [state] and scores the
+  /// Plays each of the [legalMoves] of [player] in [state] and scores the
   /// result for [player], best first. Equally good moves keep the order they
-  /// had in [legal].
+  /// had in [legalMoves].
   ///
   /// Each position spends one node of [budget]. When the budget refuses one,
   /// it stops and returns the moves played so far; the budget then says it
@@ -34,15 +34,15 @@ final class MoveRanker {
   List<Candidate> rank(
     GameState state,
     Player player,
-    List<Move> legal,
+    List<Move> legalMoves,
     NodeBudget budget,
   ) {
     final candidates = <Candidate>[];
-    for (final move in legal) {
+    for (final move in legalMoves) {
       if (!budget.trySpend()) break;
-      final next = _moves.applyLegal(state, move);
-      final score = _evaluator.score(next, player);
-      candidates.add((move: move, state: next, score: score));
+      final nextState = _moves.applyLegal(state, move);
+      final score = _evaluator.score(nextState, player);
+      candidates.add((move: move, state: nextState, score: score));
     }
     candidates.sortBestFirst();
     return candidates;

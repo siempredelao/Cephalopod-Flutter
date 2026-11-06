@@ -42,7 +42,7 @@ void main() {
       final result = search(state, Player.black, depth: 2);
 
       expect(
-        result.ranked.first.move,
+        result.rankedMoveCandidates.first.move,
         Move(
           const Position(3, 2),
           captures: {
