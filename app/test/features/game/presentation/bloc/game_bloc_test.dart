@@ -428,7 +428,9 @@ void main() {
       act: (bloc) => bloc
         ..add(const GameResumed())
         ..add(const SquareTapped(center)),
-      expect: () => [thinking, replied],
+      // Resuming a game with no moves emits the starting position again:
+      // a bloc's first emission is never skipped as a duplicate.
+      expect: () => [placing(start), thinking, replied],
       verify: (_) async {
         final saved = await repository.load();
         expect(saved?.record.moves, [Move(center), reply]);
@@ -445,6 +447,7 @@ void main() {
         ..add(const UndoRequested())
         ..add(const RedoRequested()),
       expect: () => [
+        placing(start),
         thinking,
         replied,
         placing(start).copyWith(canRedo: true),
