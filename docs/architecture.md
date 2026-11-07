@@ -31,6 +31,12 @@ by feature first and by layer second.
 | Core | `core` | Code shared by features: route names, the `FeatureModule` interface, theme, shared widgets | `core`, engine, Flutter |
 | App | `app` | `App` widget, router, theme, composition root | Anything |
 
+Presentation is moving to UI models
+([ADR 0015](adr/0015-views-render-ui-models.md)). Widgets in `view/` and the
+UI models in `models/` will import neither the engine nor `domain/`; only the
+blocs and their mappers in `bloc/` will. The architecture check enforces it
+once every screen has moved.
+
 Dependencies are wired by hand, in two levels
 ([ADR 0013](adr/0013-hand-written-feature-modules.md)):
 
