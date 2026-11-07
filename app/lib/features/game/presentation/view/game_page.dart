@@ -10,7 +10,6 @@ class GamePage extends StatelessWidget {
   const GamePage({
     required this.createBloc,
     required this.opening,
-    this.highlightLastMove = true,
     super.key,
   });
 
@@ -22,14 +21,11 @@ class GamePage extends StatelessWidget {
   /// `GameResumed` to pick up the saved one.
   final GameEvent opening;
 
-  /// Whether the board marks the last move, as the player's settings say.
-  final bool highlightLastMove;
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => createBloc()..add(opening),
-      child: GameView(highlightLastMove: highlightLastMove),
+      child: const GameView(),
     );
   }
 }

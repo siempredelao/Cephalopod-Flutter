@@ -96,7 +96,6 @@ final class GameModule implements FeatureModule {
       builder: (_, state) => GamePage(
         createBloc: _createBloc,
         opening: _openingOf(state.uri.queryParameters),
-        highlightLastMove: _highlightLastMove(),
       ),
     ),
     GoRoute(
@@ -120,6 +119,7 @@ final class GameModule implements FeatureModule {
       undoMove: _undoMove,
       resumeGame: _resumeGame,
       requestAgentMove: _requestAgentMove,
+      highlightLastMove: _highlightLastMove(),
     );
   }
 

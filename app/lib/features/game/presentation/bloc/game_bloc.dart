@@ -7,8 +7,9 @@ import 'package:cephalopod/features/game/domain/use_cases/resume_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/start_new_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/undo_move.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
-import 'package:cephalopod/features/game/presentation/bloc/game_view_state.dart';
+import 'package:cephalopod/features/game/presentation/bloc/game_view_state_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
+import 'package:cephalopod/features/game/presentation/models/game_view_state.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:collection/collection.dart';
 
@@ -16,24 +17,65 @@ import 'package:collection/collection.dart';
 /// what the screen shows. The rules stay in the engine; this class only asks
 /// it which moves are legal, and plays, undoes and saves them through the
 /// use cases. Against the computer, it lets the computer play its turns.
+///
+/// It keeps the game to itself and emits a [GameViewState], which only
+/// describes the screen (docs/adr/0015).
 class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// Shows a new game under [config] until the opening event replaces it,
-  /// or the given [position], which tests use to start mid-game.
-  GameBloc({
+  /// or the given [position], which tests use to start mid-game. The board
+  /// marks the last move when [highlightLastMove] is on.
+  factory GameBloc({
+    required CephalopodRules cephalopodRules,
+    required StartNewGame startNewGame,
+    required PlayMove playMove,
+    required UndoMove undoMove,
+    required ResumeGame resumeGame,
+    required RequestAgentMove requestAgentMove,
+    GameViewStateMapper gameViewStateMapper = const GameViewStateMapper(),
+    bool highlightLastMove = true,
+    GameConfig config = GameConfig.standard,
+    GameState? position,
+  }) {
+    return GameBloc._(
+      cephalopodRules: cephalopodRules,
+      startNewGame: startNewGame,
+      playMove: playMove,
+      undoMove: undoMove,
+      resumeGame: resumeGame,
+      requestAgentMove: requestAgentMove,
+      gameViewStateMapper: gameViewStateMapper,
+      highlightLastMove: highlightLastMove,
+      currentGame: (
+        record: GameRecord(config: config),
+        opponent: const FriendOpponent(),
+        state: position ?? cephalopodRules.newGame(config),
+      ),
+    );
+  }
+
+  /// Shows [_currentGame] as it starts: waiting for the first placement,
+  /// with nothing to undo or redo.
+  GameBloc._({
     required this._cephalopodRules,
     required this._startNewGame,
     required this._playMove,
     required this._undoMove,
     required this._resumeGame,
     required this._requestAgentMove,
-    GameConfig config = GameConfig.standard,
-    GameState? position,
-  }) : super(_startOf(position ?? _cephalopodRules.newGame(config))) {
-    _currentGame = (
-      record: GameRecord(config: config),
-      opponent: const FriendOpponent(),
-      state: state.game,
-    );
+    required this._gameViewStateMapper,
+    required this._highlightLastMove,
+    required this._currentGame,
+  }) : super(
+         _gameViewStateMapper.map(
+           game: _currentGame.state,
+           opponent: _currentGame.opponent,
+           lastMove: null,
+           phase: const TurnPhase.awaitingPlacement(),
+           highlightLastMove: _highlightLastMove,
+           canUndo: false,
+           canRedo: false,
+         ),
+       ) {
     // Events wait for storage, so they run one at a time, in order: each
     // sees the game the one before it left.
     on<GameEvent>(_onEvent, transformer: _inOrder);
@@ -45,11 +87,14 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   final UndoMove _undoMove;
   final ResumeGame _resumeGame;
   final RequestAgentMove _requestAgentMove;
+  final GameViewStateMapper _gameViewStateMapper;
+
+  /// Whether the board marks the last move, as the player's settings say.
+  final bool _highlightLastMove;
 
   /// The game on screen, as the use cases take and give it. The bloc keeps
-  /// it here rather than reading it back from its state, which only
-  /// describes the screen.
-  late CurrentGame _currentGame;
+  /// it here; its state only describes the screen.
+  CurrentGame _currentGame;
 
   /// What the screen is waiting for.
   TurnPhase _turnPhase = const TurnPhase.awaitingPlacement();
@@ -64,9 +109,6 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     FriendOpponent() => 1,
     ComputerOpponent() => 2,
   };
-
-  static GameViewState _startOf(GameState game) =>
-      GameViewState(game: game, phase: const TurnPhase.awaitingPlacement());
 
   static Stream<E> _inOrder<E>(Stream<E> events, EventMapper<E> mapper) =>
       events.asyncExpand(mapper);
@@ -249,16 +291,16 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// Emits what the screen shows of the game and the turn phase.
   void _emitScreen(Emitter<GameViewState> emit) {
     final game = _currentGame;
-    emit(
-      GameViewState(
-        game: game.state,
-        phase: _turnPhase,
-        lastMove: game.record.moves.lastOrNull,
-        canUndo: _canUndo,
-        canRedo: _undone.isNotEmpty,
-        opponent: game.opponent,
-      ),
+    final screen = _gameViewStateMapper.map(
+      game: game.state,
+      opponent: game.opponent,
+      lastMove: game.record.moves.lastOrNull,
+      phase: _turnPhase,
+      highlightLastMove: _highlightLastMove,
+      canUndo: _canUndo,
+      canRedo: _undone.isNotEmpty,
     );
+    emit(screen);
   }
 
   TurnPhase _phaseOf(CurrentGame game) {
