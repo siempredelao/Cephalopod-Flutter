@@ -1,0 +1,108 @@
+# 0015. Views render UI models
+
+- **Status:** Accepted
+- **Date:** 2026-11-07
+
+## Context
+
+By the end of M4 the game screen's widgets read engine and domain types and
+make decisions with them:
+
+- `GameView` switches over the engine's `GameStatus`, works out the score,
+  and picks between "You win" and "Player 2 wins" from the `Opponent`.
+- `GameBoard` reads `board.dice`, `config.boardSize` and the positions in
+  `TurnPhase`, and builds each square's screen-reader label from the die's
+  owner and the opponent.
+- `DieFace` takes an engine `Die` and picks its colours from its `Player`.
+- The new-game dialog and the settings screen use domain enums
+  (`Difficulty`, `Player`, `ThemePreference`) as the values of their
+  controls.
+
+So those decisions can only be tested through widget tests, and a change in
+the engine or the domain ripples into widgets. M5 adds accessibility and a
+second language, which touch exactly these decisions.
+
+Android apps usually avoid this with a `UiState` or UI model per screen,
+built by a mapper in the view model, so the view only draws it.
+
+## Decision
+
+Widgets render UI models and decide nothing. A UI model says *what* the
+screen shows, in presentation terms. The bloc or cubit keeps the domain
+state privately and turns it into UI models with a mapper.
+
+- **`presentation/view/`**: widgets. They import `presentation/models/`,
+  `presentation/bloc/` (to reach the bloc and send it events), `core/` and
+  Flutter. Never the engine or `domain/`.
+- **`presentation/models/`**: UI models. These are each screen's state, the
+  parts it is made of, and the events the view sends. They are plain data:
+  `freezed` for states (ADR 0011), sealed classes for events. They import
+  `core/` and Flutter only, so nothing the view reads exposes an engine or
+  domain type.
+- **`presentation/bloc/`**: blocs, cubits and their mappers. This is the only
+  presentation code that imports `domain/` or the engine.
+
+What a UI model holds:
+
+- **Meanings, not text.** For example `Headline.won(winner: Side.you,
+  score: (13, 12))`, or a square with its pips, its side and its mark. The
+  widget turns a meaning into words, through `context.l10n` once M5 adds
+  translations, and into colours, through the theme. This is the Flutter
+  counterpart of Kotlin's `@StringRes` or `UiText`. Flutter has no resource
+  IDs, so a sealed class names the message instead.
+- **Events carry presentation values.** A tap sends the square's row and
+  column, not an engine `Position`. The bloc maps it back.
+- **Naming.** A screen's whole state keeps the `…ViewState` name (as
+  `GameViewState` today). Its parts end in `Ui` (`SquareUi`, `DieUi`), which
+  also keeps them apart from engine types of the same name in the mappers.
+- **Mappers** are classes in `presentation/bloc/`, injected into the bloc or
+  cubit. They are pure: domain state in, UI model out. Behaviour stays out
+  of the data, as in the engine (ADR 0009).
+
+`tool/check_architecture.dart` enforces the import rules once every screen
+has moved. Until then, screens move one pull request at a time.
+
+## Consequences
+
+Pros:
+
+- Widgets are thin enough to read at a glance: they draw what they are
+  given and send what was tapped.
+- The decisions (whose turn, who won, which squares to mark, what a square
+  is called) move into mappers that unit tests can check without widgets.
+- Engine and domain changes stop at the mapper; the view's contract changes
+  only when the screen does.
+- Localisation and accessibility in M5 touch the widgets' wording and the UI
+  models' meanings, nowhere else.
+- One rule for every screen, which CI can check.
+
+Cons:
+
+- More types: a UI model next to each domain type the screen shows, and
+  small presentation enums mirroring domain ones (`Difficulty` in the
+  new-game dialog), with mapping between them.
+- The game bloc can no longer read the game back from its own state, so it
+  keeps the domain state privately, as it already does with the game's
+  record and opponent.
+- A one-off migration, heaviest in the bloc tests, which compare whole
+  states.
+- Widget previews and the how-to-play tutorial build UI models (directly,
+  or through a mapper) instead of engine positions.
+
+## Alternatives considered
+
+- **Keep engine and domain types in widgets.** Least code, and common in
+  Flutter samples, but it keeps decisions in widgets and the coupling
+  described above.
+- **UI models holding finished text** (`headline: 'You win 13 to 12'`).
+  Common in Android, with a `StringProvider` in the view model. In Flutter,
+  the mapper would need `lookupAppLocalizations(locale)`. The bloc would
+  then have to watch the locale and emit again when it changes, which
+  Flutter otherwise does for widgets, and tests would depend on the
+  translation files.
+- **Text as functions** (`String Function(AppLocalizations)` in the state).
+  Translates in the widget, but functions have no value equality, so Bloc
+  could no longer skip repeated states and `bloc_test` could not compare
+  them.
+- **Only the game screen.** It holds most of the logic, but two rules would
+  be harder to explain and to check than one.

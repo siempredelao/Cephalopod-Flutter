@@ -21,3 +21,4 @@ supersedes an earlier one instead. Start new records from
 | [0012](0012-shared-preferences-for-local-storage.md) | Local storage with `shared_preferences` | Accepted |
 | [0013](0013-hand-written-feature-modules.md) | Hand-written feature modules instead of a DI container | Accepted |
 | [0014](0014-game-agents-in-the-engine.md) | Computer opponents as engine agents | Accepted |
+| [0015](0015-views-render-ui-models.md) | Views render UI models | Accepted |
