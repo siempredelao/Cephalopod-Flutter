@@ -115,7 +115,7 @@ void main() {
         ),
         (1, 2): const DieUi(
           pips: 5,
-          owner: SideUi(player: PlayerUi.one, role: RoleUi.you),
+          owner: SideUi(player: PlayerUi.one, role: RoleUi.person),
         ),
       });
 

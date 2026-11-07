@@ -87,7 +87,7 @@ void main() {
       final board = map(opponent: computer);
 
       expect(squareAt(board, left).die?.owner.role, RoleUi.computer);
-      expect(squareAt(board, below).die?.owner.role, RoleUi.you);
+      expect(squareAt(board, below).die?.owner.role, RoleUi.person);
     });
 
     test('marks the last move', () {

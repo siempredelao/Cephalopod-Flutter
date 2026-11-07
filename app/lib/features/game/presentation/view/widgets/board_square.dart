@@ -69,7 +69,7 @@ class BoardSquare extends StatelessWidget {
   /// computer's" against the computer.
   static String _ownerOf(SideUi side) => switch (side.role) {
     RoleUi.player => playerUiNameOf(side.player),
-    RoleUi.you => 'your',
+    RoleUi.person => 'your',
     RoleUi.computer => "the computer's",
   };
 

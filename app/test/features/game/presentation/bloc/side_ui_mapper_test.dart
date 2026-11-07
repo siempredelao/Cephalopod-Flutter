@@ -36,7 +36,7 @@ void main() {
       );
       expect(
         mapper.map(Player.white, computer),
-        const SideUi(player: PlayerUi.two, role: RoleUi.you),
+        const SideUi(player: PlayerUi.two, role: RoleUi.person),
       );
     });
   });
