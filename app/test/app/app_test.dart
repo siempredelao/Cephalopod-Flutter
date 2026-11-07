@@ -8,6 +8,7 @@ import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/game_module.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
+import 'package:cephalopod/features/game/presentation/models/square_mark.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
 import 'package:cephalopod/features/game/presentation/view/new_game_dialog.dart';
@@ -206,9 +207,15 @@ void main() {
       await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
       await startNewGame(tester);
+      await tester.tap(find.byKey(const ValueKey((2, 2))));
+      await tester.pumpAndSettle();
 
-      final page = tester.widget<GamePage>(find.byType(GamePage));
-      expect(page.highlightLastMove, isFalse);
+      final squares = tester.widgetList<BoardSquare>(find.byType(BoardSquare));
+      expect(find.byType(DieFace), findsOne);
+      expect(
+        squares.map((square) => square.square.mark),
+        everyElement(SquareMark.none),
+      );
     });
 
     testWidgets('opens the about page from home', (tester) async {

@@ -4,8 +4,10 @@ import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
-import 'package:cephalopod/features/game/presentation/bloc/game_view_state.dart';
+import 'package:cephalopod/features/game/presentation/bloc/game_view_state_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
+import 'package:cephalopod/features/game/presentation/models/game_view_state.dart';
+import 'package:cephalopod/features/game/presentation/models/headline_ui.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:cephalopod_engine/testing.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -27,8 +29,28 @@ void main() {
     return createTestGameBloc(position: position);
   }
 
-  GameViewState placing(GameState game) =>
-      GameViewState(game: game, phase: const TurnPhase.awaitingPlacement());
+  /// What the screen shows of [game], as the bloc maps it, with the board
+  /// marking the last move.
+  GameViewState screenOf(
+    GameState game, {
+    TurnPhase phase = const TurnPhase.awaitingPlacement(),
+    Move? lastMove,
+    bool canUndo = false,
+    bool canRedo = false,
+    Opponent opponent = const FriendOpponent(),
+  }) {
+    return const GameViewStateMapper().map(
+      game: game,
+      opponent: opponent,
+      lastMove: lastMove,
+      phase: phase,
+      highlightLastMove: true,
+      canUndo: canUndo,
+      canRedo: canRedo,
+    );
+  }
+
+  GameViewState placing(GameState game) => screenOf(game);
 
   /// A tap on [square], as the screen sends it.
   SquareTapped tap(Position square) {
@@ -60,7 +82,8 @@ void main() {
     Set<Position> selected = const {},
     int sum = 0,
     bool canConfirm = false,
-  }) => placing(figure4).copyWith(
+  }) => screenOf(
+    figure4,
     phase: TurnPhase.choosingCapture(
       target: top,
       options: topOptions,
@@ -88,9 +111,8 @@ void main() {
       build: build,
       act: (bloc) => bloc.add(tap(center)),
       expect: () => [
-        GameViewState(
-          game: after(rules.newGame(), Move(center)),
-          phase: const TurnPhase.awaitingPlacement(),
+        screenOf(
+          after(rules.newGame(), Move(center)),
           lastMove: Move(center),
           canUndo: true,
         ),
@@ -121,9 +143,8 @@ void main() {
       build: () => buildAt(oneCapture),
       act: (bloc) => bloc.add(tap(center)),
       expect: () => [
-        GameViewState(
-          game: after(oneCapture, captureBoth),
-          phase: const TurnPhase.awaitingPlacement(),
+        screenOf(
+          after(oneCapture, captureBoth),
           lastMove: captureBoth,
           canUndo: true,
         ),
@@ -184,9 +205,8 @@ void main() {
         ..add(const CaptureConfirmed()),
       skip: 3,
       expect: () => [
-        GameViewState(
-          game: after(figure4, Move(top, captures: {left, right})),
-          phase: const TurnPhase.awaitingPlacement(),
+        screenOf(
+          after(figure4, Move(top, captures: {left, right})),
           lastMove: Move(top, captures: {left, right}),
           canUndo: true,
         ),
@@ -240,8 +260,8 @@ void main() {
       build: () => buildAt(lastSquare),
       act: (bloc) => bloc.add(tap(const Position(1, 1))),
       expect: () => [
-        GameViewState(
-          game: after(lastSquare, Move(const Position(1, 1))),
+        screenOf(
+          after(lastSquare, Move(const Position(1, 1))),
           phase: const TurnPhase.gameEnded(blackWins),
           lastMove: Move(const Position(1, 1)),
         ),
@@ -289,9 +309,8 @@ void main() {
     late InMemoryGameRepository repository;
     const friend = FriendOpponent();
     final savedNewGame = (record: GameRecord(), opponent: friend);
-    final played = GameViewState(
-      game: after(rules.newGame(), Move(center)),
-      phase: const TurnPhase.awaitingPlacement(),
+    final played = screenOf(
+      after(rules.newGame(), Move(center)),
       lastMove: Move(center),
       canUndo: true,
     );
@@ -335,9 +354,8 @@ void main() {
       expect: () => [
         played,
         undone,
-        GameViewState(
-          game: after(rules.newGame(), Move(top)),
-          phase: const TurnPhase.awaitingPlacement(),
+        screenOf(
+          after(rules.newGame(), Move(top)),
           lastMove: Move(top),
           canUndo: true,
         ),
@@ -353,7 +371,7 @@ void main() {
       skip: 1,
       expect: () => <GameViewState>[],
       verify: (bloc) {
-        expect(bloc.state.phase, isA<GameEnded>());
+        expect(bloc.state.headline, isA<PlayerWonHeadline>());
         expect(bloc.state.canUndo, isFalse);
       },
     );
@@ -378,9 +396,8 @@ void main() {
 
       expect(
         bloc.state,
-        GameViewState(
-          game: second,
-          phase: const TurnPhase.awaitingPlacement(),
+        screenOf(
+          second,
           lastMove: Move(top),
           canUndo: true,
         ),
@@ -422,16 +439,15 @@ void main() {
     final start = rules.newGame();
     final afterCenter = after(start, Move(center));
     final reply = rules.legalMoves(afterCenter).first;
-    final waiting = placing(start).copyWith(opponent: whiteComputer);
-    final thinking = GameViewState(
-      game: afterCenter,
+    final waiting = screenOf(start, opponent: whiteComputer);
+    final thinking = screenOf(
+      afterCenter,
       phase: const TurnPhase.computerThinking(),
       lastMove: Move(center),
       opponent: whiteComputer,
     );
-    final replied = GameViewState(
-      game: after(afterCenter, reply),
-      phase: const TurnPhase.awaitingPlacement(),
+    final replied = screenOf(
+      after(afterCenter, reply),
       lastMove: reply,
       canUndo: true,
       opponent: whiteComputer,
@@ -455,14 +471,13 @@ void main() {
       expect: () {
         final opening = rules.legalMoves(start).first;
         return [
-          GameViewState(
-            game: start,
+          screenOf(
+            start,
             phase: const TurnPhase.computerThinking(),
             opponent: blackComputer,
           ),
-          GameViewState(
-            game: after(start, opening),
-            phase: const TurnPhase.awaitingPlacement(),
+          screenOf(
+            after(start, opening),
             lastMove: opening,
             opponent: blackComputer,
           ),
