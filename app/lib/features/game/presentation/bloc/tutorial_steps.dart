@@ -1,5 +1,5 @@
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
-import 'package:cephalopod/features/game/presentation/view/how_to_play/models/tutorial_step.dart';
+import 'package:cephalopod/features/game/presentation/bloc/tutorial_step.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
 const Position _centre = Position(2, 2);

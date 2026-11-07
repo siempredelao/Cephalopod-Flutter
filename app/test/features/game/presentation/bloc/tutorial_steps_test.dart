@@ -1,5 +1,5 @@
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
-import 'package:cephalopod/features/game/presentation/view/how_to_play/tutorial_steps.dart';
+import 'package:cephalopod/features/game/presentation/bloc/tutorial_steps.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
 

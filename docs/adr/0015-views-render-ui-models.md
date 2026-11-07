@@ -48,7 +48,9 @@ What a UI model holds:
   text mapper in `view/` turns a meaning into words (below), and the widget
   turns it into colours, through the theme. This is the Flutter
   counterpart of Kotlin's `@StringRes` or `UiText`. Flutter has no resource
-  IDs, so a sealed class names the message instead.
+  IDs, so a sealed class names the message instead. The exception is text
+  that describes an example, like How to play's titles and bodies: it
+  stays next to its example, and its UI model carries it as text.
 - **Events carry presentation values.** A tap sends the square's row and
   column, not an engine `Position`. The bloc maps it back.
 - **Events stay next to their bloc, for now.** The opening event is the
