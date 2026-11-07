@@ -3,7 +3,7 @@ import 'package:cephalopod/features/game/presentation/bloc/how_to_play_cubit.dar
 import 'package:cephalopod/features/game/presentation/bloc/tutorial_step_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/tutorial_steps.dart';
 import 'package:cephalopod/features/game/presentation/models/how_to_play_view_state.dart';
-import 'package:cephalopod/features/game/presentation/models/tutorial_button_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/tutorial_right_button_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -17,7 +17,7 @@ void main() {
         HowToPlayViewState(
           steps: steps,
           currentStep: 0,
-          rightButton: TutorialButtonUi.next,
+          rightButton: TutorialRightButtonUi.next,
         ),
       );
     });
@@ -30,7 +30,7 @@ void main() {
         HowToPlayViewState(
           steps: steps,
           currentStep: 1,
-          rightButton: TutorialButtonUi.next,
+          rightButton: TutorialRightButtonUi.next,
         ),
       ],
     );
@@ -43,7 +43,7 @@ void main() {
         HowToPlayViewState(
           steps: steps,
           currentStep: lastStep,
-          rightButton: TutorialButtonUi.finish,
+          rightButton: TutorialRightButtonUi.finish,
         ),
       ],
     );

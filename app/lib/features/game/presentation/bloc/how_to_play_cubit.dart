@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/tutorial_step_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/tutorial_steps.dart';
 import 'package:cephalopod/features/game/presentation/models/how_to_play_view_state.dart';
-import 'package:cephalopod/features/game/presentation/models/tutorial_button_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/tutorial_right_button_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/tutorial_step_ui.dart';
 
 /// How to play's view model: maps the tutorial's steps to pages once, and
@@ -12,15 +12,21 @@ class HowToPlayCubit extends Cubit<HowToPlayViewState> {
     TutorialStepUiMapper tutorialStepUiMapper = const TutorialStepUiMapper(),
   }) : super(_at(tutorialSteps.map(tutorialStepUiMapper.map).toList(), 0));
 
-  /// The tutorial's [steps], with [step] on screen, counting from 0. The
-  /// right button finishes the tutorial from the last step.
+  /// The tutorial's [steps], with [step] on screen, counting from 0.
   static HowToPlayViewState _at(List<TutorialStepUi> steps, int step) {
-    final isLastStep = step == steps.length - 1;
     return HowToPlayViewState(
       steps: steps,
       currentStep: step,
-      rightButton: isLastStep ? TutorialButtonUi.finish : TutorialButtonUi.next,
+      rightButton: _rightButtonAt(step, steps.length),
     );
+  }
+
+  /// What the right button does on [step] of [stepCount]: it finishes the
+  /// tutorial from the last step, and turns to the next one from any other.
+  static TutorialRightButtonUi _rightButtonAt(int step, int stepCount) {
+    final isLastStep = step == stepCount - 1;
+    if (isLastStep) return TutorialRightButtonUi.finish;
+    return TutorialRightButtonUi.next;
   }
 
   /// The page on screen is now [step], after a swipe or Next.

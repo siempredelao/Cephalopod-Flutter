@@ -1,6 +1,6 @@
 import 'package:cephalopod/features/game/presentation/bloc/how_to_play_cubit.dart';
 import 'package:cephalopod/features/game/presentation/models/how_to_play_view_state.dart';
-import 'package:cephalopod/features/game/presentation/models/tutorial_button_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/tutorial_right_button_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/tutorial_step_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -43,24 +43,26 @@ class _TutorialPagesState extends State<_TutorialPages> {
     super.dispose();
   }
 
-  /// Turns to the next page, or leaves the tutorial, as [button] says.
-  void _press(TutorialButtonUi button) {
-    switch (button) {
-      case TutorialButtonUi.next:
+  /// Turns to the next page, or leaves the tutorial, as [rightButton] says.
+  void _pressRightButton(TutorialRightButtonUi rightButton) {
+    switch (rightButton) {
+      case TutorialRightButtonUi.next:
         _pageController.nextPage(
           duration: _turnDuration,
           curve: Curves.easeInOut,
         );
-      case TutorialButtonUi.finish:
+      case TutorialRightButtonUi.finish:
         Navigator.of(context).maybePop();
     }
   }
 
-  /// The words on [button].
-  static String _labelOf(TutorialButtonUi button) => switch (button) {
-    TutorialButtonUi.next => 'Next',
-    TutorialButtonUi.finish => 'Got it',
-  };
+  /// The words on [rightButton].
+  static String _rightButtonLabelOf(TutorialRightButtonUi rightButton) {
+    return switch (rightButton) {
+      TutorialRightButtonUi.next => 'Next',
+      TutorialRightButtonUi.finish => 'Got it',
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,8 +92,8 @@ class _TutorialPagesState extends State<_TutorialPages> {
                     ),
                     const Spacer(),
                     FilledButton(
-                      onPressed: () => _press(state.rightButton),
-                      child: Text(_labelOf(state.rightButton)),
+                      onPressed: () => _pressRightButton(state.rightButton),
+                      child: Text(_rightButtonLabelOf(state.rightButton)),
                     ),
                   ],
                 ),

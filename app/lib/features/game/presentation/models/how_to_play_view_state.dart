@@ -1,4 +1,4 @@
-import 'package:cephalopod/features/game/presentation/models/tutorial_button_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/tutorial_right_button_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/tutorial_step_ui.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -15,6 +15,6 @@ abstract class HowToPlayViewState with _$HowToPlayViewState {
   const factory HowToPlayViewState({
     required List<TutorialStepUi> steps,
     required int currentStep,
-    required TutorialButtonUi rightButton,
+    required TutorialRightButtonUi rightButton,
   }) = _HowToPlayViewState;
 }
