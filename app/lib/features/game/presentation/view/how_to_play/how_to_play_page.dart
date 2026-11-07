@@ -43,8 +43,8 @@ class _TutorialPagesState extends State<_TutorialPages> {
   }
 
   /// Turns to the next page, or leaves the tutorial from the last one.
-  void _next(HowToPlayViewState state) {
-    if (state.isLastStep) {
+  void _next({required bool isLastStep}) {
+    if (isLastStep) {
       Navigator.of(context).maybePop();
       return;
     }
@@ -79,7 +79,7 @@ class _TutorialPagesState extends State<_TutorialPages> {
                     ),
                     const Spacer(),
                     FilledButton(
-                      onPressed: () => _next(state),
+                      onPressed: () => _next(isLastStep: state.isLastStep),
                       child: Text(state.isLastStep ? 'Got it' : 'Next'),
                     ),
                   ],
