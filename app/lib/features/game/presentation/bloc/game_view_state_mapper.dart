@@ -36,11 +36,14 @@ final class GameViewStateMapper {
       opponent: opponent,
       highlightLastMove: highlightLastMove,
     );
+    final headlineUi = _headlineUiMapper.map(game.status, opponent);
+    final captureUi = _captureUiOf(phase, game.config);
+    final canTap = _canTapIn(phase);
     return GameViewState(
       board: boardUi,
-      headline: _headlineUiMapper.map(game.status, opponent),
-      capture: _captureUiOf(phase, game.config),
-      canTap: phase is AwaitingPlacement || phase is ChoosingCapture,
+      headline: headlineUi,
+      capture: captureUi,
+      canTap: canTap,
       canUndo: canUndo,
       canRedo: canRedo,
     );
@@ -57,4 +60,12 @@ final class GameViewStateMapper {
       _ => null,
     };
   }
+
+  /// Whether the board takes taps in [phase]: while a die can be placed or a
+  /// capture chosen, but not while the computer thinks, nor once the game is
+  /// over.
+  bool _canTapIn(TurnPhase phase) => switch (phase) {
+    AwaitingPlacement() || ChoosingCapture() => true,
+    ComputerThinking() || GameEnded() => false,
+  };
 }

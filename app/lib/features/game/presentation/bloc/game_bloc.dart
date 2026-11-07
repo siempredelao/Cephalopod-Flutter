@@ -24,6 +24,11 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// Shows a new game under [config] until the opening event replaces it,
   /// or the given [position], which tests use to start mid-game. The board
   /// marks the last move when [highlightLastMove] is on.
+  ///
+  /// A factory, so that it builds the starting game once and hands it to
+  /// `GameBloc._`, which both keeps it and maps the first screen from it.
+  /// One constructor could not: `super(...)` runs before the body, and sees
+  /// only the parameters.
   factory GameBloc({
     required CephalopodRules cephalopodRules,
     required StartNewGame startNewGame,
