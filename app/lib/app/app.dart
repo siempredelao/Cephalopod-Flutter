@@ -1,8 +1,8 @@
 import 'package:cephalopod/app/flavor.dart';
 import 'package:cephalopod/app/theme.dart';
-import 'package:cephalopod/features/settings/domain/models/app_settings.dart';
-import 'package:cephalopod/features/settings/domain/models/theme_preference.dart';
 import 'package:cephalopod/features/settings/presentation/bloc/settings_cubit.dart';
+import 'package:cephalopod/features/settings/presentation/models/settings_view_state.dart';
+import 'package:cephalopod/features/settings/presentation/models/theme_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
@@ -27,7 +27,7 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: settings,
-      child: BlocBuilder<SettingsCubit, AppSettings>(
+      child: BlocBuilder<SettingsCubit, SettingsViewState>(
         builder: (context, current) => MaterialApp.router(
           title: 'Cephalopod',
           theme: AppTheme.light,
@@ -40,9 +40,9 @@ class App extends StatelessWidget {
     );
   }
 
-  static ThemeMode _modeOf(ThemePreference theme) => switch (theme) {
-    ThemePreference.system => ThemeMode.system,
-    ThemePreference.light => ThemeMode.light,
-    ThemePreference.dark => ThemeMode.dark,
+  static ThemeMode _modeOf(ThemeUi theme) => switch (theme) {
+    ThemeUi.system => ThemeMode.system,
+    ThemeUi.light => ThemeMode.light,
+    ThemeUi.dark => ThemeMode.dark,
   };
 }
