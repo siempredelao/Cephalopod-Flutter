@@ -1,6 +1,6 @@
+import 'package:cephalopod/features/game/presentation/models/square_mark.dart';
 import 'package:cephalopod/features/game/presentation/view/previews/board_preview_wrapper.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
-import 'package:cephalopod/features/game/presentation/view/widgets/square_mark.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:material_ui/material_ui.dart';

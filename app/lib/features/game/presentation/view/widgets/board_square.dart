@@ -1,6 +1,6 @@
 import 'package:cephalopod/core/theme/board_colors.dart';
+import 'package:cephalopod/features/game/presentation/models/square_mark.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
-import 'package:cephalopod/features/game/presentation/view/widgets/square_mark.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:material_ui/material_ui.dart';
 
