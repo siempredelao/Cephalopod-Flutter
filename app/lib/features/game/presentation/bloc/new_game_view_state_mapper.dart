@@ -1,6 +1,5 @@
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
-import 'package:cephalopod/features/game/presentation/models/computer_choices_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/difficulty_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/new_game_view_state.dart';
 import 'package:cephalopod/features/game/presentation/models/opponent_ui.dart';
@@ -13,14 +12,16 @@ final class NewGameViewStateMapper {
   const NewGameViewStateMapper();
 
   /// The dialog with [opponent] chosen.
-  NewGameViewState map(Opponent opponent) => switch (opponent) {
-    FriendOpponent() => const NewGameViewState(opponent: OpponentUi.friend),
-    ComputerOpponent(:final difficulty, :final player) => NewGameViewState(
-      opponent: OpponentUi.computer,
-      computerChoices: ComputerChoicesUi(
-        difficulty: _difficultyUiOf(difficulty),
-        personMoves: _personMovesUiOf(player),
-      ),
+  NewGameViewState map(Opponent opponent) {
+    final opponentUi = _opponentUiOf(opponent);
+    return NewGameViewState(opponent: opponentUi);
+  }
+
+  OpponentUi _opponentUiOf(Opponent opponent) => switch (opponent) {
+    FriendOpponent() => const OpponentUi.friend(),
+    ComputerOpponent(:final difficulty, :final player) => OpponentUi.computer(
+      difficulty: _difficultyUiOf(difficulty),
+      personMoves: _personMovesUiOf(player),
     ),
   };
 

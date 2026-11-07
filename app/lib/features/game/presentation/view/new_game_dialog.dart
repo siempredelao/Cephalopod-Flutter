@@ -33,11 +33,11 @@ class NewGameDialog extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _OpponentChoice(state.opponent),
-              if (state.computerChoices case final computerChoices?) ...[
+              if (state.opponent case final ComputerOpponentUi computer) ...[
                 const SizedBox(height: _spacing),
-                _DifficultyChoice(computerChoices.difficulty),
+                _DifficultyChoice(computer.difficulty),
                 const SizedBox(height: _spacing),
-                _PersonMovesChoice(computerChoices.personMoves),
+                _PersonMovesChoice(computer.personMoves),
               ],
             ],
           ),
@@ -67,6 +67,11 @@ class NewGameDialog extends StatelessWidget {
   }
 }
 
+/// The segments of the opponent choice. A segment needs a plain value to
+/// compare, and the computer's [OpponentUi] carries its choices, so the
+/// segments have their own.
+enum _OpponentSegment { friend, computer }
+
 /// A friend, or the computer, with the [opponent] chosen.
 class _OpponentChoice extends StatelessWidget {
   const _OpponentChoice(this.opponent);
@@ -78,18 +83,35 @@ class _OpponentChoice extends StatelessWidget {
     final cubit = context.read<NewGameCubit>();
     return _Section(
       title: 'Opponent',
-      child: SegmentedButton<OpponentUi>(
+      child: SegmentedButton<_OpponentSegment>(
         segments: const [
-          ButtonSegment(value: OpponentUi.friend, label: Text('A friend')),
           ButtonSegment(
-            value: OpponentUi.computer,
+            value: _OpponentSegment.friend,
+            label: Text('A friend'),
+          ),
+          ButtonSegment(
+            value: _OpponentSegment.computer,
             label: Text('The computer'),
           ),
         ],
-        selected: {opponent},
-        onSelectionChanged: (choice) => cubit.chooseOpponent(choice.single),
+        selected: {_segmentOf(opponent)},
+        onSelectionChanged: (choice) {
+          switch (choice.single) {
+            case _OpponentSegment.friend:
+              cubit.chooseFriend();
+            case _OpponentSegment.computer:
+              cubit.chooseComputer();
+          }
+        },
       ),
     );
+  }
+
+  static _OpponentSegment _segmentOf(OpponentUi opponent) {
+    return switch (opponent) {
+      FriendOpponentUi() => _OpponentSegment.friend,
+      ComputerOpponentUi() => _OpponentSegment.computer,
+    };
   }
 }
 

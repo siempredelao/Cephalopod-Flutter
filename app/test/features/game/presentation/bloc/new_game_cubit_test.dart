@@ -2,7 +2,6 @@ import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/presentation/bloc/new_game_cubit.dart';
 import 'package:cephalopod/features/game/presentation/bloc/opponent_query_codec.dart';
-import 'package:cephalopod/features/game/presentation/models/computer_choices_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/difficulty_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/new_game_view_state.dart';
 import 'package:cephalopod/features/game/presentation/models/opponent_ui.dart';
@@ -25,18 +24,20 @@ void main() {
     }
 
     test('starts on a friend, with nothing more to choose', () {
-      expect(cubit.state, const NewGameViewState(opponent: OpponentUi.friend));
+      expect(
+        cubit.state,
+        const NewGameViewState(opponent: OpponentUi.friend()),
+      );
       expect(chosenOpponent(), const FriendOpponent());
     });
 
     test('offers the Medium computer, with the person moving first', () {
-      cubit.chooseOpponent(OpponentUi.computer);
+      cubit.chooseComputer();
 
       expect(
         cubit.state,
         const NewGameViewState(
-          opponent: OpponentUi.computer,
-          computerChoices: ComputerChoicesUi(
+          opponent: OpponentUi.computer(
             difficulty: DifficultyUi.medium,
             personMoves: PersonMovesUi.first,
           ),
@@ -53,13 +54,13 @@ void main() {
 
     test('plays the computer with the difficulty and turn chosen', () {
       cubit
-        ..chooseOpponent(OpponentUi.computer)
+        ..chooseComputer()
         ..chooseDifficulty(DifficultyUi.hard)
         ..choosePersonMoves(PersonMovesUi.second);
 
       expect(
-        cubit.state.computerChoices,
-        const ComputerChoicesUi(
+        cubit.state.opponent,
+        const OpponentUi.computer(
           difficulty: DifficultyUi.hard,
           personMoves: PersonMovesUi.second,
         ),
@@ -76,26 +77,28 @@ void main() {
     test('offers every difficulty', () {
       for (final difficulty in DifficultyUi.values) {
         cubit
-          ..chooseOpponent(OpponentUi.computer)
+          ..chooseComputer()
           ..chooseDifficulty(difficulty);
 
+        final opponentUi = cubit.state.opponent as ComputerOpponentUi;
         final opponent = chosenOpponent() as ComputerOpponent;
-        expect(cubit.state.computerChoices?.difficulty, difficulty);
+        expect(opponentUi.difficulty, difficulty);
         expect(opponent.difficulty.name, difficulty.name);
       }
     });
 
     test('keeps the computer chosen while a friend is picked', () {
       cubit
-        ..chooseOpponent(OpponentUi.computer)
+        ..chooseComputer()
         ..chooseDifficulty(DifficultyUi.easy)
-        ..chooseOpponent(OpponentUi.friend);
-      expect(cubit.state.computerChoices, isNull);
+        ..chooseFriend();
+      expect(cubit.state.opponent, const OpponentUi.friend());
       expect(chosenOpponent(), const FriendOpponent());
 
-      cubit.chooseOpponent(OpponentUi.computer);
+      cubit.chooseComputer();
 
-      expect(cubit.state.computerChoices?.difficulty, DifficultyUi.easy);
+      final opponentUi = cubit.state.opponent as ComputerOpponentUi;
+      expect(opponentUi.difficulty, DifficultyUi.easy);
     });
   });
 }

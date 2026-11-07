@@ -5,7 +5,6 @@ import 'package:cephalopod/features/game/presentation/bloc/new_game_view_state_m
 import 'package:cephalopod/features/game/presentation/bloc/opponent_query_codec.dart';
 import 'package:cephalopod/features/game/presentation/models/difficulty_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/new_game_view_state.dart';
-import 'package:cephalopod/features/game/presentation/models/opponent_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/person_moves_ui.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
@@ -46,11 +45,13 @@ class NewGameCubit extends Cubit<NewGameViewState> {
     return _againstComputer ? _computer : const FriendOpponent();
   }
 
-  void chooseOpponent(OpponentUi opponent) {
-    _againstComputer = switch (opponent) {
-      OpponentUi.friend => false,
-      OpponentUi.computer => true,
-    };
+  void chooseFriend() {
+    _againstComputer = false;
+    _emitChoices();
+  }
+
+  void chooseComputer() {
+    _againstComputer = true;
     _emitChoices();
   }
 
