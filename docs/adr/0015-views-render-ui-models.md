@@ -72,8 +72,9 @@ What a UI model holds:
   creates it in `build`, where `context.l10n` is. Switching language while
   the app runs is rare enough not to shape this.
 
-`tool/check_architecture.dart` enforces the import rules once every screen
-has moved. Until then, screens move one pull request at a time.
+`tool/check_architecture.dart` enforces the import rules: `view/` and
+`models/` never import the engine or `domain/`, `models/` imports only
+`models/`, and `bloc/` never imports `view/`.
 
 ## Consequences
 

@@ -24,8 +24,14 @@ void main() {
 typedef _Package = ({String name, String lib});
 
 /// Where a file sits in `app/lib`: `features/game/domain/x.dart` is layer
-/// `features`, feature `game`, sublayer `domain`.
-typedef _Location = ({String layer, String? feature, String? sublayer});
+/// `features`, feature `game`, sublayer `domain`. Inside presentation, the
+/// folder says which part it is: `view`, `models` or `bloc`.
+typedef _Location = ({
+  String layer,
+  String? feature,
+  String? sublayer,
+  String? folder,
+});
 
 const _Package _engine = (
   name: 'cephalopod_engine',
@@ -50,6 +56,19 @@ const Map<String, Set<String>> _allowedWithinFeature = {
   'data': {'data', 'domain'},
   'presentation': {'presentation', 'domain'},
 };
+
+/// Which folders of the same feature's presentation each folder may import.
+/// Views reach the blocs to send them events; UI models are plain data; the
+/// blocs build UI models but never widgets (docs/adr/0015).
+const Map<String, Set<String>> _allowedWithinPresentation = {
+  'view': {'view', 'models', 'bloc'},
+  'models': {'models'},
+  'bloc': {'bloc', 'models'},
+};
+
+/// The presentation folders that only handle UI models, so neither the
+/// engine nor the domain (docs/adr/0015).
+const Set<String> _uiModelFolders = {'view', 'models'};
 
 final RegExp _directive = RegExp(
   r'''^\s*(?:import|export)\s+['"]([^'"]+)['"]''',
@@ -77,6 +96,10 @@ String? _appViolation(_Location from, String uri) {
   if (from.sublayer == 'domain' && _flutterImports.any(uri.startsWith)) {
     return 'domain code must stay pure Dart';
   }
+  final rendersUiModels = _uiModelFolders.contains(from.folder);
+  if (rendersUiModels && uri.startsWith('package:${_engine.name}/')) {
+    return '${from.folder} must not depend on the engine: it uses UI models';
+  }
   final ownPackage = 'package:${_app.name}/';
   if (!uri.startsWith(ownPackage)) return null;
 
@@ -97,16 +120,35 @@ String? _appViolation(_Location from, String uri) {
       !allowed.contains(to.sublayer)) {
     return '${from.sublayer} must not depend on ${to.sublayer}';
   }
+  if (to.feature == from.feature) return _presentationViolation(from, to);
   return null;
+}
+
+/// Why [from] may not import [to], both in the same feature, under the UI
+/// model rule (docs/adr/0015), or `null` when it may.
+String? _presentationViolation(_Location from, _Location to) {
+  if (_uiModelFolders.contains(from.folder) && to.sublayer == 'domain') {
+    return '${from.folder} must not depend on domain: it uses UI models';
+  }
+  final allowed = _allowedWithinPresentation[from.folder];
+  final toFolder = to.folder;
+  if (allowed == null || toFolder == null || allowed.contains(toFolder)) {
+    return null;
+  }
+  return 'presentation/${from.folder} must not depend on '
+      'presentation/$toFolder';
 }
 
 _Location _locate(String libPath) {
   final parts = libPath.split('/');
   final inFeature = parts.first == 'features' && parts.length > 2;
+  final sublayer = inFeature && parts.length > 3 ? parts[2] : null;
+  final inPresentation = sublayer == 'presentation' && parts.length > 4;
   return (
     layer: parts.first,
     feature: inFeature ? parts[1] : null,
-    sublayer: inFeature && parts.length > 3 ? parts[2] : null,
+    sublayer: sublayer,
+    folder: inPresentation ? parts[3] : null,
   );
 }
 

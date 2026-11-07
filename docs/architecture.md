@@ -31,11 +31,11 @@ by feature first and by layer second.
 | Core | `core` | Code shared by features: route names, the `FeatureModule` interface, theme, shared widgets | `core`, engine, Flutter |
 | App | `app` | `App` widget, router, theme, composition root | Anything |
 
-Presentation is moving to UI models
+Inside presentation, views render UI models
 ([ADR 0015](adr/0015-views-render-ui-models.md)). Widgets in `view/` and the
-UI models in `models/` will import neither the engine nor `domain/`; only the
-blocs and their mappers in `bloc/` will. The architecture check enforces it
-once every screen has moved.
+UI models in `models/` import neither the engine nor `domain/`; only the
+blocs and their mappers in `bloc/` do. Views reach `models/` and `bloc/`, UI
+models only other UI models, and blocs `models/` but never `view/`.
 
 Dependencies are wired by hand, in two levels
 ([ADR 0013](adr/0013-hand-written-feature-modules.md)):
@@ -65,6 +65,8 @@ the `CephalopodRules` factory wires them
 | Presentation never imports data, and data never imports presentation | `tool/check_architecture.dart` |
 | A feature never imports another feature or `app/` | `tool/check_architecture.dart` |
 | `core/` never imports `features/` or `app/` | `tool/check_architecture.dart` |
+| Views (`view/`) and UI models (`models/`) never import the engine or `domain/` | `tool/check_architecture.dart` |
+| UI models import only UI models, and blocs never import views | `tool/check_architecture.dart` |
 | Imports inside `lib` use `package:` URIs | `always_use_package_imports` lint |
 
 CI runs the check on every push. Shared code moves to `core/` rather than
