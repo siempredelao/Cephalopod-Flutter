@@ -1,9 +1,9 @@
 import 'package:cephalopod/core/navigation/app_route.dart';
-import 'package:cephalopod/features/game/domain/models/difficulty.dart';
-import 'package:cephalopod/features/game/presentation/bloc/new_game_choices.dart';
 import 'package:cephalopod/features/game/presentation/bloc/new_game_cubit.dart';
-import 'package:cephalopod/features/game/presentation/view/opponent_query_codec.dart';
-import 'package:cephalopod_engine/cephalopod_engine.dart';
+import 'package:cephalopod/features/game/presentation/models/difficulty_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/new_game_view_state.dart';
+import 'package:cephalopod/features/game/presentation/models/opponent_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/person_moves_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
@@ -24,20 +24,20 @@ class NewGameDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => NewGameCubit(),
-      child: BlocBuilder<NewGameCubit, NewGameChoices>(
-        builder: (context, choices) => AlertDialog(
+      child: BlocBuilder<NewGameCubit, NewGameViewState>(
+        builder: (context, state) => AlertDialog(
           title: const Text('New game'),
           scrollable: true,
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _OpponentChoice(choices),
-              if (choices.againstComputer) ...[
+              _OpponentChoice(state.opponent),
+              if (state.opponent case final ComputerOpponentUi computer) ...[
                 const SizedBox(height: _spacing),
-                _DifficultyChoice(choices),
+                _DifficultyChoice(computer.difficulty),
                 const SizedBox(height: _spacing),
-                _FirstMoveChoice(choices),
+                _PersonMovesChoice(computer.personMoves),
               ],
             ],
           ),
@@ -59,89 +59,104 @@ class NewGameDialog extends StatelessWidget {
   static void _cancel(BuildContext context) => context.pop();
 
   static void _start(BuildContext context) {
-    final opponent = context.read<NewGameCubit>().opponent;
     final game = context.namedLocation(
       AppRoute.game.name,
-      queryParameters: const OpponentQueryCodec().encode(opponent),
+      queryParameters: context.read<NewGameCubit>().gameQueryParameters,
     );
     context.pop(game);
   }
 }
 
-/// A friend, or the computer.
-class _OpponentChoice extends StatelessWidget {
-  const _OpponentChoice(this.choices);
+/// The segments of the opponent choice. A segment needs a plain value to
+/// compare, and the computer's [OpponentUi] carries its choices, so the
+/// segments have their own.
+enum _OpponentSegment { friend, computer }
 
-  final NewGameChoices choices;
+/// A friend, or the computer, with the [opponent] chosen.
+class _OpponentChoice extends StatelessWidget {
+  const _OpponentChoice(this.opponent);
+
+  final OpponentUi opponent;
 
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<NewGameCubit>();
     return _Section(
       title: 'Opponent',
-      child: SegmentedButton<bool>(
+      child: SegmentedButton<_OpponentSegment>(
         segments: const [
-          ButtonSegment(value: false, label: Text('A friend')),
-          ButtonSegment(value: true, label: Text('The computer')),
+          ButtonSegment(
+            value: _OpponentSegment.friend,
+            label: Text('A friend'),
+          ),
+          ButtonSegment(
+            value: _OpponentSegment.computer,
+            label: Text('The computer'),
+          ),
         ],
-        selected: {choices.againstComputer},
+        selected: {_segmentOf(opponent)},
         onSelectionChanged: (choice) {
-          if (choice.single) {
-            cubit.chooseComputer();
-          } else {
-            cubit.chooseFriend();
+          switch (choice.single) {
+            case _OpponentSegment.friend:
+              cubit.chooseFriend();
+            case _OpponentSegment.computer:
+              cubit.chooseComputer();
           }
         },
       ),
     );
   }
+
+  static _OpponentSegment _segmentOf(OpponentUi opponent) {
+    return switch (opponent) {
+      FriendOpponentUi() => _OpponentSegment.friend,
+      ComputerOpponentUi() => _OpponentSegment.computer,
+    };
+  }
 }
 
-/// How strongly the computer plays.
+/// How strongly the computer plays, with the [difficulty] chosen.
 class _DifficultyChoice extends StatelessWidget {
-  const _DifficultyChoice(this.choices);
+  const _DifficultyChoice(this.difficulty);
 
-  final NewGameChoices choices;
+  final DifficultyUi difficulty;
 
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<NewGameCubit>();
     return _Section(
       title: 'Difficulty',
-      child: SegmentedButton<Difficulty>(
+      child: SegmentedButton<DifficultyUi>(
         segments: const [
-          ButtonSegment(value: Difficulty.easy, label: Text('Easy')),
-          ButtonSegment(value: Difficulty.medium, label: Text('Medium')),
-          ButtonSegment(value: Difficulty.hard, label: Text('Hard')),
+          ButtonSegment(value: DifficultyUi.easy, label: Text('Easy')),
+          ButtonSegment(value: DifficultyUi.medium, label: Text('Medium')),
+          ButtonSegment(value: DifficultyUi.hard, label: Text('Hard')),
         ],
-        selected: {choices.computer.difficulty},
+        selected: {difficulty},
         onSelectionChanged: (choice) => cubit.chooseDifficulty(choice.single),
       ),
     );
   }
 }
 
-/// Whether the person moves first or second.
-class _FirstMoveChoice extends StatelessWidget {
-  const _FirstMoveChoice(this.choices);
+/// Whether the person moves first or second, with [personMoves] chosen.
+class _PersonMovesChoice extends StatelessWidget {
+  const _PersonMovesChoice(this.personMoves);
 
-  final NewGameChoices choices;
+  final PersonMovesUi personMoves;
 
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<NewGameCubit>();
     return _Section(
       title: 'You move',
-      // Each value is the colour the computer plays: when the person moves
-      // first, the computer plays White, which moves second.
-      child: SegmentedButton<Player>(
+      child: SegmentedButton<PersonMovesUi>(
         segments: const [
-          ButtonSegment(value: Player.white, label: Text('First')),
-          ButtonSegment(value: Player.black, label: Text('Second')),
+          ButtonSegment(value: PersonMovesUi.first, label: Text('First')),
+          ButtonSegment(value: PersonMovesUi.second, label: Text('Second')),
         ],
-        selected: {choices.computer.player},
-        onSelectionChanged: (choice) =>
-            cubit.chooseComputerPlayer(choice.single),
+        selected: {personMoves},
+        onSelectionChanged: (choice) => cubit.choosePersonMoves(choice.single),
       ),
     );
   }
