@@ -1,33 +1,91 @@
 import 'package:bloc/bloc.dart';
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
-import 'package:cephalopod/features/game/presentation/bloc/new_game_choices.dart';
+import 'package:cephalopod/features/game/presentation/bloc/new_game_view_state_mapper.dart';
+import 'package:cephalopod/features/game/presentation/bloc/opponent_query_codec.dart';
+import 'package:cephalopod/features/game/presentation/models/difficulty_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/new_game_view_state.dart';
+import 'package:cephalopod/features/game/presentation/models/opponent_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/person_moves_ui.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
-/// The new-game dialog's view model: what the person has chosen so far, and
-/// the [opponent] that makes. It starts on a friend.
-class NewGameCubit extends Cubit<NewGameChoices> {
-  NewGameCubit() : super(const NewGameChoices());
+/// The computer the new-game dialog offers first: Medium, with the person
+/// moving first.
+const ComputerOpponent _firstOffer = ComputerOpponent(
+  difficulty: Difficulty.medium,
+  player: Player.white,
+);
 
-  /// Who the person plays against, as chosen.
-  Opponent get opponent {
-    return state.againstComputer ? state.computer : const FriendOpponent();
+/// The new-game dialog's view model. It keeps what the person has chosen so
+/// far and emits it as a [NewGameViewState]. It starts on a friend.
+///
+/// While a friend is chosen, the dialog hides the computer's choices, but
+/// the cubit keeps them: choosing the computer again shows them as they
+/// were.
+class NewGameCubit extends Cubit<NewGameViewState> {
+  NewGameCubit({
+    this._newGameViewStateMapper = const NewGameViewStateMapper(),
+    this._opponentQueryCodec = const OpponentQueryCodec(),
+  }) : super(_newGameViewStateMapper.map(const FriendOpponent()));
+
+  final NewGameViewStateMapper _newGameViewStateMapper;
+  final OpponentQueryCodec _opponentQueryCodec;
+
+  bool _againstComputer = false;
+
+  /// The computer to play, if the person chooses it.
+  ComputerOpponent _computer = _firstOffer;
+
+  /// The game route's query parameters for the opponent chosen, so the
+  /// dialog can open the game without knowing who that is.
+  Map<String, String> get gameQueryParameters {
+    return _opponentQueryCodec.encode(_opponent);
   }
 
-  void chooseFriend() => emit(state.copyWith(againstComputer: false));
-
-  void chooseComputer() => emit(state.copyWith(againstComputer: true));
-
-  void chooseDifficulty(Difficulty difficulty) {
-    final player = state.computer.player;
-    final computer = ComputerOpponent(difficulty: difficulty, player: player);
-    emit(state.copyWith(computer: computer));
+  Opponent get _opponent {
+    return _againstComputer ? _computer : const FriendOpponent();
   }
 
-  /// [player] is the colour the computer plays; the person plays the other.
-  void chooseComputerPlayer(Player player) {
-    final difficulty = state.computer.difficulty;
-    final computer = ComputerOpponent(difficulty: difficulty, player: player);
-    emit(state.copyWith(computer: computer));
+  void chooseOpponent(OpponentUi opponent) {
+    _againstComputer = switch (opponent) {
+      OpponentUi.friend => false,
+      OpponentUi.computer => true,
+    };
+    _emitChoices();
+  }
+
+  void chooseDifficulty(DifficultyUi difficulty) {
+    _computer = ComputerOpponent(
+      difficulty: _difficultyOf(difficulty),
+      player: _computer.player,
+    );
+    _emitChoices();
+  }
+
+  void choosePersonMoves(PersonMovesUi personMoves) {
+    _computer = ComputerOpponent(
+      difficulty: _computer.difficulty,
+      player: _computerPlayerOf(personMoves),
+    );
+    _emitChoices();
+  }
+
+  void _emitChoices() => emit(_newGameViewStateMapper.map(_opponent));
+
+  static Difficulty _difficultyOf(DifficultyUi difficulty) {
+    return switch (difficulty) {
+      DifficultyUi.easy => Difficulty.easy,
+      DifficultyUi.medium => Difficulty.medium,
+      DifficultyUi.hard => Difficulty.hard,
+    };
+  }
+
+  /// The colour the computer plays for the person to move as [personMoves]
+  /// says: Black moves first, so the person moves first against White.
+  static Player _computerPlayerOf(PersonMovesUi personMoves) {
+    return switch (personMoves) {
+      PersonMovesUi.first => Player.white,
+      PersonMovesUi.second => Player.black,
+    };
   }
 }

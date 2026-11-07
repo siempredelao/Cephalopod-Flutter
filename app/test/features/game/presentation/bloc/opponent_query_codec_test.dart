@@ -1,6 +1,6 @@
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
-import 'package:cephalopod/features/game/presentation/view/opponent_query_codec.dart';
+import 'package:cephalopod/features/game/presentation/bloc/opponent_query_codec.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
 
