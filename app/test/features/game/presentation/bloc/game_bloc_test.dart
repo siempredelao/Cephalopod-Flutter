@@ -30,6 +30,11 @@ void main() {
   GameViewState placing(GameState game) =>
       GameViewState(game: game, phase: const TurnPhase.awaitingPlacement());
 
+  /// A tap on [square], as the screen sends it.
+  SquareTapped tap(Position square) {
+    return SquareTapped(row: square.row, col: square.col);
+  }
+
   /// The state after [move], as the engine plays it.
   GameState after(GameState state, Move move) =>
       switch (rules.apply(state, move)) {
@@ -81,7 +86,7 @@ void main() {
     blocTest<GameBloc, GameViewState>(
       'R7: a tap with no capture places a 1 and passes the turn',
       build: build,
-      act: (bloc) => bloc.add(const SquareTapped(center)),
+      act: (bloc) => bloc.add(tap(center)),
       expect: () => [
         GameViewState(
           game: after(rules.newGame(), Move(center)),
@@ -95,7 +100,7 @@ void main() {
     blocTest<GameBloc, GameViewState>(
       'R2: a tap on an occupied square does nothing',
       build: () => buildAt(figure4),
-      act: (bloc) => bloc.add(const SquareTapped(left)),
+      act: (bloc) => bloc.add(tap(left)),
       expect: () => <GameViewState>[],
     );
 
@@ -114,7 +119,7 @@ void main() {
     blocTest<GameBloc, GameViewState>(
       'R5: a tap with exactly one capture plays it at once',
       build: () => buildAt(oneCapture),
-      act: (bloc) => bloc.add(const SquareTapped(center)),
+      act: (bloc) => bloc.add(tap(center)),
       expect: () => [
         GameViewState(
           game: after(oneCapture, captureBoth),
@@ -128,7 +133,7 @@ void main() {
     blocTest<GameBloc, GameViewState>(
       'R5: a tap with several captures lets the player choose',
       build: () => buildAt(figure4),
-      act: (bloc) => bloc.add(const SquareTapped(top)),
+      act: (bloc) => bloc.add(tap(top)),
       expect: () => [choosing()],
       verify: (_) => expect(topOptions, hasLength(3)),
     );
@@ -137,9 +142,9 @@ void main() {
       'picking dice updates the sum and whether the capture is valid',
       build: () => buildAt(figure4),
       act: (bloc) => bloc
-        ..add(const SquareTapped(top))
-        ..add(const SquareTapped(left))
-        ..add(const SquareTapped(right)),
+        ..add(tap(top))
+        ..add(tap(left))
+        ..add(tap(right)),
       skip: 1,
       expect: () => [
         choosing(selected: {left}, sum: 1),
@@ -151,9 +156,9 @@ void main() {
       'tapping a picked die again takes it out',
       build: () => buildAt(figure4),
       act: (bloc) => bloc
-        ..add(const SquareTapped(top))
-        ..add(const SquareTapped(below))
-        ..add(const SquareTapped(below)),
+        ..add(tap(top))
+        ..add(tap(below))
+        ..add(tap(below)),
       skip: 2,
       expect: () => [choosing()],
     );
@@ -162,9 +167,9 @@ void main() {
       'dice outside every capture option cannot be picked',
       build: () => buildAt(figure4),
       act: (bloc) => bloc
-        ..add(const SquareTapped(top))
-        ..add(const SquareTapped(top))
-        ..add(const SquareTapped(Position(4, 4))),
+        ..add(tap(top))
+        ..add(tap(top))
+        ..add(tap(const Position(4, 4))),
       skip: 1,
       expect: () => <GameViewState>[],
     );
@@ -173,9 +178,9 @@ void main() {
       'R6: confirming plays the chosen capture',
       build: () => buildAt(figure4),
       act: (bloc) => bloc
-        ..add(const SquareTapped(top))
-        ..add(const SquareTapped(left))
-        ..add(const SquareTapped(right))
+        ..add(tap(top))
+        ..add(tap(left))
+        ..add(tap(right))
         ..add(const CaptureConfirmed()),
       skip: 3,
       expect: () => [
@@ -192,8 +197,8 @@ void main() {
       'confirming does nothing until the picked dice are an option',
       build: () => buildAt(figure4),
       act: (bloc) => bloc
-        ..add(const SquareTapped(top))
-        ..add(const SquareTapped(left))
+        ..add(tap(top))
+        ..add(tap(left))
         ..add(const CaptureConfirmed()),
       skip: 2,
       expect: () => <GameViewState>[],
@@ -203,8 +208,8 @@ void main() {
       'cancelling goes back to placing, with the board unchanged',
       build: () => buildAt(figure4),
       act: (bloc) => bloc
-        ..add(const SquareTapped(top))
-        ..add(const SquareTapped(left))
+        ..add(tap(top))
+        ..add(tap(left))
         ..add(const CaptureCancelled()),
       skip: 2,
       expect: () => [placing(figure4)],
@@ -233,7 +238,7 @@ void main() {
     blocTest<GameBloc, GameViewState>(
       'R8: filling the last square ends the game',
       build: () => buildAt(lastSquare),
-      act: (bloc) => bloc.add(const SquareTapped(Position(1, 1))),
+      act: (bloc) => bloc.add(tap(const Position(1, 1))),
       expect: () => [
         GameViewState(
           game: after(lastSquare, Move(const Position(1, 1))),
@@ -247,8 +252,8 @@ void main() {
       'taps after the game ended do nothing',
       build: () => buildAt(lastSquare),
       act: (bloc) => bloc
-        ..add(const SquareTapped(Position(1, 1)))
-        ..add(const SquareTapped(Position(1, 1))),
+        ..add(tap(const Position(1, 1)))
+        ..add(tap(const Position(1, 1))),
       skip: 1,
       expect: () => <GameViewState>[],
     );
@@ -257,8 +262,8 @@ void main() {
       'starting a new game drops the current one',
       build: () => buildAt(figure4),
       act: (bloc) => bloc
-        ..add(const SquareTapped(top))
-        ..add(const SquareTapped(left))
+        ..add(tap(top))
+        ..add(tap(left))
         ..add(
           const GameStarted(
             opponent: FriendOpponent(),
@@ -273,7 +278,7 @@ void main() {
       'restarting keeps the rules of the game on screen',
       build: () => createTestGameBloc(config: const GameConfig(boardSize: 3)),
       act: (bloc) => bloc
-        ..add(const SquareTapped(Position(1, 1)))
+        ..add(tap(const Position(1, 1)))
         ..add(const GameRestarted()),
       skip: 1,
       expect: () => [placing(rules.newGame(const GameConfig(boardSize: 3)))],
@@ -301,8 +306,8 @@ void main() {
 
     test('saves the game after every move', () async {
       final bloc = buildSaving()
-        ..add(const SquareTapped(center))
-        ..add(const SquareTapped(top));
+        ..add(tap(center))
+        ..add(tap(top));
       await settle();
 
       final record = GameRecord(moves: [Move(center), Move(top)]);
@@ -314,7 +319,7 @@ void main() {
       'undo takes back the last move, and redo plays it again',
       build: build,
       act: (bloc) => bloc
-        ..add(const SquareTapped(center))
+        ..add(tap(center))
         ..add(const UndoRequested())
         ..add(const RedoRequested()),
       expect: () => [played, undone, played],
@@ -324,9 +329,9 @@ void main() {
       'a new move clears the moves taken back',
       build: build,
       act: (bloc) => bloc
-        ..add(const SquareTapped(center))
+        ..add(tap(center))
         ..add(const UndoRequested())
-        ..add(const SquareTapped(top)),
+        ..add(tap(top)),
       expect: () => [
         played,
         undone,
@@ -343,7 +348,7 @@ void main() {
       'R8: a finished game cannot be undone',
       build: () => createTestGameBloc(config: const GameConfig(boardSize: 1)),
       act: (bloc) => bloc
-        ..add(const SquareTapped(Position(0, 0)))
+        ..add(tap(const Position(0, 0)))
         ..add(const UndoRequested()),
       skip: 1,
       expect: () => <GameViewState>[],
@@ -471,7 +476,7 @@ void main() {
       build: buildResuming,
       act: (bloc) => bloc
         ..add(const GameResumed())
-        ..add(const SquareTapped(center)),
+        ..add(tap(center)),
       // Resuming a game with no moves emits the starting position again:
       // a bloc's first emission is never skipped as a duplicate.
       expect: () => [waiting, thinking, replied],
@@ -487,7 +492,7 @@ void main() {
       build: buildResuming,
       act: (bloc) => bloc
         ..add(const GameResumed())
-        ..add(const SquareTapped(center))
+        ..add(tap(center))
         ..add(const UndoRequested())
         ..add(const RedoRequested()),
       expect: () => [
@@ -505,7 +510,7 @@ void main() {
       build: buildResuming,
       act: (bloc) => bloc
         ..add(const GameResumed())
-        ..add(const SquareTapped(center))
+        ..add(tap(center))
         ..add(const GameRestarted()),
       expect: () => [waiting, thinking, replied, waiting],
       verify: (_) async {

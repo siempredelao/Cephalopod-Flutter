@@ -104,7 +104,7 @@ class GameView extends StatelessWidget {
   ) {
     if (state.phase is ComputerThinking) return null;
     final bloc = context.read<GameBloc>();
-    return (square) => bloc.add(SquareTapped(Position(square.row, square.col)));
+    return (square) => bloc.add(SquareTapped(row: square.row, col: square.col));
   }
 
   static Widget? _controlsFor(BuildContext context, GameViewState state) {
