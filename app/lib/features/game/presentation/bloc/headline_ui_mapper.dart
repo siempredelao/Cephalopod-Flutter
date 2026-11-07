@@ -22,14 +22,13 @@ final class HeadlineUiMapper {
     };
   }
 
-  /// [player] is to move. Against the computer, its turn is shown as it
-  /// thinking, because it plays as soon as its turn comes.
+  /// [player] is to move.
   HeadlineUi _toMoveOf(Player player, Opponent opponent) {
     final sideUi = _sideUiMapper.map(player, opponent);
     return switch (sideUi.role) {
       RoleUi.player => HeadlineUi.playerToMove(sideUi.player),
-      RoleUi.you => const HeadlineUi.yourTurn(),
-      RoleUi.computer => const HeadlineUi.computerThinking(),
+      RoleUi.person => const HeadlineUi.personToMove(),
+      RoleUi.computer => const HeadlineUi.computerToMove(),
     };
   }
 
@@ -50,7 +49,7 @@ final class HeadlineUiMapper {
         winnerDice: winnerDice,
         loserDice: loserDice,
       ),
-      RoleUi.you => HeadlineUi.youWon(
+      RoleUi.person => HeadlineUi.personWon(
         winnerDice: winnerDice,
         loserDice: loserDice,
       ),

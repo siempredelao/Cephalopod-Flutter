@@ -37,17 +37,17 @@ void main() {
       );
     });
 
-    test("says it is the person's turn against the computer", () {
+    test('the person is to move against the computer', () {
       expect(
         mapper.map(const InProgress(Player.black), computer),
-        const HeadlineUi.yourTurn(),
+        const HeadlineUi.personToMove(),
       );
     });
 
-    test("shows the computer thinking on the computer's turn", () {
+    test('the computer is to move on its turn', () {
       expect(
         mapper.map(const InProgress(Player.white), computer),
-        const HeadlineUi.computerThinking(),
+        const HeadlineUi.computerToMove(),
       );
     });
 
@@ -70,10 +70,10 @@ void main() {
       );
     });
 
-    test('R8: says whether the person or the computer won', () {
+    test('R8: tells the person winning from the computer winning', () {
       expect(
         mapper.map(blackWins, computer),
-        const HeadlineUi.youWon(winnerDice: 13, loserDice: 12),
+        const HeadlineUi.personWon(winnerDice: 13, loserDice: 12),
       );
       expect(
         mapper.map(whiteWins, computer),

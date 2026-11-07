@@ -18,7 +18,7 @@ final class SideUiMapper {
       FriendOpponent() => RoleUi.player,
       ComputerOpponent(player: final computer) when computer == player =>
         RoleUi.computer,
-      ComputerOpponent() => RoleUi.you,
+      ComputerOpponent() => RoleUi.person,
     };
     return SideUi(player: playerUi, role: roleUi);
   }

@@ -3,8 +3,8 @@ enum RoleUi {
   /// One of two people taking turns, named by number.
   player,
 
-  /// The person, in a game against the computer.
-  you,
+  /// The person at the screen, in a game against the computer.
+  person,
 
   /// The computer.
   computer,
