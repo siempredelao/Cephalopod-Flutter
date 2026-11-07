@@ -15,10 +15,12 @@ import 'computer_turns.dart';
 /// wired the way the composition root wires it to device storage.
 ///
 /// The computer always plays its first legal move, on the test's isolate
-/// unless [backgroundRunner] says otherwise.
+/// unless [backgroundRunner] says otherwise. The bloc starts from a new game
+/// under [config], or from [position] when given.
 GameBloc createTestGameBloc({
   GameRepository? repository,
   GameConfig config = GameConfig.standard,
+  GameState? position,
   BackgroundRunner backgroundRunner = runHere,
 }) {
   final rules = CephalopodRules();
@@ -43,5 +45,6 @@ GameBloc createTestGameBloc({
     resumeGame: resumeGame,
     requestAgentMove: requestAgentMove,
     config: config,
+    position: position,
   );
 }

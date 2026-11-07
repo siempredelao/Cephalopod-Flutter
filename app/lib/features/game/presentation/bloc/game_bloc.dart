@@ -17,6 +17,8 @@ import 'package:collection/collection.dart';
 /// it which moves are legal, and plays, undoes and saves them through the
 /// use cases. Against the computer, it lets the computer play its turns.
 class GameBloc extends Bloc<GameEvent, GameViewState> {
+  /// Shows a new game under [config] until the opening event replaces it,
+  /// or the given [position], which tests use to start mid-game.
   GameBloc({
     required this._cephalopodRules,
     required this._startNewGame,
@@ -25,8 +27,13 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     required this._resumeGame,
     required this._requestAgentMove,
     GameConfig config = GameConfig.standard,
-  }) : super(_startOf(_cephalopodRules.newGame(config))) {
-    _gameRecord = GameRecord(config: config);
+    GameState? position,
+  }) : super(_startOf(position ?? _cephalopodRules.newGame(config))) {
+    _currentGame = (
+      record: GameRecord(config: config),
+      opponent: const FriendOpponent(),
+      state: state.game,
+    );
     // Events wait for storage, so they run one at a time, in order: each
     // sees the game the one before it left.
     on<GameEvent>(_onEvent, transformer: _inOrder);
@@ -39,12 +46,13 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   final ResumeGame _resumeGame;
   final RequestAgentMove _requestAgentMove;
 
-  /// The moves played so far, as saved. The position they reach is
-  /// `state.game`.
-  late GameRecord _gameRecord;
+  /// The game on screen, as the use cases take and give it. The bloc keeps
+  /// it here rather than reading it back from its state, which only
+  /// describes the screen.
+  late CurrentGame _currentGame;
 
-  /// Who the person faces, as saved.
-  Opponent _opponent = const FriendOpponent();
+  /// What the screen is waiting for.
+  TurnPhase _turnPhase = const TurnPhase.awaitingPlacement();
 
   /// Moves taken back, most recent last, for redo. A new move clears them.
   final List<Move> _undone = [];
@@ -52,7 +60,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// How many moves one undo or redo covers: one against a friend; against
   /// the computer, the person's move and the computer's reply, so the
   /// person is to move again.
-  int get _movesPerUndo => switch (_opponent) {
+  int get _movesPerUndo => switch (_currentGame.opponent) {
     FriendOpponent() => 1,
     ComputerOpponent() => 2,
   };
@@ -63,17 +71,20 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   static Stream<E> _inOrder<E>(Stream<E> events, EventMapper<E> mapper) =>
       events.asyncExpand(mapper);
 
-  /// The game on screen, as the use cases take it.
-  CurrentGame get _currentGame {
-    return (record: _gameRecord, opponent: _opponent, state: state.game);
-  }
+  /// Whether a turn can be taken back: there is one, and neither the
+  /// computer is thinking nor the game is over.
+  bool get _canUndo => switch (_turnPhase) {
+    AwaitingPlacement() || ChoosingCapture() =>
+      _currentGame.record.moves.length >= _movesPerUndo,
+    ComputerThinking() || GameEnded() => false,
+  };
 
   Future<void> _onEvent(GameEvent event, Emitter<GameViewState> emit) async {
     switch (event) {
       case GameStarted(:final opponent, :final config):
         await _start(opponent, config, emit);
       case GameRestarted():
-        await _start(_opponent, _gameRecord.config, emit);
+        await _start(_currentGame.opponent, _currentGame.record.config, emit);
       case GameResumed():
         await _resume(emit);
       case SquareTapped(:final position):
@@ -108,14 +119,15 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
 
   /// A new game like the one on screen: same config, same opponent.
   Future<CurrentGame> _restart() {
-    return _startNewGame(config: _gameRecord.config, opponent: _opponent);
+    final game = _currentGame;
+    return _startNewGame(config: game.record.config, opponent: game.opponent);
   }
 
   Future<void> _onSquareTapped(
     Position square,
     Emitter<GameViewState> emit,
   ) async {
-    switch (state.phase) {
+    switch (_turnPhase) {
       case AwaitingPlacement():
         await _place(square, emit);
       case final ChoosingCapture phase:
@@ -130,7 +142,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// chooses which capture to make (rule R5).
   Future<void> _place(Position square, Emitter<GameViewState> emit) async {
     final moves = [
-      for (final move in _cephalopodRules.legalMoves(state.game))
+      for (final move in _cephalopodRules.legalMoves(_currentGame.state))
         if (move.position == square) move,
     ];
     switch (moves) {
@@ -139,14 +151,11 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
       case [final move]:
         await _play(move, emit);
       case _:
-        emit(
-          state.copyWith(
-            phase: TurnPhase.choosingCapture(
-              target: square,
-              options: [for (final move in moves) move.captures],
-            ),
-          ),
+        _turnPhase = TurnPhase.choosingCapture(
+          target: square,
+          options: [for (final move in moves) move.captures],
         );
+        _emitScreen(emit);
     }
   }
 
@@ -161,22 +170,19 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     final selected = phase.selected.contains(square)
         ? phase.selected.difference({square})
         : {...phase.selected, square};
-    final dice = state.game.board.dice;
-    emit(
-      state.copyWith(
-        phase: phase.copyWith(
-          selected: selected,
-          selectedSum: selected.map((picked) => dice[picked]?.pips ?? 0).sum,
-          canConfirm: phase.options.any(
-            (option) => const SetEquality<Position>().equals(option, selected),
-          ),
-        ),
+    final dice = _currentGame.state.board.dice;
+    _turnPhase = phase.copyWith(
+      selected: selected,
+      selectedSum: selected.map((picked) => dice[picked]?.pips ?? 0).sum,
+      canConfirm: phase.options.any(
+        (option) => const SetEquality<Position>().equals(option, selected),
       ),
     );
+    _emitScreen(emit);
   }
 
   Future<void> _confirm(Emitter<GameViewState> emit) async {
-    if (state.phase case ChoosingCapture(
+    if (_turnPhase case ChoosingCapture(
       :final target,
       :final selected,
       canConfirm: true,
@@ -186,8 +192,9 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   }
 
   void _cancel(Emitter<GameViewState> emit) {
-    if (state.phase is ChoosingCapture) {
-      emit(state.copyWith(phase: const TurnPhase.awaitingPlacement()));
+    if (_turnPhase is ChoosingCapture) {
+      _turnPhase = const TurnPhase.awaitingPlacement();
+      _emitScreen(emit);
     }
   }
 
@@ -200,10 +207,10 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     }
   }
 
-  /// Takes back the last [_movesPerUndo] moves, when the screen allows it,
-  /// and remembers them for redo. A finished game stays finished.
+  /// Takes back the last [_movesPerUndo] moves, when [_canUndo], and
+  /// remembers them for redo. A finished game stays finished.
   Future<void> _undo(Emitter<GameViewState> emit) async {
-    if (!state.canUndo) return;
+    if (!_canUndo) return;
     var game = _currentGame;
     for (var i = 0; i < _movesPerUndo; i++) {
       _undone.add(game.record.moves.last);
@@ -227,23 +234,27 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// Lets the computer play while the screen shows it thinking. Other
   /// events wait until it has played.
   Future<void> _letComputerPlay(Emitter<GameViewState> emit) async {
-    if (state.phase is! ComputerThinking) return;
+    if (_turnPhase is! ComputerThinking) return;
     _show(await _requestAgentMove(_currentGame), emit);
   }
 
-  /// Shows [game], the result of a use case, and keeps its record and
-  /// opponent for the next move.
+  /// Keeps [game], the result of a use case, for the next move, and shows
+  /// it.
   void _show(CurrentGame game, Emitter<GameViewState> emit) {
-    _gameRecord = game.record;
-    _opponent = game.opponent;
-    final phase = _phaseOf(game);
-    final moves = game.record.moves;
+    _currentGame = game;
+    _turnPhase = _phaseOf(game);
+    _emitScreen(emit);
+  }
+
+  /// Emits what the screen shows of the game and the turn phase.
+  void _emitScreen(Emitter<GameViewState> emit) {
+    final game = _currentGame;
     emit(
       GameViewState(
         game: game.state,
-        phase: phase,
-        lastMove: moves.lastOrNull,
-        canUndo: phase is AwaitingPlacement && moves.length >= _movesPerUndo,
+        phase: _turnPhase,
+        lastMove: game.record.moves.lastOrNull,
+        canUndo: _canUndo,
         canRedo: _undone.isNotEmpty,
         opponent: game.opponent,
       ),
