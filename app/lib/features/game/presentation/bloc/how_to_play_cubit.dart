@@ -13,13 +13,13 @@ class HowToPlayCubit extends Cubit<HowToPlayViewState> {
   }) : super(_at(tutorialSteps.map(tutorialStepUiMapper.map).toList(), 0));
 
   /// The tutorial's [steps], with [step] on screen, counting from 0. The
-  /// button finishes the tutorial from the last step.
+  /// right button finishes the tutorial from the last step.
   static HowToPlayViewState _at(List<TutorialStepUi> steps, int step) {
     final isLastStep = step == steps.length - 1;
     return HowToPlayViewState(
       steps: steps,
       currentStep: step,
-      button: isLastStep ? TutorialButtonUi.finish : TutorialButtonUi.next,
+      rightButton: isLastStep ? TutorialButtonUi.finish : TutorialButtonUi.next,
     );
   }
 

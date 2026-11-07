@@ -17,7 +17,7 @@ void main() {
         HowToPlayViewState(
           steps: steps,
           currentStep: 0,
-          button: TutorialButtonUi.next,
+          rightButton: TutorialButtonUi.next,
         ),
       );
     });
@@ -30,7 +30,7 @@ void main() {
         HowToPlayViewState(
           steps: steps,
           currentStep: 1,
-          button: TutorialButtonUi.next,
+          rightButton: TutorialButtonUi.next,
         ),
       ],
     );
@@ -43,7 +43,7 @@ void main() {
         HowToPlayViewState(
           steps: steps,
           currentStep: lastStep,
-          button: TutorialButtonUi.finish,
+          rightButton: TutorialButtonUi.finish,
         ),
       ],
     );

@@ -90,8 +90,8 @@ class _TutorialPagesState extends State<_TutorialPages> {
                     ),
                     const Spacer(),
                     FilledButton(
-                      onPressed: () => _press(state.button),
-                      child: Text(_labelOf(state.button)),
+                      onPressed: () => _press(state.rightButton),
+                      child: Text(_labelOf(state.rightButton)),
                     ),
                   ],
                 ),
