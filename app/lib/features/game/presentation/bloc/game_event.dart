@@ -33,11 +33,13 @@ final class GameResumed extends GameEvent {
   const GameResumed();
 }
 
-/// The player tapped the square at [position].
+/// The player tapped the square at [row] and [col], counting from 0 at the
+/// top left.
 final class SquareTapped extends GameEvent {
-  const SquareTapped(this.position);
+  const SquareTapped({required this.row, required this.col});
 
-  final Position position;
+  final int row;
+  final int col;
 }
 
 /// The player confirmed the dice picked for a capture.

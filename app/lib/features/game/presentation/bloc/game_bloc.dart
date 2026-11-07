@@ -87,8 +87,8 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
         await _start(_currentGame.opponent, _currentGame.record.config, emit);
       case GameResumed():
         await _resume(emit);
-      case SquareTapped(:final position):
-        await _onSquareTapped(position, emit);
+      case SquareTapped(:final row, :final col):
+        await _onSquareTapped(Position(row, col), emit);
       case CaptureConfirmed():
         await _confirm(emit);
       case CaptureCancelled():
