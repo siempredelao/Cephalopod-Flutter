@@ -1,5 +1,6 @@
 import 'package:cephalopod/core/navigation/app_route.dart';
 import 'package:cephalopod/features/home/presentation/bloc/home_cubit.dart';
+import 'package:cephalopod/features/home/presentation/models/home_view_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
@@ -44,8 +45,8 @@ class HomeView extends StatelessWidget {
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
-            child: BlocBuilder<HomeCubit, bool>(
-              builder: (context, canContinue) => Column(
+            child: BlocBuilder<HomeCubit, HomeViewState>(
+              builder: (context, state) => Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text('Cephalopod', style: textTheme.displaySmall),
@@ -56,7 +57,7 @@ class HomeView extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),
-                  if (canContinue) ...[
+                  if (state.canContinue) ...[
                     FilledButton(
                       onPressed: () => _continue(context),
                       child: const Text('Continue'),
