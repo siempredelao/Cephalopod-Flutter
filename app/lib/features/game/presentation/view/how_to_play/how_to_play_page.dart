@@ -1,29 +1,41 @@
-import 'package:cephalopod/features/game/domain/models/opponent.dart';
-import 'package:cephalopod/features/game/presentation/bloc/board_ui_mapper.dart';
-import 'package:cephalopod/features/game/presentation/models/board_ui.dart';
-import 'package:cephalopod/features/game/presentation/view/how_to_play/models/tutorial_step.dart';
-import 'package:cephalopod/features/game/presentation/view/how_to_play/tutorial_steps.dart';
+import 'package:cephalopod/features/game/presentation/bloc/how_to_play_cubit.dart';
+import 'package:cephalopod/features/game/presentation/models/how_to_play_view_state.dart';
+import 'package:cephalopod/features/game/presentation/models/tutorial_right_button_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/tutorial_step_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
 const double _spacing = 16;
 
-/// How to play, one idea per page: swipe or tap Next through
-/// [tutorialSteps], each with a board that shows it.
-class HowToPlayPage extends StatefulWidget {
+/// How to play, one idea per page: swipe or tap Next through the tutorial's
+/// steps, each with a board that shows it. It draws the
+/// [HowToPlayViewState] of the [HowToPlayCubit] it creates.
+class HowToPlayPage extends StatelessWidget {
   const HowToPlayPage({super.key});
 
   @override
-  State<HowToPlayPage> createState() => _HowToPlayPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => HowToPlayCubit(),
+      child: const _TutorialPages(),
+    );
+  }
 }
 
-class _HowToPlayPageState extends State<HowToPlayPage> {
+/// The pages and the controls under them. The page controller is the
+/// widget's own; the cubit follows which page it shows.
+class _TutorialPages extends StatefulWidget {
+  const _TutorialPages();
+
+  @override
+  State<_TutorialPages> createState() => _TutorialPagesState();
+}
+
+class _TutorialPagesState extends State<_TutorialPages> {
   static const Duration _turnDuration = Duration(milliseconds: 300);
 
   final PageController _pageController = PageController();
-  int _current = 0;
-
-  bool get _onLastStep => _current == tutorialSteps.length - 1;
 
   @override
   void dispose() {
@@ -31,45 +43,63 @@ class _HowToPlayPageState extends State<HowToPlayPage> {
     super.dispose();
   }
 
-  /// Turns to the next page, or leaves the tutorial from the last one.
-  void _next() {
-    if (_onLastStep) {
-      Navigator.of(context).maybePop();
-      return;
+  /// Turns to the next page, or leaves the tutorial, as [rightButton] says.
+  void _pressRightButton(TutorialRightButtonUi rightButton) {
+    switch (rightButton) {
+      case TutorialRightButtonUi.next:
+        _pageController.nextPage(
+          duration: _turnDuration,
+          curve: Curves.easeInOut,
+        );
+      case TutorialRightButtonUi.finish:
+        Navigator.of(context).maybePop();
     }
-    _pageController.nextPage(duration: _turnDuration, curve: Curves.easeInOut);
+  }
+
+  /// The words on [rightButton].
+  static String _rightButtonLabelOf(TutorialRightButtonUi rightButton) {
+    return switch (rightButton) {
+      TutorialRightButtonUi.next => 'Next',
+      TutorialRightButtonUi.finish => 'Got it',
+    };
   }
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<HowToPlayCubit>();
     return Scaffold(
       appBar: AppBar(title: const Text('How to play')),
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                onPageChanged: (page) => setState(() => _current = page),
-                children: [
-                  for (final step in tutorialSteps) _StepView(step: step),
-                ],
+        child: BlocBuilder<HowToPlayCubit, HowToPlayViewState>(
+          builder: (context, state) => Column(
+            children: [
+              Expanded(
+                child: PageView(
+                  controller: _pageController,
+                  onPageChanged: cubit.showStep,
+                  children: [
+                    for (final step in state.steps) _StepView(step: step),
+                  ],
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(_spacing),
-              child: Row(
-                children: [
-                  _StepDots(count: tutorialSteps.length, current: _current),
-                  const Spacer(),
-                  FilledButton(
-                    onPressed: _next,
-                    child: Text(_onLastStep ? 'Got it' : 'Next'),
-                  ),
-                ],
+              Padding(
+                padding: const EdgeInsets.all(_spacing),
+                child: Row(
+                  children: [
+                    _StepDots(
+                      count: state.steps.length,
+                      current: state.currentStep,
+                    ),
+                    const Spacer(),
+                    FilledButton(
+                      onPressed: () => _pressRightButton(state.rightButton),
+                      child: Text(_rightButtonLabelOf(state.rightButton)),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -80,15 +110,12 @@ class _HowToPlayPageState extends State<HowToPlayPage> {
 class _StepView extends StatelessWidget {
   const _StepView({required this.step});
 
-  final TutorialStep step;
+  final TutorialStepUi step;
 
   /// The board and the text get fixed shares of the page, whatever the text
   /// says, so the board is in the same place on every page.
   static const int _boardShare = 3;
   static const int _textShare = 2;
-
-  // Until the tutorial's steps hold their boards, they are mapped here.
-  static const BoardUiMapper _boardUiMapper = BoardUiMapper();
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +131,7 @@ class _StepView extends StatelessWidget {
             child: Center(
               child: ExcludeSemantics(
                 child: IgnorePointer(
-                  child: GameBoard(board: _boardOf(step), onSquareTapped: null),
+                  child: GameBoard(board: step.board, onSquareTapped: null),
                 ),
               ),
             ),
@@ -132,17 +159,6 @@ class _StepView extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  static BoardUi _boardOf(TutorialStep step) {
-    final example = step.example;
-    return _boardUiMapper.map(
-      game: example.game,
-      phase: example.phase,
-      lastMove: example.lastMove,
-      opponent: const FriendOpponent(),
-      highlightLastMove: true,
     );
   }
 }

@@ -1,6 +1,6 @@
 import 'package:cephalopod/core/theme/board_colors.dart';
+import 'package:cephalopod/features/game/presentation/bloc/tutorial_steps.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
-import 'package:cephalopod/features/game/presentation/view/how_to_play/tutorial_steps.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
