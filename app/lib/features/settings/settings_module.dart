@@ -24,7 +24,7 @@ final class SettingsModule implements FeatureModule {
   /// Whether the board should mark the last move, as the settings say now.
   /// A plain function, so the composition root can hand it to features that
   /// may not import this one.
-  bool highlightLastMove() => cubit.state.highlightLastMove;
+  bool highlightLastMove() => cubit.settings.highlightLastMove;
 
   @override
   List<RouteBase> get routes => [

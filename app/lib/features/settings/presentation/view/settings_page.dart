@@ -1,6 +1,6 @@
-import 'package:cephalopod/features/settings/domain/models/app_settings.dart';
-import 'package:cephalopod/features/settings/domain/models/theme_preference.dart';
 import 'package:cephalopod/features/settings/presentation/bloc/settings_cubit.dart';
+import 'package:cephalopod/features/settings/presentation/models/settings_view_state.dart';
+import 'package:cephalopod/features/settings/presentation/models/theme_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -17,8 +17,8 @@ class SettingsPage extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
-      body: BlocBuilder<SettingsCubit, AppSettings>(
-        builder: (context, settings) => ListView(
+      body: BlocBuilder<SettingsCubit, SettingsViewState>(
+        builder: (context, state) => ListView(
           padding: const EdgeInsets.symmetric(vertical: _spacing),
           children: [
             Padding(
@@ -27,29 +27,29 @@ class SettingsPage extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.all(_spacing),
-              child: SegmentedButton<ThemePreference>(
+              child: SegmentedButton<ThemeUi>(
                 segments: const [
                   ButtonSegment(
-                    value: ThemePreference.system,
+                    value: ThemeUi.system,
                     label: Text('System'),
                   ),
                   ButtonSegment(
-                    value: ThemePreference.light,
+                    value: ThemeUi.light,
                     label: Text('Light'),
                   ),
                   ButtonSegment(
-                    value: ThemePreference.dark,
+                    value: ThemeUi.dark,
                     label: Text('Dark'),
                   ),
                 ],
-                selected: {settings.theme},
+                selected: {state.theme},
                 onSelectionChanged: (choice) =>
                     cubit.chooseTheme(choice.single),
               ),
             ),
             SwitchListTile(
               title: const Text('Highlight the last move'),
-              value: settings.highlightLastMove,
+              value: state.highlightLastMove,
               onChanged: (_) => cubit.toggleLastMoveHighlight(),
             ),
           ],

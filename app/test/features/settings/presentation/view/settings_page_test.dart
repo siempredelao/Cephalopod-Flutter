@@ -1,6 +1,6 @@
 import 'package:cephalopod/features/settings/data/in_memory_settings_repository.dart';
-import 'package:cephalopod/features/settings/domain/models/theme_preference.dart';
 import 'package:cephalopod/features/settings/presentation/bloc/settings_cubit.dart';
+import 'package:cephalopod/features/settings/presentation/models/theme_ui.dart';
 import 'package:cephalopod/features/settings/presentation/view/settings_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -26,7 +26,7 @@ void main() {
       await tester.tap(find.text('Dark'));
       await tester.pumpAndSettle();
 
-      expect(cubit.state.theme, ThemePreference.dark);
+      expect(cubit.state.theme, ThemeUi.dark);
     });
 
     testWidgets('turns the last-move highlight off', (tester) async {
