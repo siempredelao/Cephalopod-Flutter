@@ -84,7 +84,9 @@ void main() {
       final screen = map(
         phase: TurnPhase.choosingCapture(
           target: top,
-          options: [{left, right}],
+          options: [
+            {left, right},
+          ],
           selected: {left},
           selectedSum: 1,
         ),
