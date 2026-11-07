@@ -1,4 +1,4 @@
-import 'package:cephalopod/features/game/domain/models/opponent.dart';
+import 'package:cephalopod/features/game/presentation/models/player_ui.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
 /// How the screen names [player]. The engine follows the rule sheet's black
@@ -9,10 +9,8 @@ String playerNameOf(Player player) => switch (player) {
   Player.white => 'Player 2',
 };
 
-/// Whose dice [owner]'s are, as a square's label says it: "Player 1" in a
-/// game between two people; "your" or "the computer's" against the computer.
-String dieOwnerOf(Player owner, Opponent opponent) => switch (opponent) {
-  FriendOpponent() => playerNameOf(owner),
-  ComputerOpponent(:final player) when player == owner => "the computer's",
-  ComputerOpponent() => 'your',
+/// How the screen names a numbered [player]: "Player 1" or "Player 2".
+String playerUiNameOf(PlayerUi player) => switch (player) {
+  PlayerUi.one => 'Player 1',
+  PlayerUi.two => 'Player 2',
 };

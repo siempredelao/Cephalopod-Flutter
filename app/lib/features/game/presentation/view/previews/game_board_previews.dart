@@ -1,15 +1,17 @@
-import 'package:cephalopod/features/game/presentation/bloc/game_view_state.dart';
-import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
+import 'package:cephalopod/features/game/presentation/models/board_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/die_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/player_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/role_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/side_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/square_mark.dart';
+import 'package:cephalopod/features/game/presentation/models/square_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/previews/board_preview_wrapper.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
-import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:material_ui/material_ui.dart';
 
-const Position _top = Position(0, 2);
-const Position _left = Position(0, 1);
-const Position _right = Position(0, 3);
-const Position _below = Position(1, 2);
+const SideUi _player1 = SideUi(player: PlayerUi.one, role: RoleUi.player);
+const SideUi _player2 = SideUi(player: PlayerUi.two, role: RoleUi.player);
 
 @Preview(
   group: 'GameBoard',
@@ -17,10 +19,7 @@ const Position _below = Position(1, 2);
   size: Size(400, 400),
   wrapper: boardPreviewWrapper,
 )
-Widget newGamePreview() {
-  final game = CephalopodRules().newGame();
-  return _boardOf(_placing(game));
-}
+Widget newGamePreview() => _boardOf({});
 
 @Preview(
   group: 'GameBoard',
@@ -29,17 +28,18 @@ Widget newGamePreview() {
   wrapper: boardPreviewWrapper,
 )
 Widget midGamePreview() {
-  final game = _gameWith({
-    const Position(0, 0): const Die(owner: Player.white, pips: 1),
-    const Position(0, 2): const Die(owner: Player.black, pips: 2),
-    const Position(1, 1): const Die(owner: Player.black, pips: 1),
-    const Position(2, 0): const Die(owner: Player.black, pips: 6),
-    const Position(2, 2): const Die(owner: Player.white, pips: 5),
-    const Position(3, 2): const Die(owner: Player.black, pips: 4),
-    const Position(4, 1): const Die(owner: Player.white, pips: 5),
-  });
-  final lastMove = Move(const Position(2, 2));
-  return _boardOf(_placing(game, lastMove: lastMove));
+  return _boardOf(
+    {
+      (0, 0): const DieUi(pips: 1, owner: _player2),
+      (0, 2): const DieUi(pips: 2, owner: _player1),
+      (1, 1): const DieUi(pips: 1, owner: _player1),
+      (2, 0): const DieUi(pips: 6, owner: _player1),
+      (2, 2): const DieUi(pips: 5, owner: _player2),
+      (3, 2): const DieUi(pips: 4, owner: _player1),
+      (4, 1): const DieUi(pips: 5, owner: _player2),
+    },
+    marks: {(2, 2): SquareMark.lastMove},
+  );
 }
 
 /// Rule sheet Fig. 4: a die on the top centre square can capture three ways.
@@ -51,43 +51,42 @@ Widget midGamePreview() {
   wrapper: boardPreviewWrapper,
 )
 Widget choosingCapturePreview() {
-  final game = _gameWith({
-    _left: const Die(owner: Player.white, pips: 1),
-    _right: const Die(owner: Player.white, pips: 1),
-    _below: const Die(owner: Player.black, pips: 5),
-  });
-  final options = [
-    for (final move in CephalopodRules().legalMoves(game))
-      if (move.position == _top) move.captures,
-  ];
-  final choosing = _placing(game).copyWith(
-    phase: TurnPhase.choosingCapture(
-      target: _top,
-      options: options,
-      selected: {_left},
-      selectedSum: 1,
-    ),
-  );
-  return _boardOf(choosing);
-}
-
-/// A standard game in progress, with [dice] on the board and Player 1 to
-/// move.
-GameState _gameWith(Map<Position, Die> dice) {
-  return GameState(
-    board: Board(size: GameConfig.standard.boardSize, dice: dice),
-    status: const InProgress(Player.black),
+  return _boardOf(
+    {
+      (0, 1): const DieUi(pips: 1, owner: _player2),
+      (0, 3): const DieUi(pips: 1, owner: _player2),
+      (1, 2): const DieUi(pips: 5, owner: _player1),
+    },
+    marks: {
+      (0, 2): SquareMark.captureTarget,
+      (0, 1): SquareMark.captureSelected,
+      (0, 3): SquareMark.captureOption,
+      (1, 2): SquareMark.captureOption,
+    },
   );
 }
 
-GameViewState _placing(GameState game, {Move? lastMove}) {
-  return GameViewState(
-    game: game,
-    phase: const TurnPhase.awaitingPlacement(),
-    lastMove: lastMove,
-  );
-}
+/// A standard 5 × 5 board with [dice] on their (row, column) squares, and
+/// the squares in [marks] standing out.
+Widget _boardOf(
+  Map<(int, int), DieUi> dice, {
+  Map<(int, int), SquareMark> marks = const {},
+}) {
+  const size = 5;
+  SquareUi squareAt(int row, int col) {
+    return SquareUi(
+      row: row,
+      col: col,
+      die: dice[(row, col)],
+      mark: marks[(row, col)] ?? SquareMark.none,
+    );
+  }
 
-Widget _boardOf(GameViewState state) {
-  return GameBoard(state: state, onSquareTapped: (_) {});
+  final board = BoardUi(
+    rows: [
+      for (var row = 0; row < size; row++)
+        [for (var col = 0; col < size; col++) squareAt(row, col)],
+    ],
+  );
+  return GameBoard(board: board, onSquareTapped: (_) {});
 }

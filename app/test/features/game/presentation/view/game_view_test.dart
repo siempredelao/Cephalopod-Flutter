@@ -34,7 +34,7 @@ void main() {
   }
 
   Future<void> tapSquare(WidgetTester tester, Position square) async {
-    await tester.tap(find.byKey(ValueKey(square)));
+    await tester.tap(find.byKey(ValueKey((square.row, square.col))));
     await tester.pumpAndSettle();
   }
 

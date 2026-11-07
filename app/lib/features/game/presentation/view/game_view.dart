@@ -1,9 +1,12 @@
 import 'package:cephalopod/core/navigation/app_route.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
+import 'package:cephalopod/features/game/presentation/bloc/board_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_view_state.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
+import 'package:cephalopod/features/game/presentation/models/board_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/square_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/player_name.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/capture_controls.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
@@ -22,6 +25,9 @@ class GameView extends StatelessWidget {
   final bool highlightLastMove;
 
   static const double _spacing = 16;
+
+  // Until the bloc's state carries the board, the view maps it on each build.
+  static const BoardUiMapper _boardUiMapper = BoardUiMapper();
 
   /// Room kept for [CaptureControls] even when they are hidden, so the board
   /// does not jump when they appear.
@@ -62,8 +68,7 @@ class GameView extends StatelessWidget {
                 Expanded(
                   child: Center(
                     child: GameBoard(
-                      state: state,
-                      highlightLastMove: highlightLastMove,
+                      board: _boardOf(state),
                       onSquareTapped: _tapHandlerOf(context, state),
                     ),
                   ),
@@ -81,15 +86,25 @@ class GameView extends StatelessWidget {
     );
   }
 
+  BoardUi _boardOf(GameViewState state) {
+    return _boardUiMapper.map(
+      game: state.game,
+      phase: state.phase,
+      lastMove: state.lastMove,
+      opponent: state.opponent,
+      highlightLastMove: highlightLastMove,
+    );
+  }
+
   /// What a tap on a square does: nothing while the computer thinks, because
   /// a tap sent then would wait, and land after the computer's move.
-  static ValueChanged<Position>? _tapHandlerOf(
+  static ValueChanged<SquareUi>? _tapHandlerOf(
     BuildContext context,
     GameViewState state,
   ) {
     if (state.phase is ComputerThinking) return null;
     final bloc = context.read<GameBloc>();
-    return (square) => bloc.add(SquareTapped(square));
+    return (square) => bloc.add(SquareTapped(Position(square.row, square.col)));
   }
 
   static Widget? _controlsFor(BuildContext context, GameViewState state) {

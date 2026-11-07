@@ -1,3 +1,6 @@
+import 'package:cephalopod/features/game/domain/models/opponent.dart';
+import 'package:cephalopod/features/game/presentation/bloc/board_ui_mapper.dart';
+import 'package:cephalopod/features/game/presentation/models/board_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/models/tutorial_step.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/tutorial_steps.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
@@ -84,6 +87,9 @@ class _StepView extends StatelessWidget {
   static const int _boardShare = 3;
   static const int _textShare = 2;
 
+  // Until the tutorial's steps hold their boards, they are mapped here.
+  static const BoardUiMapper _boardUiMapper = BoardUiMapper();
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -98,7 +104,7 @@ class _StepView extends StatelessWidget {
             child: Center(
               child: ExcludeSemantics(
                 child: IgnorePointer(
-                  child: GameBoard(state: step.example, onSquareTapped: (_) {}),
+                  child: GameBoard(board: _boardOf(step), onSquareTapped: null),
                 ),
               ),
             ),
@@ -126,6 +132,17 @@ class _StepView extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  static BoardUi _boardOf(TutorialStep step) {
+    final example = step.example;
+    return _boardUiMapper.map(
+      game: example.game,
+      phase: example.phase,
+      lastMove: example.lastMove,
+      opponent: const FriendOpponent(),
+      highlightLastMove: true,
     );
   }
 }
