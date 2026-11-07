@@ -74,8 +74,8 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// Whether a turn can be taken back: there is one, and neither the
   /// computer is thinking nor the game is over.
   bool get _canUndo => switch (_turnPhase) {
-    AwaitingPlacement() || ChoosingCapture() =>
-      _currentGame.record.moves.length >= _movesPerUndo,
+    AwaitingPlacement() ||
+    ChoosingCapture() => _currentGame.record.moves.length >= _movesPerUndo,
     ComputerThinking() || GameEnded() => false,
   };
 
