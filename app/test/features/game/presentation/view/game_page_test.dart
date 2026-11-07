@@ -52,7 +52,7 @@ void main() {
 
       // The computer plays Black, which moves first.
       expect(find.byType(DieFace), findsOne);
-      expect(find.text('Player 2 to move'), findsOne);
+      expect(find.text('Your turn'), findsOne);
     });
 
     testWidgets('picks up the saved game when resuming', (tester) async {

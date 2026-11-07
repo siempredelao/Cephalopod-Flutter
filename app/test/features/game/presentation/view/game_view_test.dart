@@ -188,8 +188,52 @@ void main() {
       doneThinking.complete();
       await tester.pumpAndSettle();
 
-      expect(find.text('Player 2 to move'), findsOne);
+      expect(find.text('Your turn'), findsOne);
       expect(find.byType(DieFace), findsOne);
+    });
+
+    group('against the computer', () {
+      const oneSquare = GameConfig(boardSize: 1);
+
+      /// Resumes a new game on a [config] board against the computer
+      /// playing [player], which plays its first legal move.
+      Future<void> pumpAgainst(
+        WidgetTester tester,
+        Player player, {
+        GameConfig config = GameConfig.standard,
+      }) async {
+        final repository = InMemoryGameRepository();
+        final computer = ComputerOpponent(
+          difficulty: Difficulty.easy,
+          player: player,
+        );
+        final record = GameRecord(config: config);
+        await repository.save((record: record, opponent: computer));
+        final bloc = createTestGameBloc(repository: repository)
+          ..add(const GameResumed());
+        await pumpGame(tester, bloc: bloc);
+        await tester.pumpAndSettle();
+      }
+
+      testWidgets("says when it is the person's turn", (tester) async {
+        await pumpAgainst(tester, Player.white);
+
+        expect(find.text('Your turn'), findsOne);
+      });
+
+      testWidgets('R8: says when the person won', (tester) async {
+        await pumpAgainst(tester, Player.white, config: oneSquare);
+
+        await tapSquare(tester, const Position(0, 0));
+
+        expect(find.text('You win 1 to 0'), findsOne);
+      });
+
+      testWidgets('R8: says when the computer won', (tester) async {
+        await pumpAgainst(tester, Player.black, config: oneSquare);
+
+        expect(find.text('The computer wins 1 to 0'), findsOne);
+      });
     });
   });
 }

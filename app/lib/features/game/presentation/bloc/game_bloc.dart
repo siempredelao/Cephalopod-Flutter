@@ -245,6 +245,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
         lastMove: moves.lastOrNull,
         canUndo: phase is AwaitingPlacement && moves.length >= _movesPerUndo,
         canRedo: _undone.isNotEmpty,
+        opponent: game.opponent,
       ),
     );
   }

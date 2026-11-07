@@ -389,30 +389,37 @@ void main() {
 
   group('GameBloc against the computer', () {
     late InMemoryGameRepository repository;
+    const blackComputer = ComputerOpponent(
+      difficulty: Difficulty.easy,
+      player: Player.black,
+    );
+    const whiteComputer = ComputerOpponent(
+      difficulty: Difficulty.easy,
+      player: Player.white,
+    );
     final start = rules.newGame();
     final afterCenter = after(start, Move(center));
     final reply = rules.legalMoves(afterCenter).first;
+    final waiting = placing(start).copyWith(opponent: whiteComputer);
     final thinking = GameViewState(
       game: afterCenter,
       phase: const TurnPhase.computerThinking(),
       lastMove: Move(center),
+      opponent: whiteComputer,
     );
     final replied = GameViewState(
       game: after(afterCenter, reply),
       phase: const TurnPhase.awaitingPlacement(),
       lastMove: reply,
       canUndo: true,
+      opponent: whiteComputer,
     );
 
     setUp(() => repository = InMemoryGameRepository());
 
-    /// Saves a new game against the computer playing [player], for the bloc
-    /// to resume. The test bloc's computer plays its first legal move.
-    Future<void> saveGameAgainst(Player player) {
-      final computer = ComputerOpponent(
-        difficulty: Difficulty.easy,
-        player: player,
-      );
+    /// Saves a new game against [computer], for the bloc to resume. The test
+    /// bloc's computer plays its first legal move.
+    Future<void> saveGameAgainst(ComputerOpponent computer) {
       return repository.save((record: GameRecord(), opponent: computer));
     }
 
@@ -420,17 +427,22 @@ void main() {
 
     blocTest<GameBloc, GameViewState>(
       'plays first when it plays Black, thinking meanwhile',
-      setUp: () => saveGameAgainst(Player.black),
+      setUp: () => saveGameAgainst(blackComputer),
       build: buildResuming,
       act: (bloc) => bloc.add(const GameResumed()),
       expect: () {
         final opening = rules.legalMoves(start).first;
         return [
-          placing(start).copyWith(phase: const TurnPhase.computerThinking()),
+          GameViewState(
+            game: start,
+            phase: const TurnPhase.computerThinking(),
+            opponent: blackComputer,
+          ),
           GameViewState(
             game: after(start, opening),
             phase: const TurnPhase.awaitingPlacement(),
             lastMove: opening,
+            opponent: blackComputer,
           ),
         ];
       },
@@ -438,14 +450,14 @@ void main() {
 
     blocTest<GameBloc, GameViewState>(
       "replies to the person's move, and saves both",
-      setUp: () => saveGameAgainst(Player.white),
+      setUp: () => saveGameAgainst(whiteComputer),
       build: buildResuming,
       act: (bloc) => bloc
         ..add(const GameResumed())
         ..add(const SquareTapped(center)),
       // Resuming a game with no moves emits the starting position again:
       // a bloc's first emission is never skipped as a duplicate.
-      expect: () => [placing(start), thinking, replied],
+      expect: () => [waiting, thinking, replied],
       verify: (_) async {
         final saved = await repository.load();
         expect(saved?.record.moves, [Move(center), reply]);
@@ -454,7 +466,7 @@ void main() {
 
     blocTest<GameBloc, GameViewState>(
       "undo takes back the reply and the person's move; redo plays both",
-      setUp: () => saveGameAgainst(Player.white),
+      setUp: () => saveGameAgainst(whiteComputer),
       build: buildResuming,
       act: (bloc) => bloc
         ..add(const GameResumed())
@@ -462,26 +474,26 @@ void main() {
         ..add(const UndoRequested())
         ..add(const RedoRequested()),
       expect: () => [
-        placing(start),
+        waiting,
         thinking,
         replied,
-        placing(start).copyWith(canRedo: true),
+        waiting.copyWith(canRedo: true),
         replied,
       ],
     );
 
     blocTest<GameBloc, GameViewState>(
       'restarting keeps playing the computer',
-      setUp: () => saveGameAgainst(Player.white),
+      setUp: () => saveGameAgainst(whiteComputer),
       build: buildResuming,
       act: (bloc) => bloc
         ..add(const GameResumed())
         ..add(const SquareTapped(center))
         ..add(const GameRestarted()),
-      expect: () => [placing(start), thinking, replied, placing(start)],
+      expect: () => [waiting, thinking, replied, waiting],
       verify: (_) async {
         final saved = await repository.load();
-        expect(saved?.opponent, isA<ComputerOpponent>());
+        expect(saved?.opponent, whiteComputer);
         expect(saved?.record.moves, isEmpty);
       },
     );
