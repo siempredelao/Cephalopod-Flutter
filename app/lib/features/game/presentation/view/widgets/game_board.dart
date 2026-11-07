@@ -1,9 +1,9 @@
 import 'package:cephalopod/core/theme/board_colors.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_view_state.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
+import 'package:cephalopod/features/game/presentation/models/square_mark.dart';
 import 'package:cephalopod/features/game/presentation/view/player_name.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
-import 'package:cephalopod/features/game/presentation/view/widgets/square_mark.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:material_ui/material_ui.dart';
 

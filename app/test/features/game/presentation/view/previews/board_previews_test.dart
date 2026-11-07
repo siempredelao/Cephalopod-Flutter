@@ -1,3 +1,4 @@
+import 'package:cephalopod/features/game/presentation/models/square_mark.dart';
 import 'package:cephalopod/features/game/presentation/view/previews/board_preview_wrapper.dart';
 import 'package:cephalopod/features/game/presentation/view/previews/board_square_previews.dart';
 import 'package:cephalopod/features/game/presentation/view/previews/die_face_previews.dart';
@@ -5,7 +6,6 @@ import 'package:cephalopod/features/game/presentation/view/previews/game_board_p
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
-import 'package:cephalopod/features/game/presentation/view/widgets/square_mark.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
