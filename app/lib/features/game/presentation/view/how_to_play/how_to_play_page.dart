@@ -1,5 +1,6 @@
 import 'package:cephalopod/features/game/presentation/bloc/how_to_play_cubit.dart';
 import 'package:cephalopod/features/game/presentation/models/how_to_play_view_state.dart';
+import 'package:cephalopod/features/game/presentation/models/tutorial_button_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/tutorial_step_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -42,14 +43,24 @@ class _TutorialPagesState extends State<_TutorialPages> {
     super.dispose();
   }
 
-  /// Turns to the next page, or leaves the tutorial from the last one.
-  void _next({required bool isLastStep}) {
-    if (isLastStep) {
-      Navigator.of(context).maybePop();
-      return;
+  /// Turns to the next page, or leaves the tutorial, as [button] says.
+  void _press(TutorialButtonUi button) {
+    switch (button) {
+      case TutorialButtonUi.next:
+        _pageController.nextPage(
+          duration: _turnDuration,
+          curve: Curves.easeInOut,
+        );
+      case TutorialButtonUi.finish:
+        Navigator.of(context).maybePop();
     }
-    _pageController.nextPage(duration: _turnDuration, curve: Curves.easeInOut);
   }
+
+  /// The words on [button].
+  static String _labelOf(TutorialButtonUi button) => switch (button) {
+    TutorialButtonUi.next => 'Next',
+    TutorialButtonUi.finish => 'Got it',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -79,8 +90,8 @@ class _TutorialPagesState extends State<_TutorialPages> {
                     ),
                     const Spacer(),
                     FilledButton(
-                      onPressed: () => _next(isLastStep: state.isLastStep),
-                      child: Text(state.isLastStep ? 'Got it' : 'Next'),
+                      onPressed: () => _press(state.button),
+                      child: Text(_labelOf(state.button)),
                     ),
                   ],
                 ),

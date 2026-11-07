@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/tutorial_step_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/tutorial_steps.dart';
 import 'package:cephalopod/features/game/presentation/models/how_to_play_view_state.dart';
+import 'package:cephalopod/features/game/presentation/models/tutorial_button_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/tutorial_step_ui.dart';
 
 /// How to play's view model: maps the tutorial's steps to pages once, and
@@ -11,12 +12,14 @@ class HowToPlayCubit extends Cubit<HowToPlayViewState> {
     TutorialStepUiMapper tutorialStepUiMapper = const TutorialStepUiMapper(),
   }) : super(_at(tutorialSteps.map(tutorialStepUiMapper.map).toList(), 0));
 
-  /// The tutorial's [steps], with [step] on screen, counting from 0.
+  /// The tutorial's [steps], with [step] on screen, counting from 0. The
+  /// button finishes the tutorial from the last step.
   static HowToPlayViewState _at(List<TutorialStepUi> steps, int step) {
+    final isLastStep = step == steps.length - 1;
     return HowToPlayViewState(
       steps: steps,
       currentStep: step,
-      isLastStep: step == steps.length - 1,
+      button: isLastStep ? TutorialButtonUi.finish : TutorialButtonUi.next,
     );
   }
 
