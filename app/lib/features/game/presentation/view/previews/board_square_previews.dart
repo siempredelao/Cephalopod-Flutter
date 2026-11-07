@@ -1,7 +1,11 @@
+import 'package:cephalopod/features/game/presentation/models/die_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/player_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/role_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/side_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/square_mark.dart';
+import 'package:cephalopod/features/game/presentation/models/square_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/previews/board_preview_wrapper.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
-import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -22,11 +26,16 @@ Widget emptySquaresPreview() => _everyMarkOf(null);
   size: Size(480, 100),
   wrapper: boardPreviewWrapper,
 )
-Widget occupiedSquaresPreview() =>
-    _everyMarkOf(const Die(owner: Player.white, pips: 3));
+Widget occupiedSquaresPreview() {
+  const die = DieUi(
+    pips: 3,
+    owner: SideUi(player: PlayerUi.two, role: RoleUi.player),
+  );
+  return _everyMarkOf(die);
+}
 
 /// One square per [SquareMark], from none to picked for a capture.
-Widget _everyMarkOf(Die? die) {
+Widget _everyMarkOf(DieUi? die) {
   return Row(
     mainAxisSize: MainAxisSize.min,
     spacing: _spacing,
@@ -35,9 +44,7 @@ Widget _everyMarkOf(Die? die) {
         SizedBox.square(
           dimension: _squareSide,
           child: BoardSquare(
-            die: die,
-            mark: mark,
-            label: mark.name,
+            square: SquareUi(row: 0, col: 0, die: die, mark: mark),
             onTap: () {},
           ),
         ),

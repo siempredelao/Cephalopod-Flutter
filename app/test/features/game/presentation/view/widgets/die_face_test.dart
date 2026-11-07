@@ -1,11 +1,20 @@
 import 'package:cephalopod/core/theme/board_colors.dart';
+import 'package:cephalopod/features/game/presentation/models/die_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/player_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/role_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/side_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
-import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
 void main() {
-  Future<void> pumpDie(WidgetTester tester, Die die) {
+  /// A die of [player]'s showing [pips].
+  DieUi dieOf(PlayerUi player, int pips) {
+    final owner = SideUi(player: player, role: RoleUi.player);
+    return DieUi(pips: pips, owner: owner);
+  }
+
+  Future<void> pumpDie(WidgetTester tester, DieUi die) {
     return tester.pumpWidget(
       MaterialApp(
         theme: ThemeData(extensions: const [BoardColors.light]),
@@ -25,10 +34,12 @@ void main() {
   }
 
   group('DieFace', () {
-    for (final owner in Player.values) {
+    for (final player in PlayerUi.values) {
       for (var pips = 1; pips <= 6; pips++) {
-        testWidgets('draws a ${owner.name} die showing $pips', (tester) async {
-          await pumpDie(tester, Die(owner: owner, pips: pips));
+        testWidgets('draws a die of player ${player.name} showing $pips', (
+          tester,
+        ) async {
+          await pumpDie(tester, dieOf(player, pips));
 
           expect(tester.takeException(), isNull);
           expect(find.byType(DieFace), findsOneWidget);
@@ -37,18 +48,18 @@ void main() {
     }
 
     testWidgets('repaints only when the die changes', (tester) async {
-      await pumpDie(tester, const Die(owner: Player.black, pips: 3));
+      await pumpDie(tester, dieOf(PlayerUi.one, 3));
       final three = painterOf(tester);
-      await pumpDie(tester, const Die(owner: Player.black, pips: 3));
+      await pumpDie(tester, dieOf(PlayerUi.one, 3));
       final sameThree = painterOf(tester);
-      await pumpDie(tester, const Die(owner: Player.white, pips: 3));
-      final whiteThree = painterOf(tester);
-      await pumpDie(tester, const Die(owner: Player.white, pips: 4));
-      final whiteFour = painterOf(tester);
+      await pumpDie(tester, dieOf(PlayerUi.two, 3));
+      final otherThree = painterOf(tester);
+      await pumpDie(tester, dieOf(PlayerUi.two, 4));
+      final otherFour = painterOf(tester);
 
       expect(sameThree.shouldRepaint(three), isFalse);
-      expect(whiteThree.shouldRepaint(sameThree), isTrue);
-      expect(whiteFour.shouldRepaint(whiteThree), isTrue);
+      expect(otherThree.shouldRepaint(sameThree), isTrue);
+      expect(otherFour.shouldRepaint(otherThree), isTrue);
     });
   });
 }

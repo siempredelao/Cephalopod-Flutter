@@ -1,5 +1,6 @@
 import 'package:cephalopod/core/theme/board_colors.dart';
-import 'package:cephalopod_engine/cephalopod_engine.dart';
+import 'package:cephalopod/features/game/presentation/models/die_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/player_ui.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// A [die] drawn as a rounded block with its pips on top, in its owner's
@@ -7,14 +8,14 @@ import 'package:material_ui/material_ui.dart';
 class DieFace extends StatelessWidget {
   const DieFace({required this.die, super.key});
 
-  final Die die;
+  final DieUi die;
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<BoardColors>()!;
-    final (face, edge, pips) = switch (die.owner) {
-      Player.black => (colors.blackDie, colors.blackDieEdge, colors.blackPips),
-      Player.white => (colors.whiteDie, colors.whiteDieEdge, colors.whitePips),
+    final (face, edge, pips) = switch (die.owner.player) {
+      PlayerUi.one => (colors.blackDie, colors.blackDieEdge, colors.blackPips),
+      PlayerUi.two => (colors.whiteDie, colors.whiteDieEdge, colors.whitePips),
     };
     return CustomPaint(
       painter: _DiePainter(

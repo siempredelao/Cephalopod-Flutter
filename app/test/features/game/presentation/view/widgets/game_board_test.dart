@@ -1,88 +1,98 @@
 import 'package:cephalopod/core/theme/board_colors.dart';
-import 'package:cephalopod/features/game/domain/models/difficulty.dart';
-import 'package:cephalopod/features/game/domain/models/opponent.dart';
-import 'package:cephalopod/features/game/presentation/bloc/game_view_state.dart';
-import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
+import 'package:cephalopod/features/game/presentation/models/board_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/die_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/player_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/role_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/side_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/square_mark.dart';
+import 'package:cephalopod/features/game/presentation/models/square_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
-import 'package:cephalopod_engine/cephalopod_engine.dart';
-import 'package:cephalopod_engine/testing.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
 void main() {
-  const top = Position(0, 2);
-  const left = Position(0, 1);
-  const right = Position(0, 3);
-  const below = Position(1, 2);
+  const player1 = SideUi(player: PlayerUi.one, role: RoleUi.player);
+  const player2 = SideUi(player: PlayerUi.two, role: RoleUi.player);
 
-  /// Rule sheet Fig. 4: a die on the top centre square can capture with the
-  /// 1s either side and the 5 below.
-  final figure4 = stateFromAscii('''
-    .  w1 .  w1 .
-    .  .  b5 .  .
-    .  .  .  .  .
-    .  .  .  .  .
-    .  .  .  .  .
-  ''', toMove: Player.black);
+  /// A 5 × 5 board with [dice] on their (row, column) squares, and the
+  /// squares in [marks] standing out.
+  BoardUi boardOf(
+    Map<(int, int), DieUi> dice, {
+    Map<(int, int), SquareMark> marks = const {},
+  }) {
+    SquareUi squareAt(int row, int col) {
+      return SquareUi(
+        row: row,
+        col: col,
+        die: dice[(row, col)],
+        mark: marks[(row, col)] ?? SquareMark.none,
+      );
+    }
 
-  GameViewState placing({Move? lastMove}) => GameViewState(
-    game: figure4,
-    phase: const TurnPhase.awaitingPlacement(),
-    lastMove: lastMove,
-  );
+    return BoardUi(
+      rows: [
+        for (var row = 0; row < 5; row++)
+          [for (var col = 0; col < 5; col++) squareAt(row, col)],
+      ],
+    );
+  }
+
+  /// Rule sheet Fig. 4: the 1s of Player 2 either side of the top centre
+  /// square, and the 5 of Player 1 below it.
+  final figure4 = boardOf({
+    (0, 1): const DieUi(pips: 1, owner: player2),
+    (0, 3): const DieUi(pips: 1, owner: player2),
+    (1, 2): const DieUi(pips: 5, owner: player1),
+  });
 
   Future<void> pumpBoard(
     WidgetTester tester,
-    GameViewState state, {
-    ValueChanged<Position>? onSquareTapped,
+    BoardUi board, {
+    ValueChanged<SquareUi>? onSquareTapped,
   }) {
     return tester.pumpWidget(
       MaterialApp(
         theme: ThemeData(extensions: const [BoardColors.light]),
         home: Center(
-          child: GameBoard(
-            state: state,
-            onSquareTapped: onSquareTapped ?? (_) {},
-          ),
+          child: GameBoard(board: board, onSquareTapped: onSquareTapped),
         ),
       ),
     );
   }
 
-  BoardSquare squareAt(WidgetTester tester, Position position) =>
-      tester.widget<BoardSquare>(find.byKey(ValueKey(position)));
+  BoardSquare squareAt(WidgetTester tester, int row, int col) =>
+      tester.widget<BoardSquare>(find.byKey(ValueKey((row, col))));
 
   group('GameBoard', () {
     testWidgets('shows one square per board square', (tester) async {
-      await pumpBoard(tester, placing());
+      await pumpBoard(tester, figure4);
 
       expect(find.byType(BoardSquare), findsNWidgets(25));
     });
 
     testWidgets('draws empty and full squares as squares', (tester) async {
-      await pumpBoard(tester, placing());
+      await pumpBoard(tester, figure4);
 
-      for (final position in [top, below, const Position(4, 4)]) {
-        final size = tester.getSize(find.byKey(ValueKey(position)));
+      for (final square in [(0, 2), (1, 2), (4, 4)]) {
+        final size = tester.getSize(find.byKey(ValueKey(square)));
         expect(size.height, moreOrLessEquals(size.width, epsilon: 0.01));
         expect(size.width, greaterThan(100));
       }
     });
 
     testWidgets('shows each die on its square', (tester) async {
-      await pumpBoard(tester, placing());
+      await pumpBoard(tester, figure4);
 
       expect(find.byType(DieFace), findsNWidgets(3));
-      expect(squareAt(tester, below).die, figure4.board.dice[below]);
-      expect(squareAt(tester, top).die, isNull);
+      expect(squareAt(tester, 1, 2).square.die?.pips, 5);
+      expect(squareAt(tester, 0, 2).square.die, isNull);
     });
 
     testWidgets('names each square for screen readers', (tester) async {
       final semantics = tester.ensureSemantics();
-      await pumpBoard(tester, placing());
+      await pumpBoard(tester, figure4);
 
       expect(
         find.bySemanticsLabel('Row 1, column 2, Player 2 die showing 1'),
@@ -96,15 +106,20 @@ void main() {
       semantics.dispose();
     });
 
-    testWidgets("names the dice yours or the computer's against it", (
-      tester,
-    ) async {
+    testWidgets("names the dice yours or the computer's", (tester) async {
       final semantics = tester.ensureSemantics();
-      const computer = ComputerOpponent(
-        difficulty: Difficulty.easy,
-        player: Player.white,
-      );
-      await pumpBoard(tester, placing().copyWith(opponent: computer));
+      final board = boardOf({
+        (0, 1): const DieUi(
+          pips: 1,
+          owner: SideUi(player: PlayerUi.two, role: RoleUi.computer),
+        ),
+        (1, 2): const DieUi(
+          pips: 5,
+          owner: SideUi(player: PlayerUi.one, role: RoleUi.you),
+        ),
+      });
+
+      await pumpBoard(tester, board);
 
       expect(
         find.bySemanticsLabel("Row 1, column 2, the computer's die showing 1"),
@@ -118,58 +133,34 @@ void main() {
     });
 
     testWidgets('reports the tapped square', (tester) async {
-      final tapped = <Position>[];
-      await pumpBoard(tester, placing(), onSquareTapped: tapped.add);
+      final tapped = <SquareUi>[];
+      await pumpBoard(tester, figure4, onSquareTapped: tapped.add);
 
-      await tester.tap(find.byKey(const ValueKey(top)));
+      await tester.tap(find.byKey(const ValueKey((0, 2))));
 
-      expect(tapped, [top]);
+      expect(tapped, [squareAt(tester, 0, 2).square]);
     });
 
-    testWidgets('leaves the last move unmarked when told to', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData(extensions: const [BoardColors.light]),
-          home: Center(
-            child: GameBoard(
-              state: placing(lastMove: Move(below)),
-              onSquareTapped: (_) {},
-              highlightLastMove: false,
-            ),
-          ),
-        ),
+    testWidgets('takes no taps without a handler', (tester) async {
+      await pumpBoard(tester, figure4);
+
+      expect(squareAt(tester, 0, 2).onTap, isNull);
+    });
+
+    testWidgets("shows each square's mark", (tester) async {
+      final board = boardOf(
+        {(1, 2): const DieUi(pips: 5, owner: player1)},
+        marks: {
+          (0, 2): SquareMark.captureTarget,
+          (1, 2): SquareMark.captureOption,
+        },
       );
 
-      expect(squareAt(tester, below).mark, SquareMark.none);
-    });
+      await pumpBoard(tester, board);
 
-    testWidgets('marks the last move', (tester) async {
-      await pumpBoard(tester, placing(lastMove: Move(below)));
-
-      expect(squareAt(tester, below).mark, SquareMark.lastMove);
-      expect(squareAt(tester, top).mark, SquareMark.none);
-    });
-
-    testWidgets('R5: marks the target and the pickable dice', (tester) async {
-      final choosing = placing(lastMove: Move(below)).copyWith(
-        phase: TurnPhase.choosingCapture(
-          target: top,
-          options: [
-            {left, right},
-            {left, below},
-            {right, below},
-          ],
-          selected: {left},
-        ),
-      );
-
-      await pumpBoard(tester, choosing);
-
-      expect(squareAt(tester, top).mark, SquareMark.captureTarget);
-      expect(squareAt(tester, left).mark, SquareMark.captureSelected);
-      expect(squareAt(tester, right).mark, SquareMark.captureOption);
-      expect(squareAt(tester, below).mark, SquareMark.captureOption);
-      expect(squareAt(tester, const Position(4, 4)).mark, SquareMark.none);
+      expect(squareAt(tester, 0, 2).square.mark, SquareMark.captureTarget);
+      expect(squareAt(tester, 1, 2).square.mark, SquareMark.captureOption);
+      expect(squareAt(tester, 4, 4).square.mark, SquareMark.none);
     });
   });
 }

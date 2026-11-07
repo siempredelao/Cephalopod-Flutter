@@ -1,6 +1,9 @@
+import 'package:cephalopod/features/game/presentation/models/die_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/player_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/role_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/side_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/previews/board_preview_wrapper.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
-import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -13,7 +16,7 @@ const double _spacing = 8;
   size: Size(440, 80),
   wrapper: boardPreviewWrapper,
 )
-Widget player1DicePreview() => _allValuesOf(Player.black);
+Widget player1DicePreview() => _allValuesOf(PlayerUi.one);
 
 @Preview(
   group: 'DieFace',
@@ -21,9 +24,10 @@ Widget player1DicePreview() => _allValuesOf(Player.black);
   size: Size(440, 80),
   wrapper: boardPreviewWrapper,
 )
-Widget player2DicePreview() => _allValuesOf(Player.white);
+Widget player2DicePreview() => _allValuesOf(PlayerUi.two);
 
-Widget _allValuesOf(Player owner) {
+Widget _allValuesOf(PlayerUi player) {
+  final owner = SideUi(player: player, role: RoleUi.player);
   return Row(
     mainAxisSize: MainAxisSize.min,
     spacing: _spacing,
@@ -32,7 +36,7 @@ Widget _allValuesOf(Player owner) {
         SizedBox.square(
           dimension: _dieSide,
           child: DieFace(
-            die: Die(owner: owner, pips: pips),
+            die: DieUi(pips: pips, owner: owner),
           ),
         ),
     ],
