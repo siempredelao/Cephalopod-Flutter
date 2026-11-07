@@ -44,9 +44,9 @@ state privately and turns it into UI models with a mapper.
 What a UI model holds:
 
 - **Meanings, not text.** For example `Headline.won(winner: Side.you,
-  score: (13, 12))`, or a square with its pips, its side and its mark. The
-  widget turns a meaning into words, through `context.l10n` once M5 adds
-  translations, and into colours, through the theme. This is the Flutter
+  score: (13, 12))`, or a square with its pips, its side and its mark. A
+  text mapper in `view/` turns a meaning into words (below), and the widget
+  turns it into colours, through the theme. This is the Flutter
   counterpart of Kotlin's `@StringRes` or `UiText`. Flutter has no resource
   IDs, so a sealed class names the message instead.
 - **Events carry presentation values.** A tap sends the square's row and
@@ -62,6 +62,13 @@ What a UI model holds:
 - **Mappers** are classes in `presentation/bloc/`, injected into the bloc or
   cubit. They are pure: domain state in, UI model out. Behaviour stays out
   of the data, as in the engine (ADR 0009).
+- **Text mappers** are classes in `presentation/view/`, injected into the
+  widget (`HeadlineTextMapper` into `GameView`). They are pure too: UI
+  model in, words out. They decide nothing, since each meaning has one
+  wording; the decisions stay in the mappers above. When M5 adds
+  translations, a text mapper takes them in its constructor, and the widget
+  creates it in `build`, where `context.l10n` is. Switching language while
+  the app runs is rare enough not to shape this.
 
 `tool/check_architecture.dart` enforces the import rules once every screen
 has moved. Until then, screens move one pull request at a time.

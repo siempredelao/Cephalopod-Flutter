@@ -2,9 +2,8 @@ import 'package:cephalopod/core/navigation/app_route.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/models/game_view_state.dart';
-import 'package:cephalopod/features/game/presentation/models/headline_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/square_ui.dart';
-import 'package:cephalopod/features/game/presentation/view/player_name.dart';
+import 'package:cephalopod/features/game/presentation/view/headline_text_mapper.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/capture_controls.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,7 +14,12 @@ import 'package:material_ui/material_ui.dart';
 /// choosing a capture. It draws the [GameViewState] of the `GameBloc` above
 /// it and adds events; the bloc decides what they do.
 class GameView extends StatelessWidget {
-  const GameView({super.key});
+  const GameView({
+    this._headlineTextMapper = const HeadlineTextMapper(),
+    super.key,
+  });
+
+  final HeadlineTextMapper _headlineTextMapper;
 
   static const double _spacing = 16;
 
@@ -51,7 +55,7 @@ class GameView extends StatelessWidget {
             builder: (context, state) => Column(
               children: [
                 Text(
-                  _headlineOf(state.headline),
+                  _headlineTextMapper.map(state.headline),
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: _spacing),
@@ -100,20 +104,6 @@ class GameView extends StatelessWidget {
       onCancel: () => bloc.add(const CaptureCancelled()),
     );
   }
-
-  /// What the game waits for, or how it ended, winner first: "Player 2 wins
-  /// 13 to 12". Against the computer, the person is "you".
-  static String _headlineOf(HeadlineUi headline) => switch (headline) {
-    PlayerToMoveHeadline(:final player) => '${playerUiNameOf(player)} to move',
-    PersonToMoveHeadline() => 'Your turn',
-    ComputerToMoveHeadline() => 'The computer is thinking…',
-    PlayerWonHeadline(:final player, :final winnerDice, :final loserDice) =>
-      '${playerUiNameOf(player)} wins $winnerDice to $loserDice',
-    PersonWonHeadline(:final winnerDice, :final loserDice) =>
-      'You win $winnerDice to $loserDice',
-    ComputerWonHeadline(:final winnerDice, :final loserDice) =>
-      'The computer wins $winnerDice to $loserDice',
-  };
 }
 
 /// Undo and redo, each enabled when there is a move to take back or to play
