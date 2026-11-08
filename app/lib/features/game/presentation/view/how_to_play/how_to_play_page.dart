@@ -2,6 +2,7 @@ import 'package:cephalopod/features/game/presentation/bloc/how_to_play_cubit.dar
 import 'package:cephalopod/features/game/presentation/models/how_to_play_view_state.dart';
 import 'package:cephalopod/features/game/presentation/models/tutorial_right_button_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/tutorial_step_ui.dart';
+import 'package:cephalopod/features/game/presentation/view/how_to_play/step_dots.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
@@ -86,7 +87,7 @@ class _TutorialPagesState extends State<_TutorialPages> {
                 padding: const EdgeInsets.all(_spacing),
                 child: Row(
                   children: [
-                    _StepDots(
+                    StepDots(
                       count: state.steps.length,
                       current: state.currentStep,
                     ),
@@ -157,38 +158,6 @@ class _StepView extends StatelessWidget {
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-/// A dot per page, the current one highlighted.
-class _StepDots extends StatelessWidget {
-  const _StepDots({required this.count, required this.current});
-
-  final int count;
-  final int current;
-
-  static const double _size = 8;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Semantics(
-      label: 'Step ${current + 1} of $count',
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        spacing: _size,
-        children: [
-          for (var step = 0; step < count; step++)
-            DecoratedBox(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: step == current ? colors.primary : colors.outlineVariant,
-              ),
-              child: const SizedBox.square(dimension: _size),
-            ),
         ],
       ),
     );

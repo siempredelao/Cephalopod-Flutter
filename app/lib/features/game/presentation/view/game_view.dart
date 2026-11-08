@@ -97,9 +97,7 @@ class GameView extends StatelessWidget {
     if (capture == null) return null;
     final bloc = context.read<GameBloc>();
     return CaptureControls(
-      selectedSum: capture.selectedSum,
-      maxSum: capture.maxSum,
-      canConfirm: capture.canConfirm,
+      capture: capture,
       onConfirm: () => bloc.add(const CaptureConfirmed()),
       onCancel: () => bloc.add(const CaptureCancelled()),
     );
