@@ -67,7 +67,10 @@ What a UI model holds:
 - **Text mappers** are classes in `presentation/view/`, injected into the
   widget (`HeadlineTextMapper` into `GameView`). They are pure too: UI
   model in, words out. They decide nothing, since each meaning has one
-  wording; the decisions stay in the mappers above. When M5 adds
+  wording; the decisions stay in the mappers above. A widget may write
+  fixed labels itself, even ones picked by an enum, like Next or Got it.
+  Words built from data, such as names, numbers or positions, go through
+  a text mapper. When M5 adds
   translations, a text mapper takes them in its constructor, and the widget
   creates it in `build`, where `context.l10n` is. Switching language while
   the app runs is rare enough not to shape this.

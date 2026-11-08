@@ -1,3 +1,4 @@
+import 'package:cephalopod/features/game/presentation/models/capture_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/capture_controls.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -12,9 +13,11 @@ void main() {
       MaterialApp(
         home: Scaffold(
           body: CaptureControls(
-            selectedSum: 4,
-            maxSum: 6,
-            canConfirm: canConfirm,
+            capture: CaptureUi(
+              selectedSum: 4,
+              maxSum: 6,
+              canConfirm: canConfirm,
+            ),
             onConfirm: () => pressed.add('capture'),
             onCancel: () => pressed.add('cancel'),
           ),
