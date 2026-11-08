@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:cephalopod/app/app.dart';
+import 'package:cephalopod/app/error_reporting.dart';
 import 'package:cephalopod/app/flavor.dart';
 import 'package:cephalopod/app/router.dart';
+import 'package:cephalopod/core/errors/error_reporter.dart';
 import 'package:cephalopod/features/about/about_module.dart';
 import 'package:cephalopod/features/game/data/saved_game_json_codec.dart';
 import 'package:cephalopod/features/game/data/shared_preferences_game_repository.dart';
@@ -21,6 +23,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 void bootstrap(Flavor flavor) {
   // Storage plugins are used before runApp, so the bindings come first.
   WidgetsFlutterBinding.ensureInitialized();
+  installErrorReporting(logError);
   final preferences = SharedPreferencesAsync();
 
   final settings = SettingsModule(

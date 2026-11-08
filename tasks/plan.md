@@ -95,17 +95,24 @@ Files: `domain/use_cases/request_agent_move.dart` (renamed),
 **Task 4. `feat(app): report uncaught errors`** (S)
 
 - In `bootstrap`, set `FlutterError.onError` and
-  `PlatformDispatcher.instance.onError`, and set `Bloc.observer` to an
-  `AppBlocObserver`. All three hand errors to one reporter, which for now
-  logs them with `dart:developer` `log`.
-- In M7, crash reporting replaces the logging inside the reporter, and
-  nothing else changes.
+  `PlatformDispatcher.instance.onError`. Both hand errors to one
+  `ErrorReporter`, which for now writes them to the console as Flutter
+  writes its own errors.
+- No `BlocObserver`: bloc throws an event handler's error again after
+  telling its observer, so it reaches `PlatformDispatcher.onError` anyway.
+  An observer that reported too would report each error twice.
+- The `ErrorReporter` type lives in `core/errors/`, because Task 5's
+  repository, in `game/data/`, takes one, and features may not import
+  `app/`.
+- In M7, crash reporting replaces the console reporter, and nothing else
+  changes.
 
 Acceptance:
-- A test shows that a bloc error and a Flutter error both reach the reporter.
+- A test shows that an error inside Flutter and any other uncaught error
+  both reach the reporter.
 
-Files: `app/bootstrap.dart`, `app/error_reporter.dart` (new),
-`app/app_bloc_observer.dart` (new), tests.
+Files: `core/errors/error_reporter.dart` (new), `app/error_reporting.dart`
+(new), `app/bootstrap.dart`, tests.
 
 **Task 5. `fix(game): keep playing when the game cannot be saved`** (S)
 
@@ -152,8 +159,7 @@ Acceptance:
 - No widget outside the settings page reads `SettingsCubit`.
 
 Files: `settings_cubit.dart`, `settings_module.dart`, `settings_page.dart`,
-tests. Update ADR 0002 and 0013 where they describe the cubit living as long
-as the app.
+tests. No ADR: none says the cubit lives as long as the app.
 
 Depends on Task 6.
 
@@ -295,8 +301,9 @@ Acceptance:
 
 Files: `tutorial_step.dart`, `tutorial_steps.dart`, `tutorial_step_ui.dart`,
 `tutorial_step_ui_mapper.dart`, `how_to_play_page.dart`,
-`tutorial_text_mapper.dart` (new), tests. Update ADR 0015 (its exception
-goes).
+`tutorial_text_mapper.dart` (new), tests. Add an ADR that replaces ADR
+0015's exception for How to play's text. Accepted ADRs are never edited, so
+0015 stays as it is.
 
 Depends on Task 8.
 
