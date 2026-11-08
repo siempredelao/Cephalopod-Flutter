@@ -2,7 +2,7 @@ import 'package:cephalopod/features/game/presentation/bloc/how_to_play_cubit.dar
 import 'package:cephalopod/features/game/presentation/models/how_to_play_view_state.dart';
 import 'package:cephalopod/features/game/presentation/models/tutorial_right_button_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/tutorial_step_ui.dart';
-import 'package:cephalopod/features/game/presentation/view/how_to_play/tutorial_progress_text_mapper.dart';
+import 'package:cephalopod/features/game/presentation/view/how_to_play/step_dots.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
@@ -13,20 +13,13 @@ const double _spacing = 16;
 /// steps, each with a board that shows it. It draws the
 /// [HowToPlayViewState] of the [HowToPlayCubit] it creates.
 class HowToPlayPage extends StatelessWidget {
-  const HowToPlayPage({
-    this._tutorialProgressTextMapper = const TutorialProgressTextMapper(),
-    super.key,
-  });
-
-  final TutorialProgressTextMapper _tutorialProgressTextMapper;
+  const HowToPlayPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => HowToPlayCubit(),
-      child: _TutorialPages(
-        tutorialProgressTextMapper: _tutorialProgressTextMapper,
-      ),
+      child: const _TutorialPages(),
     );
   }
 }
@@ -34,9 +27,7 @@ class HowToPlayPage extends StatelessWidget {
 /// The pages and the controls under them. The page controller is the
 /// widget's own; the cubit follows which page it shows.
 class _TutorialPages extends StatefulWidget {
-  const _TutorialPages({required this.tutorialProgressTextMapper});
-
-  final TutorialProgressTextMapper tutorialProgressTextMapper;
+  const _TutorialPages();
 
   @override
   State<_TutorialPages> createState() => _TutorialPagesState();
@@ -77,7 +68,6 @@ class _TutorialPagesState extends State<_TutorialPages> {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<HowToPlayCubit>();
-    final tutorialProgressTextMapper = widget.tutorialProgressTextMapper;
     return Scaffold(
       appBar: AppBar(title: const Text('How to play')),
       body: SafeArea(
@@ -97,10 +87,9 @@ class _TutorialPagesState extends State<_TutorialPages> {
                 padding: const EdgeInsets.all(_spacing),
                 child: Row(
                   children: [
-                    _StepDots(
+                    StepDots(
                       count: state.steps.length,
                       current: state.currentStep,
-                      tutorialProgressTextMapper: tutorialProgressTextMapper,
                     ),
                     const Spacer(),
                     FilledButton(
@@ -169,47 +158,6 @@ class _StepView extends StatelessWidget {
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-/// A dot per page, the current one highlighted.
-class _StepDots extends StatelessWidget {
-  const _StepDots({
-    required this.count,
-    required this.current,
-    required this.tutorialProgressTextMapper,
-  });
-
-  final TutorialProgressTextMapper tutorialProgressTextMapper;
-
-  final int count;
-  final int current;
-
-  static const double _size = 8;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Semantics(
-      label: tutorialProgressTextMapper.map(
-        currentStep: current,
-        stepCount: count,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        spacing: _size,
-        children: [
-          for (var step = 0; step < count; step++)
-            DecoratedBox(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: step == current ? colors.primary : colors.outlineVariant,
-              ),
-              child: const SizedBox.square(dimension: _size),
-            ),
         ],
       ),
     );
