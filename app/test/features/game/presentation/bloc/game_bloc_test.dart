@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:cephalopod/features/game/data/in_memory_game_repository.dart';
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
@@ -534,5 +536,67 @@ void main() {
         expect(saved?.record.moves, isEmpty);
       },
     );
+
+    test('drops its move when the screen closes while it thinks', () async {
+      // The computer thinks until the test lets it finish.
+      final thought = Completer<void>();
+      Future<R> slowRunner<M, R>(
+        FutureOr<R> Function(M message) callback,
+        M message,
+      ) async {
+        await thought.future;
+        return callback(message);
+      }
+
+      await saveGameAgainst(blackComputer);
+      final closing = createTestGameBloc(
+        repository: repository,
+        backgroundRunner: slowRunner,
+      )..add(const GameResumed());
+      await pumpEventQueue();
+      // Leaving the screen closes its bloc without waiting, as
+      // `BlocProvider` does.
+      unawaited(closing.close());
+
+      // The player starts another game, which is saved.
+      final next = createTestGameBloc(repository: repository)
+        ..add(const GameStarted(opponent: FriendOpponent()));
+      await pumpEventQueue();
+      thought.complete();
+      await pumpEventQueue();
+
+      final saved = await repository.load();
+      expect(saved?.opponent, const FriendOpponent());
+      expect(saved?.record.moves, isEmpty);
+      await next.close();
+    });
+
+    blocTest<GameBloc, GameViewState>(
+      'reports an agent that breaks the rules, and saves nothing',
+      setUp: () => saveGameAgainst(blackComputer),
+      build: () => createTestGameBloc(
+        repository: repository,
+        agentFactory: (_) => _OffBoardAgent(),
+      ),
+      act: (bloc) => bloc.add(const GameResumed()),
+      expect: () => [
+        screenOf(
+          start,
+          phase: const TurnPhase.computerThinking(),
+          opponent: blackComputer,
+        ),
+      ],
+      errors: () => [isStateError],
+      verify: (_) async {
+        final saved = await repository.load();
+        expect(saved?.record.moves, isEmpty);
+      },
+    );
   });
+}
+
+/// An agent that always plays off the board, which the rules refuse.
+final class _OffBoardAgent implements GameAgent {
+  @override
+  Move chooseMove(GameState state) => Move(const Position(9, 9));
 }

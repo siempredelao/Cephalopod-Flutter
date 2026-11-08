@@ -1,8 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:cephalopod/features/game/domain/models/current_game.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
+import 'package:cephalopod/features/game/domain/use_cases/choose_agent_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/play_move.dart';
-import 'package:cephalopod/features/game/domain/use_cases/request_agent_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/resume_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/start_new_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/undo_move.dart';
@@ -35,7 +35,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     required PlayMove playMove,
     required UndoMove undoMove,
     required ResumeGame resumeGame,
-    required RequestAgentMove requestAgentMove,
+    required ChooseAgentMove chooseAgentMove,
     GameViewStateMapper gameViewStateMapper = const GameViewStateMapper(),
     bool highlightLastMove = true,
     GameConfig config = GameConfig.standard,
@@ -47,7 +47,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
       playMove: playMove,
       undoMove: undoMove,
       resumeGame: resumeGame,
-      requestAgentMove: requestAgentMove,
+      chooseAgentMove: chooseAgentMove,
       gameViewStateMapper: gameViewStateMapper,
       highlightLastMove: highlightLastMove,
       currentGame: (
@@ -66,7 +66,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     required this._playMove,
     required this._undoMove,
     required this._resumeGame,
-    required this._requestAgentMove,
+    required this._chooseAgentMove,
     required this._gameViewStateMapper,
     required this._highlightLastMove,
     required this._currentGame,
@@ -91,7 +91,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   final PlayMove _playMove;
   final UndoMove _undoMove;
   final ResumeGame _resumeGame;
-  final RequestAgentMove _requestAgentMove;
+  final ChooseAgentMove _chooseAgentMove;
   final GameViewStateMapper _gameViewStateMapper;
 
   /// Whether the board marks the last move, as the player's settings say.
@@ -280,9 +280,23 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
 
   /// Lets the computer play while the screen shows it thinking. Other
   /// events wait until it has played.
+  ///
+  /// Throws a [StateError] when the agent chooses an illegal move: that is a
+  /// bug in the agent, not an outcome to handle (docs/adr/0004).
   Future<void> _letComputerPlay(Emitter<GameViewState> emit) async {
     if (_turnPhase is! ComputerThinking) return;
-    _show(await _requestAgentMove(_currentGame), emit);
+    final game = _currentGame;
+    final move = await _chooseAgentMove(game);
+    // The screen may have closed while the computer thought, and a new game
+    // may be saved since. Playing the move now would save this old game
+    // over it, so the move is dropped.
+    if (isClosed) return;
+    switch (await _playMove(game, move)) {
+      case Ok(:final value):
+        _show(value, emit);
+      case Err(:final error):
+        throw StateError('The agent chose $move: $error');
+    }
   }
 
   /// Keeps [game], the result of a use case, for the next move, and shows
@@ -309,7 +323,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   }
 
   TurnPhase _phaseOf(CurrentGame game) {
-    if (_requestAgentMove.isComputerTurn(game)) {
+    if (_chooseAgentMove.isComputerTurn(game)) {
       return const TurnPhase.computerThinking();
     }
     return switch (game.state.status) {

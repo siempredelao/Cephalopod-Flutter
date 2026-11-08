@@ -5,9 +5,9 @@ import 'package:cephalopod/core/navigation/dialog_page.dart';
 import 'package:cephalopod/core/navigation/feature_module.dart';
 import 'package:cephalopod/features/game/domain/game_repository.dart';
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
+import 'package:cephalopod/features/game/domain/use_cases/choose_agent_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/has_game_to_continue.dart';
 import 'package:cephalopod/features/game/domain/use_cases/play_move.dart';
-import 'package:cephalopod/features/game/domain/use_cases/request_agent_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/resume_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/start_new_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/undo_move.dart';
@@ -63,10 +63,9 @@ final class GameModule implements FeatureModule {
 
   /// The computer's moves are chosen with Flutter's `compute`, on another
   /// isolate, so the screen stays responsive while the Hard level thinks.
-  late final RequestAgentMove _requestAgentMove = RequestAgentMove(
+  late final ChooseAgentMove _chooseAgentMove = ChooseAgentMove(
     agentFactory: _agentFor,
     backgroundRunner: compute,
-    playMove: _playMove,
   );
 
   /// Whether there is a saved game worth continuing. A plain function, so
@@ -118,7 +117,7 @@ final class GameModule implements FeatureModule {
       playMove: _playMove,
       undoMove: _undoMove,
       resumeGame: _resumeGame,
-      requestAgentMove: _requestAgentMove,
+      chooseAgentMove: _chooseAgentMove,
       highlightLastMove: _highlightLastMove(),
     );
   }
