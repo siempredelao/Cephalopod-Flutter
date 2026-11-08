@@ -1,0 +1,396 @@
+# Plan: architecture fixes, fitted to the milestones
+
+## Overview
+
+The architecture review of 2026-11-08 found the structure sound, plus a short
+list of problems. This plan fixes them and fits each fix into the README
+roadmap:
+
+- **Before M5:** fixes that every platform needs, and changes to files that
+  M5 will touch.
+- **Inside M5:** translations, which are M5's "English and Spanish" item.
+  They are done first within M5, because accessibility labels, the About
+  page and goldens all show text.
+- **M6, only if the web build happens:** the two problems that exist only on
+  the web.
+- **M7:** crash reporting plugs into the error reporter added before M5.
+
+Each task is one pull request, as usual here: a Conventional Commits title,
+squash-merged, `dart run melos run verify` green. Task numbers stay as first
+planned, so they can be referred to. The checklist is in `tasks/todo.md`.
+
+## Decisions
+
+- **The computer's move is chosen and played in two steps** (Task 1). The bloc
+  asks for the move, checks it is still open, then plays it with `PlayMove`.
+- **A failed save does not stop the game** (Task 5). It is reported, and play
+  goes on. A repository wrapper does it, so the use cases stay as they are.
+- **Settings get one store for the whole app** (Tasks 6 and 7). It is pure
+  Dart, in `settings/domain/`. A future language setting would live there
+  too.
+- **Languages:**
+  - English is the default. Spanish (Spain, `es`) comes second.
+  - The app follows the device: a Spanish device gets Spanish, and any other
+    device gets English. There is no language choice in Settings for now.
+  - English is listed first in `supportedLocales`, which is what makes
+    Flutter fall back to it.
+  - Adding a language later means adding one `.arb` file and one locale.
+    The check that no text is missing covers every language.
+- **Translations use Flutter's `gen-l10n`** (Task 8). The `.arb` files and the
+  generated class live in `lib/core/l10n/`, so every feature may use them.
+  The generated Dart is not committed, like freezed's: the `generate` Melos
+  script runs `flutter gen-l10n`.
+- **Text mappers receive the translations as an argument**:
+  `map(headline, l10n)`. Their tests use
+  `lookupAppLocalizations(const Locale('es'))` and need no widgets.
+- **The tutorial's text leaves the bloc folder** (Task 11). Each step names a
+  `TutorialTopic`, which a text mapper in `view/` words.
+- **No full on-device test for now** (Task 17, changed). See "Why no full
+  on-device test" below.
+- **The two web-only problems wait for M6** (Tasks 2 and 3). Android declares
+  no deep links and does not restore routes, so a `/game` link or a refresh
+  only happens on the web. `compute` blocks the screen only on the web too.
+
+## Why no full on-device test
+
+The existing tests already cover almost everything such a test would:
+
+- The storage format: shared_preferences' in-memory platform and the
+  repository contract tests.
+- The app's wiring: `test/app/app_test.dart` builds every module the way
+  `bootstrap` does.
+- Every flow: bloc and widget tests.
+
+One gap is real. No test sends an agent to another isolate (a separate Dart
+thread), which is what `compute` does on a phone. If a field that cannot be
+copied were added to an agent, the computer would crash on a device while
+every test still passed. Task 17 closes that gap with one quick engine test.
+
+A full on-device test pays off when you release to Google Play. Revisit it in
+M7.
+
+## Before M5
+
+**Task 1. `fix(game): stop a closed game from saving the computer's move`** (S)
+
+Leaving a game while the computer thinks, then starting another game, lets the
+old search overwrite the new save. This happens on every platform.
+
+- Rename `RequestAgentMove` to `ChooseAgentMove`. It returns a `Move` and
+  saves nothing.
+- `GameBloc._letComputerPlay` chooses the move, returns if `isClosed`, then
+  plays it with `PlayMove`. An illegal agent move still throws a
+  `StateError`.
+
+Acceptance:
+- A bloc test reproduces the race: computer thinking, bloc closed, a new game
+  saved, search released. The new game is still the save.
+- Every current computer-turn test still passes.
+
+Files: `domain/use_cases/request_agent_move.dart` (renamed),
+`presentation/bloc/game_bloc.dart`, `game_module.dart`,
+`test/helpers/game_bloc_factory.dart`, `game_bloc_test.dart`,
+`game_use_cases_test.dart`.
+
+**Task 4. `feat(app): report uncaught errors`** (S)
+
+- In `bootstrap`, set `FlutterError.onError` and
+  `PlatformDispatcher.instance.onError`, and set `Bloc.observer` to an
+  `AppBlocObserver`. All three hand errors to one reporter, which for now
+  logs them with `dart:developer` `log`.
+- In M7, crash reporting replaces the logging inside the reporter, and
+  nothing else changes.
+
+Acceptance:
+- A test shows that a bloc error and a Flutter error both reach the reporter.
+
+Files: `app/bootstrap.dart`, `app/error_reporter.dart` (new),
+`app/app_bloc_observer.dart` (new), tests.
+
+**Task 5. `fix(game): keep playing when the game cannot be saved`** (S)
+
+- Add `BestEffortGameRepository`, which wraps another `GameRepository`.
+  - A failed `save` or `clear` is reported and swallowed.
+  - A failed `load` is reported and gives `null`.
+- `bootstrap` wraps the shared_preferences repository in it.
+- It runs the shared repository contract tests, plus tests with a failing
+  inner repository.
+
+Acceptance:
+- With a repository whose `save` throws, a move still shows on the board and
+  the reporter receives the error.
+
+Files: `game/data/best_effort_game_repository.dart` (new),
+`app/bootstrap.dart`, tests. Add a short ADR on the save-failure policy.
+
+Depends on Task 4.
+
+**Task 6. `refactor(settings): add one settings store for the whole app`** (M)
+
+- Add `SettingsStore` in `settings/domain/`, pure Dart:
+  - `current` and a broadcast `changes` stream.
+  - `load()` does not overwrite a change made while it was loading.
+  - `update(settings)` shows the change at once, then saves it.
+- `App` listens to the store and maps `ThemePreference` to `ThemeMode`.
+- `GameModule` reads `highlightLastMove` from `store.current`.
+
+Acceptance:
+- With a slow repository, a change made before `load()` finishes survives.
+- The theme still follows the setting.
+
+Files: `settings/domain/settings_store.dart` (new), `settings_module.dart`,
+`app/app.dart`, `app/bootstrap.dart`, tests.
+
+**Task 7. `refactor(settings): give the settings page its own cubit`** (S)
+
+- `SettingsCubit` is built for each visit by `SettingsModule.createCubit`. It
+  reads and updates the store.
+- `App` no longer provides it.
+
+Acceptance:
+- The settings page shows, changes and saves both settings as before.
+- No widget outside the settings page reads `SettingsCubit`.
+
+Files: `settings_cubit.dart`, `settings_module.dart`, `settings_page.dart`,
+tests. Update ADR 0002 and 0013 where they describe the cubit living as long
+as the app.
+
+Depends on Task 6.
+
+**Task 14. `refactor(game): small game screen tweaks`** (S)
+
+Done before M5 because M5's animations and board palettes change the same
+widgets.
+
+- `BlocSelector` for the undo and redo buttons.
+- A `BoardColors.of(context)` helper in place of the three
+  `extension<BoardColors>()!`.
+- Mark `GameBloc`'s `position` with `@visibleForTesting`.
+
+Acceptance:
+- Behaviour unchanged, and every test passes.
+
+**Task 15. `perf(game): undo two moves with one replay and one save`** (S)
+
+Done before M5's animations, which will need to know what an undo removed.
+
+- `UndoMove` takes a `count`, defaulting to 1.
+
+Acceptance:
+- An undo against the computer replays and saves once (checked with a
+  counting repository).
+
+**Task 17. `test(engine): check that every agent runs on another isolate`**
+(S, changed)
+
+- An engine test plays each difficulty's agent through `Isolate.run`, as
+  `compute` does on a phone.
+- Remove the "Integration" row from the testing table in
+  `docs/architecture.md`, or mark it as planned for M7.
+
+Acceptance:
+- The test fails if an agent holds something that cannot be copied to
+  another isolate.
+
+Files: `packages/cephalopod_engine/test/src/agents/agents_isolate_test.dart`
+(new), `docs/architecture.md`.
+
+### Any time (no milestone depends on them)
+
+**Task 13. `refactor(game): keep each screen enum conversion in one place`**
+(S)
+
+- Both directions of `DifficultyUi`, `PersonMovesUi` and `ThemeUi` move into
+  the matching mapper. The cubits call the mapper.
+
+Acceptance:
+- No cubit contains a `switch` over a screen enum.
+
+**Task 16. `refactor(game): read saved games with map patterns`** (S)
+
+- `_decodeConfig` and `_decodeMove` check and read their keys with one map
+  pattern each.
+
+Acceptance:
+- The codec tests pass unchanged.
+
+**Task 18. `ci: use the same Flutter version as local`** (XS)
+
+- Set `FLUTTER_VERSION` in `ci.yaml` to 3.47.9.
+
+### Checkpoint: ready for M5
+- [ ] `dart run melos run verify` passes
+- [ ] By hand on Android: a game against Hard; leave mid-search and start a
+      game against a friend, then reopen the app; change the theme at
+      startup
+
+## M5: English and Spanish (first within M5)
+
+**Task 8. `feat(app): set up translations`** (M)
+
+- Add `flutter_localizations` and `intl`, and `generate: true` in the app's
+  pubspec.
+- Add `l10n.yaml`:
+  - `arb-dir: lib/core/l10n`, `output-dir: lib/core/l10n`.
+  - `untranslated-messages-file`.
+- Add `app_en.arb` (the template) and `app_es.arb`.
+- Ignore the generated file in git and in the analyzer. Run
+  `flutter gen-l10n` in the `generate` Melos script.
+- Add a `context.l10n` extension and a test helper that pumps widgets with
+  the delegates.
+- Wire `App`: delegates, `supportedLocales` (English first),
+  `onGenerateTitle`.
+- Move the strings of Home, Settings and About into both `.arb` files.
+- Make `verify` fail when any language is missing a key.
+
+Acceptance:
+- A Spanish device shows Spanish on Home, Settings and About. Any other
+  language shows English.
+- A key missing from `app_es.arb` fails `verify`.
+
+Files: `app/pubspec.yaml`, `app/l10n.yaml`, `lib/core/l10n/*` (new),
+`app/app.dart`, `home_view.dart`, `settings_page.dart`, `about_page.dart`,
+the root `pubspec.yaml` (Melos), `.gitignore`, tests. New ADR: translations
+with gen-l10n, English as the default, generated code not committed.
+
+Depends on Task 7 (both change `app.dart`).
+
+**Task 9. `feat(game): translate the text mappers`** (M)
+
+- `HeadlineTextMapper`, `PlayerTextMapper`, `SquareTextMapper`,
+  `CaptureTextMapper` and `TutorialProgressTextMapper` take `l10n` in `map`.
+- Use ICU placeholders for the numbers.
+- Spanish wording is Spain's: "el ordenador".
+
+Acceptance:
+- Each mapper test checks both English and Spanish, without widgets.
+
+Files: the five mappers, the widgets that call them, and their tests.
+
+Depends on Task 8.
+
+**Task 10. `feat(game): translate the game screen and new-game dialog`** (S)
+
+- Move the remaining literal strings into both `.arb` files: app bar,
+  tooltips, buttons, dialog sections and segments.
+
+Acceptance:
+- No `Text('…')` literal is left in `features/game/presentation/view/`,
+  except in previews.
+
+Files: `game_view.dart`, `new_game_dialog.dart`, `capture_controls.dart`,
+`how_to_play_page.dart`, tests.
+
+Depends on Task 8.
+
+**Task 11. `feat(game): translate How to play`** (M)
+
+- Give `TutorialStep` and `TutorialStepUi` a `TutorialTopic` enum (in
+  `presentation/models/`) instead of `title` and `body`.
+- Add a `TutorialTextMapper` in `view/` that words each topic.
+
+Acceptance:
+- `tutorial_steps.dart` holds no text.
+- A test shows that every topic has a title and a body in both languages.
+
+Files: `tutorial_step.dart`, `tutorial_steps.dart`, `tutorial_step_ui.dart`,
+`tutorial_step_ui_mapper.dart`, `how_to_play_page.dart`,
+`tutorial_text_mapper.dart` (new), tests. Update ADR 0015 (its exception
+goes).
+
+Depends on Task 8.
+
+**Task 12. `test(app): check the app in Spanish`** (S)
+
+- A widget test runs the app in Spanish and checks Home, the dialog, the
+  game screen and How to play, with no overflow at phone width (360 dp).
+
+Acceptance:
+- The test passes.
+- By hand, no clipped or wrapped segment labels in either language.
+
+Depends on Tasks 9–11.
+
+### The rest of M5, after the translations
+
+Not part of this plan, but its order follows from it:
+
+1. **Accessibility:** screen reader labels already go through the text
+   mappers, so they are translated by then.
+2. **Light and dark board palettes:** change `BoardColors`, already tidied by
+   Task 14.
+3. **Placement and capture animations:** build on Tasks 14 and 15.
+4. **Rule-sheet link and app version on About:** new text goes straight into
+   the `.arb` files.
+5. **Goldens last:** text and colours are final by then. Take them in both
+   languages, light and dark.
+
+## M6, only if the web build happens
+
+Skip both tasks if the web build is dropped. Nothing else depends on them.
+
+**Task 2. `fix(game): make the game route always show the saved game`** (M,
+mostly deletions)
+
+On the web, refreshing `/game?computer=…` or opening a link to it starts a
+new game, which erases the one in progress.
+
+- `NewGameCubit` takes `StartNewGame`. Start saves the new game, then the
+  dialog closes with the location of `/game`.
+- `GameModule` builds the dialog's cubit.
+- The `/game` route always opens with `GameResumed`. Delete `?resume=true`,
+  `_openingOf`, `OpponentQueryCodec` and its test, the `GamePage.opening`
+  parameter, and `GameStarted` if nothing sends it any more.
+
+Acceptance:
+- Refreshing `/game` in Chrome shows the same game.
+- A `/game` link never replaces a saved game.
+
+**Task 3. `fix(game): show "thinking" before the computer searches on the
+web`** (XS)
+
+- `GameModule`'s background runner waits for
+  `WidgetsBinding.instance.endOfFrame`, then calls `compute`.
+- Then decide whether the search should pause between passes, so the page
+  never freezes.
+
+Acceptance:
+- In Chrome, against Hard, "The computer is thinking…" is drawn before the
+  computer's move appears.
+
+## M7: Google Play
+
+- Crash reporting goes into Task 4's reporter.
+- Consider then a full game, saved and resumed, on a real device, as a
+  release check.
+
+## Not planned, and why
+
+- **Narrowing the engine's exports:** the engine's own tests use
+  `BoardGeometry`, `CaptureFinder` and `Referee` through the barrel. Little
+  gain for the churn.
+- **Primary constructors:** style only. Worth adopting in new code if you
+  like them, but not worth a rewrite.
+- **`HasGameToContinue` clearing a corrupted save:** documented, and
+  harmless.
+- **Mappers injected with `const` defaults that no test replaces:**
+  harmless. Just don't add more.
+
+## Risks
+
+| Risk | Impact | Mitigation |
+| --- | --- | --- |
+| Spanish text is longer and overflows segmented buttons | Medium | Task 12 tests at 360 dp; the M5 goldens lock it in |
+| The generated translations break the analyzer or the architecture check | Low | Exclude the generated file; it lives in `core/`, which every feature may import |
+| Tasks 6–8 all touch `app.dart` | Low | Done in order, not in parallel |
+| The before-M5 work delays M5 | Low | Seven small tasks and one medium; Tasks 13, 16 and 18 can slip into M5 |
+
+## Answered questions (2026-11-08)
+
+1. A failed save: keep playing and report it.
+2. Languages: English by default; more languages later. The app follows the
+   device and has no language setting.
+3. The full on-device test: not now. One isolate test covers the real gap,
+   and the full test can be revisited at M7.
+4. The web search: decided at M6, if the web build happens.
+5. Spanish: Spain's.
