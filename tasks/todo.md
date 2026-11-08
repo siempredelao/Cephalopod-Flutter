@@ -5,7 +5,7 @@ One task is one pull request. Each needs `dart run melos run verify` green.
 The numbers are the ones first planned, so they are not in order here.
 
 ## Before M5
-- [ ] 1. fix(game): stop a closed game from saving the computer's move (S)
+- [x] 1. fix(game): stop a closed game from saving the computer's move (S)
 - [ ] 4. feat(app): report uncaught errors (S)
 - [ ] 5. fix(game): keep playing when the game cannot be saved (S), after 4
 - [ ] 6. refactor(settings): add one settings store for the whole app (M)

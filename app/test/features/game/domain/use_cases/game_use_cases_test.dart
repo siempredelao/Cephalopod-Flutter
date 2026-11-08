@@ -5,9 +5,9 @@ import 'package:cephalopod/features/game/domain/models/current_game.dart';
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/domain/models/saved_game.dart';
+import 'package:cephalopod/features/game/domain/use_cases/choose_agent_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/has_game_to_continue.dart';
 import 'package:cephalopod/features/game/domain/use_cases/play_move.dart';
-import 'package:cephalopod/features/game/domain/use_cases/request_agent_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/resume_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/start_new_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/undo_move.dart';
@@ -203,12 +203,12 @@ void main() {
     });
   });
 
-  group('RequestAgentMove', () {
+  group('ChooseAgentMove', () {
     final agentMove = Move(top);
     late _FixedAgent agent;
     late List<Difficulty> difficulties;
     late int backgroundRuns;
-    late RequestAgentMove requestAgentMove;
+    late ChooseAgentMove chooseAgentMove;
 
     /// Runs the agent here, and counts the runs.
     Future<R> countingRunner<M, R>(
@@ -223,13 +223,12 @@ void main() {
       agent = _FixedAgent(agentMove);
       difficulties = [];
       backgroundRuns = 0;
-      requestAgentMove = RequestAgentMove(
+      chooseAgentMove = ChooseAgentMove(
         agentFactory: (difficulty) {
           difficulties.add(difficulty);
           return agent;
         },
         backgroundRunner: countingRunner,
-        playMove: playMove,
       );
     });
 
@@ -240,18 +239,18 @@ void main() {
       return play(start, Move(center));
     }
 
-    test('plays and saves the move the agent chooses', () async {
+    test('gives the move the agent chooses, and saves nothing', () async {
       final game = await computerToMove();
 
-      final next = await requestAgentMove(game);
+      final move = await chooseAgentMove(game);
 
       expect(agent.positions, [game.state]);
-      expect(next.record.moves, [Move(center), agentMove]);
-      expect(await repository.load(), saved(next));
+      expect(move, agentMove);
+      expect(await repository.load(), saved(game));
     });
 
     test('lets the agent choose in the background', () async {
-      await requestAgentMove(await computerToMove());
+      await chooseAgentMove(await computerToMove());
 
       expect(backgroundRuns, 1);
     });
@@ -260,9 +259,9 @@ void main() {
       final start = await startNewGame(opponent: computer);
       final againstFriend = await computerToMove(friend);
 
-      expect(requestAgentMove.isComputerTurn(start), isFalse);
-      expect(requestAgentMove.isComputerTurn(await computerToMove()), isTrue);
-      expect(requestAgentMove.isComputerTurn(againstFriend), isFalse);
+      expect(chooseAgentMove.isComputerTurn(start), isFalse);
+      expect(chooseAgentMove.isComputerTurn(await computerToMove()), isTrue);
+      expect(chooseAgentMove.isComputerTurn(againstFriend), isFalse);
     });
 
     test("asks for the agent of the computer's difficulty", () async {
@@ -271,7 +270,7 @@ void main() {
           difficulty: difficulty,
           player: Player.white,
         );
-        await requestAgentMove(await computerToMove(opponent));
+        await chooseAgentMove(await computerToMove(opponent));
       }
 
       expect(difficulties, Difficulty.values);
@@ -280,13 +279,13 @@ void main() {
     test('refuses a game against a friend', () async {
       final game = await computerToMove(friend);
 
-      await expectLater(requestAgentMove(game), throwsArgumentError);
+      await expectLater(chooseAgentMove(game), throwsArgumentError);
     });
 
     test("refuses when it is the person's turn", () async {
       final start = await startNewGame(opponent: computer);
 
-      await expectLater(requestAgentMove(start), throwsArgumentError);
+      await expectLater(chooseAgentMove(start), throwsArgumentError);
     });
 
     test('refuses a game that is over', () async {
@@ -294,15 +293,7 @@ void main() {
       final start = await startNewGame(config: oneSquare, opponent: computer);
       final over = await play(start, Move(const Position(0, 0)));
 
-      await expectLater(requestAgentMove(over), throwsArgumentError);
-    });
-
-    test('throws when the agent breaks the rules, saving nothing', () async {
-      final game = await computerToMove();
-      agent = _FixedAgent(Move(center));
-
-      await expectLater(requestAgentMove(game), throwsStateError);
-      expect(await repository.load(), saved(game));
+      await expectLater(chooseAgentMove(over), throwsArgumentError);
     });
   });
 }
