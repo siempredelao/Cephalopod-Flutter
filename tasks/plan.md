@@ -101,9 +101,13 @@ Files: `domain/use_cases/request_agent_move.dart` (renamed),
 - No `BlocObserver`: bloc throws an event handler's error again after
   telling its observer, so it reaches `PlatformDispatcher.onError` anyway.
   An observer that reported too would report each error twice.
-- The `ErrorReporter` type lives in `core/errors/`, because Task 5's
-  repository, in `game/data/`, takes one, and features may not import
-  `app/`.
+- `installUncaughtErrorReporting` sets the two hooks.
+- The `ErrorReporter` type lives in `core/errors/`, in a file that imports
+  nothing. Task 5's repository, in `game/data/`, takes one, and features may
+  not import `app/`. Importing nothing keeps the type usable by the domain
+  layer, which must stay pure Dart.
+- The console reporter, `logError`, lives in `app/`: only the composition
+  root picks a reporter.
 - In M7, crash reporting replaces the console reporter, and nothing else
   changes.
 
@@ -111,8 +115,9 @@ Acceptance:
 - A test shows that an error inside Flutter and any other uncaught error
   both reach the reporter.
 
-Files: `core/errors/error_reporter.dart` (new), `app/error_reporting.dart`
-(new), `app/bootstrap.dart`, tests.
+Files: `core/errors/error_reporter.dart` (new),
+`app/uncaught_error_reporting.dart` (new), `app/log_error.dart` (new),
+`app/bootstrap.dart`, tests.
 
 **Task 5. `fix(game): keep playing when the game cannot be saved`** (S)
 
@@ -138,11 +143,15 @@ Depends on Task 4.
   - `current` and a broadcast `changes` stream.
   - `load()` does not overwrite a change made while it was loading.
   - `update(settings)` shows the change at once, then saves it.
+  - It takes an `ErrorReporter`. A failed save or load is reported, and the
+    app goes on with the settings on screen, as Task 5 does for the game.
 - `App` listens to the store and maps `ThemePreference` to `ThemeMode`.
 - `GameModule` reads `highlightLastMove` from `store.current`.
 
 Acceptance:
 - With a slow repository, a change made before `load()` finishes survives.
+- With a repository whose `save` throws, the change still applies and the
+  reporter receives the error.
 - The theme still follows the setting.
 
 Files: `settings/domain/settings_store.dart` (new), `settings_module.dart`,

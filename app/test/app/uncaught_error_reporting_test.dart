@@ -1,11 +1,11 @@
 import 'dart:ui' show ErrorCallback, PlatformDispatcher;
 
-import 'package:cephalopod/app/error_reporting.dart';
+import 'package:cephalopod/app/uncaught_error_reporting.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('installErrorReporting', () {
+  group('installUncaughtErrorReporting', () {
     late List<(Object, StackTrace, String?)> reports;
     FlutterExceptionHandler? flutterOnError;
     ErrorCallback? platformOnError;
@@ -14,7 +14,7 @@ void main() {
       flutterOnError = FlutterError.onError;
       platformOnError = PlatformDispatcher.instance.onError;
       reports = [];
-      installErrorReporting(
+      installUncaughtErrorReporting(
         (error, stackTrace, {reason}) =>
             reports.add((error, stackTrace, reason)),
       );

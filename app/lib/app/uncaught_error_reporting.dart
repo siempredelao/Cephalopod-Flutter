@@ -12,7 +12,7 @@ import 'package:flutter/foundation.dart';
 /// Errors inside a bloc's event handler arrive through the second hook:
 /// bloc reports them to its `BlocObserver`, then throws them again. A
 /// `BlocObserver` that reported too would report each of them twice.
-void installErrorReporting(ErrorReporter report) {
+void installUncaughtErrorReporting(ErrorReporter report) {
   FlutterError.onError = (details) => report(
     details.exception,
     details.stack ?? StackTrace.empty,

@@ -1,4 +1,4 @@
-import 'package:cephalopod/core/errors/error_reporter.dart';
+import 'package:cephalopod/app/log_error.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
