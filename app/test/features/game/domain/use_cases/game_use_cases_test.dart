@@ -15,6 +15,7 @@ import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../helpers/computer_turns.dart';
+import '../../../../helpers/counting_game_repository.dart';
 
 /// The game use cases, run against the real engine and an in-memory
 /// repository: what each one returns, and what it leaves saved.
@@ -134,6 +135,43 @@ void main() {
       final start = await startNewGame(opponent: friend);
 
       expect(await undoMove(start), start);
+    });
+
+    test('takes back several moves with one save', () async {
+      final counting = CountingGameRepository();
+      final undoTwo = UndoMove(
+        cephalopodRules: rules,
+        gameRepository: counting,
+      );
+      final start = await startNewGame(opponent: computer);
+      final first = await play(start, Move(center));
+      final third = await play(
+        await play(first, Move(top)),
+        Move(const Position(4, 4)),
+      );
+
+      final undone = await undoTwo(third, count: 2);
+
+      expect(undone, first);
+      expect(await counting.load(), saved(first));
+      expect(counting.saves, 1);
+    });
+
+    test('takes back every move when asked for more', () async {
+      final start = await startNewGame(opponent: friend);
+      final first = await play(start, Move(center));
+
+      final undone = await undoMove(first, count: 5);
+
+      expect(undone, start);
+      expect(await repository.load(), saved(start));
+    });
+
+    test('refuses a negative count', () async {
+      final start = await startNewGame(opponent: friend);
+      final first = await play(start, Move(center));
+
+      await expectLater(undoMove(first, count: -1), throwsRangeError);
     });
 
     test('fails loudly on a record its moves could not build', () async {

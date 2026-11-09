@@ -11,7 +11,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] 6. refactor(settings): add one settings store for the whole app (M), with 7
 - [x] 7. refactor(settings): give the settings page its own cubit (S), done in 6's PR
 - [x] 14. refactor(game): small game screen tweaks (S)
-- [ ] 15. perf(game): undo two moves with one replay and one save (S)
+- [x] 15. perf(game): undo two moves with one replay and one save (S)
 - [ ] 17. test(engine): check that every agent runs on another isolate (S)
 - [ ] Any time: 13. refactor(game): keep each screen enum conversion in one place (S)
 - [ ] Any time: 16. refactor(game): read saved games with map patterns (S)
