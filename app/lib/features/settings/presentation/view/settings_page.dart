@@ -1,3 +1,4 @@
+import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/features/settings/presentation/bloc/settings_cubit.dart';
 import 'package:cephalopod/features/settings/presentation/models/settings_view_state.dart';
 import 'package:cephalopod/features/settings/presentation/models/theme_ui.dart';
@@ -35,31 +36,32 @@ class _SettingsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.read<SettingsCubit>();
     final textTheme = Theme.of(context).textTheme;
+    final l10n = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(l10n.settingsTitle)),
       body: BlocBuilder<SettingsCubit, SettingsViewState>(
         builder: (context, state) => ListView(
           padding: const EdgeInsets.symmetric(vertical: _spacing),
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: _spacing),
-              child: Text('Theme', style: textTheme.titleMedium),
+              child: Text(l10n.settingsTheme, style: textTheme.titleMedium),
             ),
             Padding(
               padding: const EdgeInsets.all(_spacing),
               child: SegmentedButton<ThemeUi>(
-                segments: const [
+                segments: [
                   ButtonSegment(
                     value: ThemeUi.system,
-                    label: Text('System'),
+                    label: Text(l10n.settingsThemeSystem),
                   ),
                   ButtonSegment(
                     value: ThemeUi.light,
-                    label: Text('Light'),
+                    label: Text(l10n.settingsThemeLight),
                   ),
                   ButtonSegment(
                     value: ThemeUi.dark,
-                    label: Text('Dark'),
+                    label: Text(l10n.settingsThemeDark),
                   ),
                 ],
                 selected: {state.theme},
@@ -68,7 +70,7 @@ class _SettingsView extends StatelessWidget {
               ),
             ),
             SwitchListTile(
-              title: const Text('Highlight the last move'),
+              title: Text(l10n.settingsHighlightLastMove),
               value: state.highlightLastMove,
               onChanged: (_) => cubit.toggleLastMoveHighlight(),
             ),

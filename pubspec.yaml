@@ -29,9 +29,11 @@ melos:
 
     generate:
       description: >-
-        Generate code (freezed) in the app. Run after `flutter pub get` and
-        after changing an annotated class; `generate:watch` does it on save.
-      run: cd app && dart run build_runner build
+        Generate code in the app: the translations from the .arb files, and
+        freezed's classes. Run after `flutter pub get`, after changing an
+        annotated class and after changing an .arb file; `generate:watch`
+        does freezed's on save.
+      run: cd app && flutter gen-l10n && dart run build_runner build
 
     "generate:watch":
       description: Regenerate code in the app whenever a source file changes.

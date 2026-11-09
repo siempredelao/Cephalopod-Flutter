@@ -71,6 +71,26 @@ void main() {
       expect(find.byType(HomePage), findsOneWidget);
     });
 
+    testWidgets('speaks Spanish on a Spanish device', (tester) async {
+      tester.platformDispatcher.localesTestValue = [const Locale('es', 'ES')];
+      addTearDown(tester.platformDispatcher.clearLocalesTestValue);
+
+      await pumpApp(tester);
+
+      expect(find.text('Nueva partida'), findsOneWidget);
+    });
+
+    testWidgets('speaks English on a device in any other language', (
+      tester,
+    ) async {
+      tester.platformDispatcher.localesTestValue = [const Locale('fr', 'FR')];
+      addTearDown(tester.platformDispatcher.clearLocalesTestValue);
+
+      await pumpApp(tester);
+
+      expect(find.text('New game'), findsOneWidget);
+    });
+
     testWidgets('opens a new game against a friend from home', (tester) async {
       await pumpApp(tester);
 

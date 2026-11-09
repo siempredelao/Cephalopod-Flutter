@@ -255,18 +255,22 @@ Acceptance:
 
 - Add `flutter_localizations` and `intl`, and `generate: true` in the app's
   pubspec.
-- Add `l10n.yaml`:
-  - `arb-dir: lib/core/l10n`, `output-dir: lib/core/l10n`.
-  - `untranslated-messages-file`.
+- Add `l10n.yaml`: `arb-dir: lib/core/l10n`,
+  `output-dir: lib/core/l10n/generated`, English first, formatted output.
 - Add `app_en.arb` (the template) and `app_es.arb`.
-- Ignore the generated file in git and in the analyzer. Run
+- Git, the analyzer and the coverage gate skip any `generated/` folder. Run
   `flutter gen-l10n` in the `generate` Melos script.
-- Add a `context.l10n` extension and a test helper that pumps widgets with
-  the delegates.
+- Add `core/l10n/l10n.dart`: a `context.l10n` extension, and
+  `appLocalizationsDelegates`, which takes Flutter's translations from
+  `material_ui`. The delegates gen-l10n writes are for
+  `package:flutter/material.dart`, and leave `material_ui`'s widgets without
+  Spanish.
+- Add a `localizedApp` test helper with the same delegates.
 - Wire `App`: delegates, `supportedLocales` (English first),
   `onGenerateTitle`.
 - Move the strings of Home, Settings and About into both `.arb` files.
-- Make `verify` fail when any language is missing a key.
+- Make `verify` fail when any language is missing a key: a test compares the
+  `.arb` files, since gen-l10n falls back to English without failing.
 
 Acceptance:
 - A Spanish device shows Spanish on Home, Settings and About. Any other

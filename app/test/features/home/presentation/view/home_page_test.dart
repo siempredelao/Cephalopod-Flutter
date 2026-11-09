@@ -3,6 +3,8 @@ import 'package:cephalopod/features/home/presentation/view/home_page.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../../helpers/localized_app.dart';
+
 void main() {
   group('HomePage', () {
     Future<void> pumpHome(
@@ -10,8 +12,8 @@ void main() {
       required bool hasGameToContinue,
     }) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: HomePage(
+        localizedApp(
+          HomePage(
             createCubit: () =>
                 HomeCubit(hasGameToContinue: () async => hasGameToContinue),
           ),

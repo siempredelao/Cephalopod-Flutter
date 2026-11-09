@@ -1,3 +1,4 @@
+import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:material_ui/material_ui.dart';
 
 const String _ruleSheetUrl =
@@ -11,19 +12,17 @@ class AboutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final l10n = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: const Text('About')),
+      appBar: AppBar(title: Text(l10n.aboutTitle)),
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
-          Text('Cephalopod', style: textTheme.headlineSmall),
+          Text(l10n.appTitle, style: textTheme.headlineSmall),
           const SizedBox(height: 8),
-          const Text(
-            'Cephalopod was invented by Mark Steere on February 25, 2006. '
-            'This app follows his rules without changes.',
-          ),
+          Text(l10n.aboutCredit),
           const SizedBox(height: 24),
-          Text('Official rules', style: textTheme.titleMedium),
+          Text(l10n.aboutOfficialRules, style: textTheme.titleMedium),
           const SizedBox(height: 4),
           const SelectableText(_ruleSheetUrl),
         ],

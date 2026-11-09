@@ -1,3 +1,4 @@
+import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/core/navigation/app_route.dart';
 import 'package:cephalopod/features/home/presentation/bloc/home_cubit.dart';
 import 'package:cephalopod/features/home/presentation/models/home_view_state.dart';
@@ -40,6 +41,7 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final l10n = context.l10n;
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -49,10 +51,10 @@ class HomeView extends StatelessWidget {
               builder: (context, state) => Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Cephalopod', style: textTheme.displaySmall),
+                  Text(l10n.appTitle, style: textTheme.displaySmall),
                   const SizedBox(height: 8),
                   Text(
-                    'A two-player dice game on a 5×5 board.',
+                    l10n.homeTagline,
                     style: textTheme.bodyLarge,
                     textAlign: TextAlign.center,
                   ),
@@ -60,32 +62,32 @@ class HomeView extends StatelessWidget {
                   if (state.canContinue) ...[
                     FilledButton(
                       onPressed: () => _continue(context),
-                      child: const Text('Continue'),
+                      child: Text(l10n.homeContinue),
                     ),
                     const SizedBox(height: 12),
                     FilledButton.tonal(
                       onPressed: () => _newGame(context),
-                      child: const Text('New game'),
+                      child: Text(l10n.homeNewGame),
                     ),
                   ] else
                     FilledButton(
                       onPressed: () => _newGame(context),
-                      child: const Text('New game'),
+                      child: Text(l10n.homeNewGame),
                     ),
                   const SizedBox(height: 12),
                   OutlinedButton(
                     onPressed: () => context.goNamed(AppRoute.howToPlay.name),
-                    child: const Text('How to play'),
+                    child: Text(l10n.homeHowToPlay),
                   ),
                   const SizedBox(height: 12),
                   OutlinedButton(
                     onPressed: () => context.goNamed(AppRoute.settings.name),
-                    child: const Text('Settings'),
+                    child: Text(l10n.homeSettings),
                   ),
                   const SizedBox(height: 12),
                   OutlinedButton(
                     onPressed: () => context.goNamed(AppRoute.about.name),
-                    child: const Text('About'),
+                    child: Text(l10n.homeAbout),
                   ),
                 ],
               ),

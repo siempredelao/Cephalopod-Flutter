@@ -23,3 +23,4 @@ supersedes an earlier one instead. Start new records from
 | [0014](0014-game-agents-in-the-engine.md) | Computer opponents as engine agents | Accepted |
 | [0015](0015-views-render-ui-models.md) | Views render UI models | Accepted |
 | [0016](0016-storage-failures-do-not-stop-the-game.md) | Storage failures are reported, and the game goes on | Accepted |
+| [0017](0017-translations-with-gen-l10n.md) | Translations with gen-l10n, English by default | Accepted |

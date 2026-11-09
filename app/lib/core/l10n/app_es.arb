@@ -1,0 +1,23 @@
+{
+  "@@locale": "es",
+
+  "appTitle": "Cephalopod",
+
+  "homeTagline": "Un juego de dados para dos en un tablero de 5×5.",
+  "homeContinue": "Continuar",
+  "homeNewGame": "Nueva partida",
+  "homeHowToPlay": "Cómo se juega",
+  "homeSettings": "Ajustes",
+  "homeAbout": "Acerca de",
+
+  "settingsTitle": "Ajustes",
+  "settingsTheme": "Tema",
+  "settingsThemeSystem": "Sistema",
+  "settingsThemeLight": "Claro",
+  "settingsThemeDark": "Oscuro",
+  "settingsHighlightLastMove": "Resaltar la última jugada",
+
+  "aboutTitle": "Acerca de",
+  "aboutCredit": "Mark Steere inventó Cephalopod el 25 de febrero de 2006. Esta aplicación sigue sus reglas sin cambios.",
+  "aboutOfficialRules": "Reglas oficiales"
+}
