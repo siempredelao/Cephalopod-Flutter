@@ -1,0 +1,71 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "Cephalopod",
+  "@appTitle": {
+    "description": "The game's name: the app's title, and the heading on Home and About. Mark Steere's name for the game; not translated."
+  },
+
+  "homeTagline": "A two-player dice game on a 5×5 board.",
+  "@homeTagline": {
+    "description": "Home: the line under the game's name."
+  },
+  "homeContinue": "Continue",
+  "@homeContinue": {
+    "description": "Home: button that picks up the saved game."
+  },
+  "homeNewGame": "New game",
+  "@homeNewGame": {
+    "description": "Home: button that opens the new-game dialog."
+  },
+  "homeHowToPlay": "How to play",
+  "@homeHowToPlay": {
+    "description": "Home: button that opens the rules tutorial."
+  },
+  "homeSettings": "Settings",
+  "@homeSettings": {
+    "description": "Home: button that opens the settings."
+  },
+  "homeAbout": "About",
+  "@homeAbout": {
+    "description": "Home: button that opens the credits and the official rules."
+  },
+
+  "settingsTitle": "Settings",
+  "@settingsTitle": {
+    "description": "Settings: the page's title."
+  },
+  "settingsTheme": "Theme",
+  "@settingsTheme": {
+    "description": "Settings: heading above the light, dark or system choice."
+  },
+  "settingsThemeSystem": "System",
+  "@settingsThemeSystem": {
+    "description": "Settings: theme choice that follows the device's light or dark setting."
+  },
+  "settingsThemeLight": "Light",
+  "@settingsThemeLight": {
+    "description": "Settings: theme choice that is always light."
+  },
+  "settingsThemeDark": "Dark",
+  "@settingsThemeDark": {
+    "description": "Settings: theme choice that is always dark."
+  },
+  "settingsHighlightLastMove": "Highlight the last move",
+  "@settingsHighlightLastMove": {
+    "description": "Settings: switch that marks the square of the last die placed."
+  },
+
+  "aboutTitle": "About",
+  "@aboutTitle": {
+    "description": "About: the page's title."
+  },
+  "aboutCredit": "Cephalopod was invented by Mark Steere on February 25, 2006. This app follows his rules without changes.",
+  "@aboutCredit": {
+    "description": "About: credits the game's inventor, as his rule sheet asks of anyone who programs the game."
+  },
+  "aboutOfficialRules": "Official rules",
+  "@aboutOfficialRules": {
+    "description": "About: heading above the link to the official rule sheet."
+  }
+}

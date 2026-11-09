@@ -14,6 +14,7 @@ analyzer:
     - linux/**
     - "**/*.g.dart"
     - "**/*.freezed.dart"
+    - "**/l10n/generated/**"
 
 linter:
   rules:

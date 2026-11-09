@@ -6,6 +6,8 @@ import 'package:cephalopod/features/settings/presentation/view/settings_page.dar
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../../helpers/localized_app.dart';
+
 void main() {
   late SettingsStore store;
   late SettingsCubit cubit;
@@ -13,8 +15,8 @@ void main() {
   Future<void> pumpSettings(WidgetTester tester) async {
     store = SettingsStore(settingsRepository: InMemorySettingsRepository());
     await tester.pumpWidget(
-      MaterialApp(
-        home: SettingsPage(
+      localizedApp(
+        SettingsPage(
           createCubit: () => cubit = SettingsCubit(settingsStore: store),
         ),
       ),

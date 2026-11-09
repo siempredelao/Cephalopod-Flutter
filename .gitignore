@@ -11,6 +11,7 @@ coverage/
 # Generated code is never committed; `dart run melos run generate` rebuilds it
 *.g.dart
 *.freezed.dart
+**/l10n/generated/
 
 # IDEs
 .idea/

@@ -1,5 +1,6 @@
 import 'package:cephalopod/app/flavor.dart';
 import 'package:cephalopod/app/theme.dart';
+import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/features/settings/domain/models/app_settings.dart';
 import 'package:cephalopod/features/settings/domain/models/theme_preference.dart';
 import 'package:cephalopod/features/settings/domain/settings_store.dart';
@@ -28,7 +29,10 @@ class App extends StatelessWidget {
       stream: settings.changes,
       initialData: settings.current,
       builder: (context, snapshot) => MaterialApp.router(
-        title: 'Cephalopod',
+        onGenerateTitle: (context) => context.l10n.appTitle,
+        // English first, so any language but Spanish gets English.
+        localizationsDelegates: appLocalizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         themeMode: _modeOf((snapshot.data ?? settings.current).theme),
