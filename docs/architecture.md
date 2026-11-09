@@ -120,12 +120,18 @@ Classes named above arrive in M1–M4; the table records how they will fit.
 | --- | --- | --- |
 | Engine unit | Each rule R1–R8 and each illegal move | `packages/cephalopod_engine/test` |
 | Engine property | Seeded random games always end and keep invariants | `packages/cephalopod_engine/test` |
+| Agent contract | Every agent plays legal moves, repeats itself with the same seed, and runs on another isolate as the app runs it | `packages/cephalopod_engine/test/src/agents` |
 | Repository contract | Every implementation behaves the same | `app/test/features/*/data` |
 | Bloc | Event to state sequences | `app/test/features/*/presentation` |
 | Widget and golden | Rendering, taps, semantics, light and dark | `app/test` |
-| Integration | A full game, save and resume | `app/integration_test` |
 
 Coverage gates: engine 100% of lines, app 85% of lines, generated files excluded.
+
+There is no on-device integration test yet. The tests above cover the
+storage format, the app's wiring (`app/test/app/app_test.dart`) and every
+flow, and the agent contract covers the one thing only a device did: running
+an agent on another isolate. A full game on a real device is to be
+reconsidered for the Google Play release (M7).
 
 ## Decisions
 
