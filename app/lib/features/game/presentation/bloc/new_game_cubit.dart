@@ -57,7 +57,7 @@ class NewGameCubit extends Cubit<NewGameViewState> {
 
   void chooseDifficulty(DifficultyUi difficulty) {
     _computer = ComputerOpponent(
-      difficulty: _difficultyOf(difficulty),
+      difficulty: _newGameViewStateMapper.difficultyOf(difficulty),
       player: _computer.player,
     );
     _emitChoices();
@@ -66,27 +66,10 @@ class NewGameCubit extends Cubit<NewGameViewState> {
   void choosePersonMoves(PersonMovesUi personMoves) {
     _computer = ComputerOpponent(
       difficulty: _computer.difficulty,
-      player: _computerPlayerOf(personMoves),
+      player: _newGameViewStateMapper.computerPlayerOf(personMoves),
     );
     _emitChoices();
   }
 
   void _emitChoices() => emit(_newGameViewStateMapper.map(_opponent));
-
-  static Difficulty _difficultyOf(DifficultyUi difficulty) {
-    return switch (difficulty) {
-      DifficultyUi.easy => Difficulty.easy,
-      DifficultyUi.medium => Difficulty.medium,
-      DifficultyUi.hard => Difficulty.hard,
-    };
-  }
-
-  /// The colour the computer plays for the person to move as [personMoves]
-  /// says: Black moves first, so the person moves first against White.
-  static Player _computerPlayerOf(PersonMovesUi personMoves) {
-    return switch (personMoves) {
-      PersonMovesUi.first => Player.white,
-      PersonMovesUi.second => Player.black,
-    };
-  }
 }
