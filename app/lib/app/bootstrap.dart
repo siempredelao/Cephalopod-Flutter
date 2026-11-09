@@ -39,6 +39,9 @@ void bootstrap(Flavor flavor) {
     gameRepository: SharedPreferencesGameRepository(
       sharedPreferencesAsync: preferences,
       savedGameJsonCodec: SavedGameJsonCodec(),
+      // Storage that fails is reported, and the game goes on
+      // (docs/adr/0016).
+      errorReporter: logError,
     ),
     highlightLastMove: settings.highlightLastMove,
   );

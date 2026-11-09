@@ -22,3 +22,4 @@ supersedes an earlier one instead. Start new records from
 | [0013](0013-hand-written-feature-modules.md) | Hand-written feature modules instead of a DI container | Accepted |
 | [0014](0014-game-agents-in-the-engine.md) | Computer opponents as engine agents | Accepted |
 | [0015](0015-views-render-ui-models.md) | Views render UI models | Accepted |
+| [0016](0016-storage-failures-do-not-stop-the-game.md) | Storage failures are reported, and the game goes on | Accepted |

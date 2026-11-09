@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:cephalopod/features/game/data/in_memory_game_repository.dart';
+import 'package:cephalopod/features/game/data/saved_game_json_codec.dart';
+import 'package:cephalopod/features/game/data/shared_preferences_game_repository.dart';
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
@@ -13,7 +15,10 @@ import 'package:cephalopod/features/game/presentation/models/headline_ui.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:cephalopod_engine/testing.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
+import '../../../../helpers/failing_shared_preferences.dart';
 import '../../../../helpers/game_bloc_factory.dart';
 
 void main() {
@@ -335,6 +340,26 @@ void main() {
       expect(await repository.load(), (record: record, opponent: friend));
       await bloc.close();
     });
+
+    test(
+      'keeps playing when the game cannot be saved, and reports it',
+      () async {
+        final reasons = <String?>[];
+        SharedPreferencesAsyncPlatform.instance = FailingSharedPreferences();
+        final bloc = createTestGameBloc(
+          repository: SharedPreferencesGameRepository(
+            sharedPreferencesAsync: SharedPreferencesAsync(),
+            savedGameJsonCodec: SavedGameJsonCodec(),
+            errorReporter: (_, _, {reason}) => reasons.add(reason),
+          ),
+        )..add(tap(center));
+        await settle();
+
+        expect(bloc.state, played);
+        expect(reasons, ['saving the game']);
+        await bloc.close();
+      },
+    );
 
     blocTest<GameBloc, GameViewState>(
       'undo takes back the last move, and redo plays it again',
