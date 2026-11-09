@@ -14,7 +14,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] 15. perf(game): undo two moves with one replay and one save (S)
 - [x] 17. test(engine): check that every agent runs on another isolate (S)
 - [x] Any time: 13. refactor(game): keep each screen enum conversion in one place (S)
-- [ ] Any time: 16. refactor(game): read saved games with map patterns (S)
+- [x] Any time: 16. refactor(game): read saved games with map patterns (S)
 - [ ] Any time: 18. ci: use the same Flutter version as local (XS)
 - [ ] Checkpoint: verify; by hand on Android: leave a game mid-search, change the theme at startup
 
