@@ -207,17 +207,18 @@ Acceptance:
 **Task 17. `test(engine): check that every agent runs on another isolate`**
 (S, changed)
 
-- An engine test plays each difficulty's agent through `Isolate.run`, as
-  `compute` does on a phone.
-- Remove the "Integration" row from the testing table in
-  `docs/architecture.md`, or mark it as planned for M7.
+- The agent contract, which every agent's test runs, chooses a move through
+  `Isolate.run`, as `compute` does on a phone, and checks it matches the
+  move chosen on the same isolate.
+- The testing table in `docs/architecture.md` loses the "Integration" row
+  and gains the agent contract, with a note on the full device test for M7.
 
 Acceptance:
 - The test fails if an agent holds something that cannot be copied to
   another isolate.
 
-Files: `packages/cephalopod_engine/test/src/agents/agents_isolate_test.dart`
-(new), `docs/architecture.md`.
+Files: `packages/cephalopod_engine/test/src/agents/game_agent_contract.dart`,
+`docs/architecture.md`.
 
 ### Any time (no milestone depends on them)
 
