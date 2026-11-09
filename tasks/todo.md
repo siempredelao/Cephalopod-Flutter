@@ -15,7 +15,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] 17. test(engine): check that every agent runs on another isolate (S)
 - [x] Any time: 13. refactor(game): keep each screen enum conversion in one place (S)
 - [x] Any time: 16. refactor(game): read saved games with map patterns (S)
-- [ ] Any time: 18. ci: use the same Flutter version as local (XS)
+- [x] Any time: 18. ci: use the same Flutter version as local (XS)
 - [ ] Checkpoint: verify; by hand on Android: leave a game mid-search, change the theme at startup
 
 ## M5: English and Spanish (first within M5)

@@ -68,7 +68,7 @@ trade-offs: [docs/adr](docs/adr/README.md).
 
 ## Getting started
 
-Requirements: Flutter 3.47.1 (Dart 3.13.1).
+Requirements: Flutter 3.47.9 (Dart 3.13.7).
 
 ```sh
 flutter pub get                      # resolves the whole workspace
