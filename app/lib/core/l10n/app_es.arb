@@ -19,5 +19,23 @@
 
   "aboutTitle": "Acerca de",
   "aboutCredit": "Mark Steere inventó Cephalopod el 25 de febrero de 2006. Esta aplicación sigue sus reglas sin cambios.",
-  "aboutOfficialRules": "Reglas oficiales"
+  "aboutOfficialRules": "Reglas oficiales",
+
+  "gamePlayerName": "Jugador {number}",
+
+  "gameHeadlinePlayerToMove": "Turno del {player}",
+  "gameHeadlinePersonToMove": "Tu turno",
+  "gameHeadlineComputerToMove": "El ordenador está pensando…",
+  "gameHeadlinePlayerWon": "Gana el {player} por {winnerDice} a {loserDice}",
+  "gameHeadlinePersonWon": "Ganas por {winnerDice} a {loserDice}",
+  "gameHeadlineComputerWon": "Gana el ordenador por {winnerDice} a {loserDice}",
+
+  "gameCaptureSum": "Suma de la captura: {selectedSum} de {maxSum} como máximo",
+
+  "gameSquareEmpty": "Fila {row}, columna {column}, vacía",
+  "gameSquarePlayerDie": "Fila {row}, columna {column}, dado del {player} con {pips, plural, =1{1 punto} other{{pips} puntos}}",
+  "gameSquareYourDie": "Fila {row}, columna {column}, tu dado con {pips, plural, =1{1 punto} other{{pips} puntos}}",
+  "gameSquareComputerDie": "Fila {row}, columna {column}, dado del ordenador con {pips, plural, =1{1 punto} other{{pips} puntos}}",
+
+  "howToPlayProgress": "Paso {step} de {stepCount}"
 }

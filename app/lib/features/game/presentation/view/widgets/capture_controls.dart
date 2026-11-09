@@ -1,3 +1,4 @@
+import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/features/game/presentation/models/capture_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/capture_text_mapper.dart';
 import 'package:material_ui/material_ui.dart';
@@ -28,7 +29,7 @@ class CaptureControls extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(_captureTextMapper.map(capture)),
+        Text(_captureTextMapper.map(capture, context.l10n)),
         const SizedBox(height: _spacing),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,

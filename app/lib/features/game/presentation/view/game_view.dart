@@ -1,3 +1,4 @@
+import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/core/navigation/app_route.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
@@ -55,7 +56,7 @@ class GameView extends StatelessWidget {
             builder: (context, state) => Column(
               children: [
                 Text(
-                  _headlineTextMapper.map(state.headline),
+                  _headlineTextMapper.map(state.headline, context.l10n),
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: _spacing),

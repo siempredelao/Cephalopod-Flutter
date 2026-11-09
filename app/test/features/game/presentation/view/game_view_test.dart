@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/core/theme/board_colors.dart';
 import 'package:cephalopod/features/game/data/in_memory_game_repository.dart';
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
@@ -27,6 +28,8 @@ void main() {
     addTearDown(gameBloc.close);
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: appLocalizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         theme: ThemeData(extensions: const [BoardColors.light]),
         home: BlocProvider.value(value: gameBloc, child: const GameView()),
       ),

@@ -1,3 +1,4 @@
+import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/tutorial_progress_text_mapper.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -26,6 +27,7 @@ class StepDots extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return Semantics(
       label: _tutorialProgressTextMapper.map(
+        context.l10n,
         currentStep: current,
         stepCount: count,
       ),

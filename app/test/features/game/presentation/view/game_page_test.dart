@@ -1,3 +1,4 @@
+import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/core/theme/board_colors.dart';
 import 'package:cephalopod/features/game/data/in_memory_game_repository.dart';
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
@@ -18,6 +19,8 @@ void main() {
     testWidgets('starts a game on the standard board', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: appLocalizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           theme: ThemeData(extensions: const [BoardColors.light]),
           home: const GamePage(
             createBloc: createTestGameBloc,
@@ -41,6 +44,8 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: appLocalizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           theme: ThemeData(extensions: const [BoardColors.light]),
           home: const GamePage(
             createBloc: createTestGameBloc,
@@ -62,6 +67,8 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: appLocalizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           theme: ThemeData(extensions: const [BoardColors.light]),
           home: GamePage(
             createBloc: () => createTestGameBloc(repository: repository),

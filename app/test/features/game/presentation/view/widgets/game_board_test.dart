@@ -1,3 +1,4 @@
+import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/core/theme/board_colors.dart';
 import 'package:cephalopod/features/game/presentation/models/board_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/die_ui.dart';
@@ -54,6 +55,8 @@ void main() {
   }) {
     return tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: appLocalizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         theme: ThemeData(extensions: const [BoardColors.light]),
         home: Center(
           child: GameBoard(board: board, onSquareTapped: onSquareTapped),

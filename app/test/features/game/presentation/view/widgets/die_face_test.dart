@@ -1,3 +1,4 @@
+import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/core/theme/board_colors.dart';
 import 'package:cephalopod/features/game/presentation/models/die_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/player_ui.dart';
@@ -17,6 +18,8 @@ void main() {
   Future<void> pumpDie(WidgetTester tester, DieUi die) {
     return tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: appLocalizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         theme: ThemeData(extensions: const [BoardColors.light]),
         home: Center(
           child: SizedBox.square(dimension: 60, child: DieFace(die: die)),
