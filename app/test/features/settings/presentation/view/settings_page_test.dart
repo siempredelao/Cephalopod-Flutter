@@ -1,20 +1,22 @@
 import 'package:cephalopod/features/settings/data/in_memory_settings_repository.dart';
+import 'package:cephalopod/features/settings/domain/settings_store.dart';
 import 'package:cephalopod/features/settings/presentation/bloc/settings_cubit.dart';
 import 'package:cephalopod/features/settings/presentation/models/theme_ui.dart';
 import 'package:cephalopod/features/settings/presentation/view/settings_page.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
 void main() {
+  late SettingsStore store;
   late SettingsCubit cubit;
 
   Future<void> pumpSettings(WidgetTester tester) async {
-    cubit = SettingsCubit(settingsRepository: InMemorySettingsRepository());
-    addTearDown(cubit.close);
+    store = SettingsStore(settingsRepository: InMemorySettingsRepository());
     await tester.pumpWidget(
       MaterialApp(
-        home: BlocProvider.value(value: cubit, child: const SettingsPage()),
+        home: SettingsPage(
+          createCubit: () => cubit = SettingsCubit(settingsStore: store),
+        ),
       ),
     );
   }
@@ -39,6 +41,14 @@ void main() {
       expect(cubit.state.highlightLastMove, isFalse);
       final tile = tester.widget<SwitchListTile>(find.byType(SwitchListTile));
       expect(tile.value, isFalse);
+    });
+
+    testWidgets('closes its cubit when it leaves the screen', (tester) async {
+      await pumpSettings(tester);
+
+      await tester.pumpWidget(const SizedBox());
+
+      expect(cubit.isClosed, isTrue);
     });
   });
 }
