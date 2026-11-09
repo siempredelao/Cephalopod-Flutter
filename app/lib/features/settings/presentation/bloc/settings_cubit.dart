@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:cephalopod/features/settings/domain/models/app_settings.dart';
-import 'package:cephalopod/features/settings/domain/models/theme_preference.dart';
 import 'package:cephalopod/features/settings/domain/settings_store.dart';
 import 'package:cephalopod/features/settings/presentation/bloc/settings_view_state_mapper.dart';
 import 'package:cephalopod/features/settings/presentation/models/settings_view_state.dart';
@@ -30,7 +29,7 @@ class SettingsCubit extends Cubit<SettingsViewState> {
   Future<void> chooseTheme(ThemeUi theme) {
     final current = _settingsStore.current;
     return _settingsStore.update((
-      theme: _themePreferenceOf(theme),
+      theme: _settingsViewStateMapper.themePreferenceOf(theme),
       highlightLastMove: current.highlightLastMove,
     ));
   }
@@ -49,10 +48,4 @@ class SettingsCubit extends Cubit<SettingsViewState> {
   Future<void> close() async {
     await Future.wait([_subscription.cancel(), super.close()]);
   }
-
-  static ThemePreference _themePreferenceOf(ThemeUi theme) => switch (theme) {
-    ThemeUi.system => ThemePreference.system,
-    ThemeUi.light => ThemePreference.light,
-    ThemeUi.dark => ThemePreference.dark,
-  };
 }

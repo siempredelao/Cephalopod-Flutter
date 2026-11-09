@@ -7,7 +7,11 @@ import 'package:cephalopod/features/game/presentation/models/person_moves_ui.dar
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
 /// Turns the opponent chosen in the new-game dialog into the
-/// [NewGameViewState] it draws.
+/// [NewGameViewState] it draws, and the dialog's choices back into the
+/// computer's settings.
+///
+/// Both ways live here, so a difficulty added to one side is added to the
+/// other in the same file.
 final class NewGameViewStateMapper {
   const NewGameViewStateMapper();
 
@@ -23,6 +27,22 @@ final class NewGameViewStateMapper {
       difficulty: _difficultyUiOf(difficulty),
       personMoves: _personMovesUiOf(player),
     ),
+  };
+
+  /// The difficulty chosen as [difficulty] in the dialog: the way back from
+  /// [map].
+  Difficulty difficultyOf(DifficultyUi difficulty) => switch (difficulty) {
+    DifficultyUi.easy => Difficulty.easy,
+    DifficultyUi.medium => Difficulty.medium,
+    DifficultyUi.hard => Difficulty.hard,
+  };
+
+  /// The colour the computer plays for the person to move as [personMoves]
+  /// says: Black moves first, so the person moves first against White. The
+  /// way back from [map].
+  Player computerPlayerOf(PersonMovesUi personMoves) => switch (personMoves) {
+    PersonMovesUi.first => Player.white,
+    PersonMovesUi.second => Player.black,
   };
 
   DifficultyUi _difficultyUiOf(Difficulty difficulty) => switch (difficulty) {

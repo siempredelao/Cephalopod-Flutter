@@ -24,6 +24,14 @@ void main() {
       }
     });
 
+    test('reads every theme back as itself', () {
+      for (final theme in ThemePreference.values) {
+        final shown = mapper.map((theme: theme, highlightLastMove: true)).theme;
+
+        expect(mapper.themePreferenceOf(shown), theme);
+      }
+    });
+
     test('shows the last-move highlight turned off', () {
       const settings = (theme: ThemePreference.dark, highlightLastMove: false);
 

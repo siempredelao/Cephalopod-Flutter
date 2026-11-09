@@ -50,6 +50,22 @@ void main() {
       }
     });
 
+    test('reads every difficulty back as itself', () {
+      for (final difficulty in Difficulty.values) {
+        final shown = computerShownFor(difficulty, Player.white).difficulty;
+
+        expect(mapper.difficultyOf(shown), difficulty);
+      }
+    });
+
+    test('reads back the colour the computer plays', () {
+      for (final computer in Player.values) {
+        final shown = computerShownFor(Difficulty.easy, computer).personMoves;
+
+        expect(mapper.computerPlayerOf(shown), computer);
+      }
+    });
+
     test('lets the person move first against White', () {
       final computer = computerShownFor(Difficulty.easy, Player.white);
 
