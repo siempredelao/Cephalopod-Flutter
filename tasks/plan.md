@@ -24,7 +24,8 @@ planned, so they can be referred to. The checklist is in `tasks/todo.md`.
 - **The computer's move is chosen and played in two steps** (Task 1). The bloc
   asks for the move, checks it is still open, then plays it with `PlayMove`.
 - **A failed save does not stop the game** (Task 5). It is reported, and play
-  goes on. A repository wrapper does it, so the use cases stay as they are.
+  goes on. The shared_preferences repository does it, so the use cases stay
+  as they are.
 - **Settings get one store for the whole app** (Tasks 6 and 7). It is pure
   Dart, in `settings/domain/`. A future language setting would live there
   too.
@@ -121,19 +122,22 @@ Files: `core/errors/error_reporter.dart` (new),
 
 **Task 5. `fix(game): keep playing when the game cannot be saved`** (S)
 
-- Add `BestEffortGameRepository`, which wraps another `GameRepository`.
+- `SharedPreferencesGameRepository` takes an `ErrorReporter` and catches its
+  own storage failures (`Exception`s only):
   - A failed `save` or `clear` is reported and swallowed.
   - A failed `load` is reported and gives `null`.
-- `bootstrap` wraps the shared_preferences repository in it.
-- It runs the shared repository contract tests, plus tests with a failing
-  inner repository.
+- The plugin, `SharedPreferencesAsync`, stays the data source: it only reads
+  and writes strings. The rule belongs to the repository, next to the JSON.
+- Tests fail the storage with `FailingSharedPreferences`, a shared_preferences
+  platform that throws the plugin's `PlatformException`.
 
 Acceptance:
-- With a repository whose `save` throws, a move still shows on the board and
-  the reporter receives the error.
+- With storage whose writes fail, a move still shows on the board and the
+  reporter receives the error.
 
-Files: `game/data/best_effort_game_repository.dart` (new),
-`app/bootstrap.dart`, tests. Add a short ADR on the save-failure policy.
+Files: `game/data/shared_preferences_game_repository.dart`,
+`app/bootstrap.dart`, `test/helpers/failing_shared_preferences.dart` (new),
+tests. ADR 0016 records the rule.
 
 Depends on Task 4.
 
@@ -143,18 +147,20 @@ Depends on Task 4.
   - `current` and a broadcast `changes` stream.
   - `load()` does not overwrite a change made while it was loading.
   - `update(settings)` shows the change at once, then saves it.
-  - It takes an `ErrorReporter`. A failed save or load is reported, and the
-    app goes on with the settings on screen, as Task 5 does for the game.
+- `SharedPreferencesSettingsRepository` takes an `ErrorReporter` and catches
+  its own storage failures, as Task 5 does for the game (ADR 0016). A failed
+  load gives the defaults; a failed save leaves the change on screen.
 - `App` listens to the store and maps `ThemePreference` to `ThemeMode`.
 - `GameModule` reads `highlightLastMove` from `store.current`.
 
 Acceptance:
 - With a slow repository, a change made before `load()` finishes survives.
-- With a repository whose `save` throws, the change still applies and the
-  reporter receives the error.
+- With `FailingSharedPreferences`, a change still applies and the reporter
+  receives the error.
 - The theme still follows the setting.
 
-Files: `settings/domain/settings_store.dart` (new), `settings_module.dart`,
+Files: `settings/domain/settings_store.dart` (new),
+`shared_preferences_settings_repository.dart`, `settings_module.dart`,
 `app/app.dart`, `app/bootstrap.dart`, tests.
 
 **Task 7. `refactor(settings): give the settings page its own cubit`** (S)

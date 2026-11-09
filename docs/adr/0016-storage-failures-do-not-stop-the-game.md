@@ -20,9 +20,9 @@ built, and the repositories return plain futures.
 
 ## Decision
 
-Storage failures are reported, and the game goes on.
-`BestEffortGameRepository` wraps the device's repository in the composition
-root:
+Storage failures are reported, and the game goes on. The repository that
+talks to the device's storage, `SharedPreferencesGameRepository`, catches
+its own failures and hands them to an `ErrorReporter`:
 
 - A failed `save` or `clear` is reported, and the game on screen goes on.
 - A failed `load` is reported, and reads as "no saved game", so a new game
@@ -31,6 +31,10 @@ root:
 It catches only `Exception`s, which is how storage reports a failure. An
 `Error` is a bug, so it goes on to the app-wide error reporting. The use
 cases do not change.
+
+The rule sits in the repository, next to turning the stored JSON into a
+game, because the repository is the layer that knows about storage: the
+plugin, `SharedPreferencesAsync`, only reads and writes strings.
 
 This replaces the `PersistenceFailure` part of ADR 0004. The rest of ADR
 0004 stands: illegal moves are still `Result` values.
@@ -44,9 +48,14 @@ This replaces the `PersistenceFailure` part of ADR 0004. The rest of ADR
   could not be read. If the failure was brief, the old game is lost. We
   accept that: shared_preferences rarely fails to read, and seldom recovers
   when it does.
-- The rule lives in one class, chosen in `bootstrap`. Tests and the
-  in-memory repository are unaffected.
-- The settings follow the same rule.
+- The rule lives in one class, the only one that talks to storage. The
+  in-memory repository that tests use has nothing to fail, so it does not
+  follow the rule.
+- The settings follow the same rule, in their own shared_preferences
+  repository.
+- A second kind of storage, such as cloud sync, would have to catch its
+  own failures too. If that happens, the rule can move into one class that
+  coordinates both.
 
 ## Alternatives considered
 
@@ -55,5 +64,8 @@ This replaces the `PersistenceFailure` part of ADR 0004. The rest of ADR
 - **`Result` values with `PersistenceFailure`, as ADR 0004 planned.** Every
   use case would unwrap a result whose only handling is "report it and go
   on", in four places instead of one.
+- **A wrapper repository that adds the rule around another one.** It could
+  wrap any storage, but there is only one, so it added a class and a layer
+  of nesting in `bootstrap` for no gain.
 - **Retry the save.** Storage failures are seldom brief, and a retry would
   delay every move.
