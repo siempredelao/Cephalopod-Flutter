@@ -32,17 +32,17 @@ class GameView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cephalopod'),
+        title: Text(context.l10n.appTitle),
         actions: [
           const _HistoryButtons(),
           // Pushed on top, so the game is still here on the way back.
           IconButton(
-            tooltip: 'How to play',
+            tooltip: context.l10n.gameHowToPlayTooltip,
             icon: const Icon(Icons.help_outline),
             onPressed: () => context.pushNamed(AppRoute.howToPlay.name),
           ),
           IconButton(
-            tooltip: 'New game',
+            tooltip: context.l10n.gameRestartTooltip,
             icon: const Icon(Icons.refresh),
             onPressed: () =>
                 context.read<GameBloc>().add(const GameRestarted()),
@@ -121,12 +121,12 @@ class _HistoryButtons extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
-            tooltip: 'Undo',
+            tooltip: context.l10n.gameUndoTooltip,
             icon: const Icon(Icons.undo),
             onPressed: can.undo ? () => bloc.add(const UndoRequested()) : null,
           ),
           IconButton(
-            tooltip: 'Redo',
+            tooltip: context.l10n.gameRedoTooltip,
             icon: const Icon(Icons.redo),
             onPressed: can.redo ? () => bloc.add(const RedoRequested()) : null,
           ),

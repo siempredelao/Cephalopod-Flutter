@@ -1,3 +1,4 @@
+import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/core/navigation/app_route.dart';
 import 'package:cephalopod/features/game/presentation/bloc/new_game_cubit.dart';
 import 'package:cephalopod/features/game/presentation/models/difficulty_ui.dart';
@@ -26,7 +27,7 @@ class NewGameDialog extends StatelessWidget {
       create: (_) => NewGameCubit(),
       child: BlocBuilder<NewGameCubit, NewGameViewState>(
         builder: (context, state) => AlertDialog(
-          title: const Text('New game'),
+          title: Text(context.l10n.newGameTitle),
           scrollable: true,
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -44,11 +45,11 @@ class NewGameDialog extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => _cancel(context),
-              child: const Text('Cancel'),
+              child: Text(context.l10n.newGameCancel),
             ),
             FilledButton(
               onPressed: () => _start(context),
-              child: const Text('Start'),
+              child: Text(context.l10n.newGameStart),
             ),
           ],
         ),
@@ -82,16 +83,16 @@ class _OpponentChoice extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.read<NewGameCubit>();
     return _Section(
-      title: 'Opponent',
+      title: context.l10n.newGameOpponent,
       child: SegmentedButton<_OpponentSegment>(
-        segments: const [
+        segments: [
           ButtonSegment(
             value: _OpponentSegment.friend,
-            label: Text('A friend'),
+            label: Text(context.l10n.newGameFriend),
           ),
           ButtonSegment(
             value: _OpponentSegment.computer,
-            label: Text('The computer'),
+            label: Text(context.l10n.newGameComputer),
           ),
         ],
         selected: {_segmentOf(opponent)},
@@ -125,12 +126,21 @@ class _DifficultyChoice extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.read<NewGameCubit>();
     return _Section(
-      title: 'Difficulty',
+      title: context.l10n.newGameDifficulty,
       child: SegmentedButton<DifficultyUi>(
-        segments: const [
-          ButtonSegment(value: DifficultyUi.easy, label: Text('Easy')),
-          ButtonSegment(value: DifficultyUi.medium, label: Text('Medium')),
-          ButtonSegment(value: DifficultyUi.hard, label: Text('Hard')),
+        segments: [
+          ButtonSegment(
+            value: DifficultyUi.easy,
+            label: Text(context.l10n.newGameEasy),
+          ),
+          ButtonSegment(
+            value: DifficultyUi.medium,
+            label: Text(context.l10n.newGameMedium),
+          ),
+          ButtonSegment(
+            value: DifficultyUi.hard,
+            label: Text(context.l10n.newGameHard),
+          ),
         ],
         selected: {difficulty},
         onSelectionChanged: (choice) => cubit.chooseDifficulty(choice.single),
@@ -149,11 +159,17 @@ class _PersonMovesChoice extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.read<NewGameCubit>();
     return _Section(
-      title: 'You move',
+      title: context.l10n.newGamePersonMoves,
       child: SegmentedButton<PersonMovesUi>(
-        segments: const [
-          ButtonSegment(value: PersonMovesUi.first, label: Text('First')),
-          ButtonSegment(value: PersonMovesUi.second, label: Text('Second')),
+        segments: [
+          ButtonSegment(
+            value: PersonMovesUi.first,
+            label: Text(context.l10n.newGameFirst),
+          ),
+          ButtonSegment(
+            value: PersonMovesUi.second,
+            label: Text(context.l10n.newGameSecond),
+          ),
         ],
         selected: {personMoves},
         onSelectionChanged: (choice) => cubit.choosePersonMoves(choice.single),

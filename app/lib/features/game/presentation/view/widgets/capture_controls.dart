@@ -34,11 +34,14 @@ class CaptureControls extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TextButton(onPressed: onCancel, child: const Text('Cancel')),
+            TextButton(
+              onPressed: onCancel,
+              child: Text(context.l10n.gameCaptureCancel),
+            ),
             const SizedBox(width: _spacing),
             FilledButton(
               onPressed: capture.canConfirm ? onConfirm : null,
-              child: const Text('Capture'),
+              child: Text(context.l10n.gameCaptureConfirm),
             ),
           ],
         ),

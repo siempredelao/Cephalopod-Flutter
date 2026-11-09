@@ -37,5 +37,30 @@
   "gameSquareYourDie": "Fila {row}, columna {column}, tu dado con {pips, plural, =1{1 punto} other{{pips} puntos}}",
   "gameSquareComputerDie": "Fila {row}, columna {column}, dado del ordenador con {pips, plural, =1{1 punto} other{{pips} puntos}}",
 
-  "howToPlayProgress": "Paso {step} de {stepCount}"
+  "howToPlayProgress": "Paso {step} de {stepCount}",
+
+  "gameHowToPlayTooltip": "Cómo se juega",
+  "gameRestartTooltip": "Nueva partida",
+  "gameUndoTooltip": "Deshacer",
+  "gameRedoTooltip": "Rehacer",
+  "gameCaptureCancel": "Cancelar",
+  "gameCaptureConfirm": "Capturar",
+
+  "newGameTitle": "Nueva partida",
+  "newGameOpponent": "Rival",
+  "newGameFriend": "Un amigo",
+  "newGameComputer": "El ordenador",
+  "newGameDifficulty": "Dificultad",
+  "newGameEasy": "Fácil",
+  "newGameMedium": "Media",
+  "newGameHard": "Difícil",
+  "newGamePersonMoves": "Juegas",
+  "newGameFirst": "Primero",
+  "newGameSecond": "Segundo",
+  "newGameCancel": "Cancelar",
+  "newGameStart": "Empezar",
+
+  "howToPlayTitle": "Cómo se juega",
+  "howToPlayNext": "Siguiente",
+  "howToPlayDone": "Entendido"
 }

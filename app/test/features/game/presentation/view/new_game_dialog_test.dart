@@ -9,8 +9,11 @@ import 'package:material_ui/material_ui.dart';
 void main() {
   group('NewGameDialog', () {
     /// A page that opens the dialog, by route as the app does, and shows
-    /// what the dialog closed with.
-    Future<void> pumpOpener(WidgetTester tester) async {
+    /// what the dialog closed with. The app speaks [locale]'s language.
+    Future<void> pumpOpener(
+      WidgetTester tester, {
+      Locale locale = const Locale('en'),
+    }) async {
       final router = GoRouter(
         routes: [
           GoRoute(
@@ -37,6 +40,7 @@ void main() {
       addTearDown(router.dispose);
       await tester.pumpWidget(
         MaterialApp.router(
+          locale: locale,
           localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           routerConfig: router,
@@ -44,6 +48,19 @@ void main() {
       );
       await _tapText(tester, 'Open');
     }
+
+    testWidgets('speaks Spanish', (tester) async {
+      await pumpOpener(tester, locale: const Locale('es'));
+
+      expect(find.text('Nueva partida'), findsOneWidget);
+      expect(find.text('Un amigo'), findsOneWidget);
+      await _tapText(tester, 'El ordenador');
+
+      for (final words in ['Dificultad', 'Fácil', 'Juegas', 'Primero']) {
+        expect(find.text(words), findsOneWidget, reason: words);
+      }
+      expect(find.text('Empezar'), findsOneWidget);
+    });
 
     testWidgets('offers a friend, with nothing more to choose', (tester) async {
       await pumpOpener(tester);
