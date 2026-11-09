@@ -112,23 +112,22 @@ class _HistoryButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<GameBloc>();
-    return BlocBuilder<GameBloc, GameViewState>(
-      builder: (context, state) => Row(
+    // Rebuilds only when undo or redo becomes available or not, not on every
+    // tap on the board.
+    return BlocSelector<GameBloc, GameViewState, ({bool undo, bool redo})>(
+      selector: (state) => (undo: state.canUndo, redo: state.canRedo),
+      builder: (context, can) => Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
             tooltip: 'Undo',
             icon: const Icon(Icons.undo),
-            onPressed: state.canUndo
-                ? () => bloc.add(const UndoRequested())
-                : null,
+            onPressed: can.undo ? () => bloc.add(const UndoRequested()) : null,
           ),
           IconButton(
             tooltip: 'Redo',
             icon: const Icon(Icons.redo),
-            onPressed: state.canRedo
-                ? () => bloc.add(const RedoRequested())
-                : null,
+            onPressed: can.redo ? () => bloc.add(const RedoRequested()) : null,
           ),
         ],
       ),

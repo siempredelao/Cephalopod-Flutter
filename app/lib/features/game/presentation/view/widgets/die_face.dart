@@ -12,7 +12,7 @@ class DieFace extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).extension<BoardColors>()!;
+    final colors = BoardColors.of(context);
     final (face, edge, pips) = switch (die.owner.player) {
       PlayerUi.one => (colors.blackDie, colors.blackDieEdge, colors.blackPips),
       PlayerUi.two => (colors.whiteDie, colors.whiteDieEdge, colors.whitePips),

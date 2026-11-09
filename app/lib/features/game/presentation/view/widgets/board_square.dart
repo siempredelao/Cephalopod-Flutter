@@ -33,7 +33,7 @@ class BoardSquare extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).extension<BoardColors>()!;
+    final colors = BoardColors.of(context);
     final die = square.die;
     final markColor = switch (square.mark) {
       SquareMark.none => null,
