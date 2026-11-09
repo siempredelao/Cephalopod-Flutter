@@ -18,6 +18,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
+import '../../../../helpers/counting_game_repository.dart';
 import '../../../../helpers/failing_shared_preferences.dart';
 import '../../../../helpers/game_bloc_factory.dart';
 
@@ -545,6 +546,24 @@ void main() {
         replied,
       ],
     );
+
+    test('one undo saves once, for both moves it takes back', () async {
+      final counting = CountingGameRepository();
+      await counting.save((record: GameRecord(), opponent: whiteComputer));
+      final bloc = createTestGameBloc(repository: counting)
+        ..add(const GameResumed())
+        ..add(tap(center));
+      await pumpEventQueue();
+      final savesBeforeUndo = counting.saves;
+
+      bloc.add(const UndoRequested());
+      await pumpEventQueue();
+
+      expect(bloc.state, waiting.copyWith(canRedo: true));
+      expect(counting.saves - savesBeforeUndo, 1);
+      expect((await counting.load())?.record.moves, isEmpty);
+      await bloc.close();
+    });
 
     blocTest<GameBloc, GameViewState>(
       'restarting keeps playing the computer',

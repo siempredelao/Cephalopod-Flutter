@@ -259,12 +259,11 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// remembers them for redo. A finished game stays finished.
   Future<void> _undo(Emitter<GameViewState> emit) async {
     if (!_canUndo) return;
-    var game = _currentGame;
-    for (var i = 0; i < _movesPerUndo; i++) {
-      _undone.add(game.record.moves.last);
-      game = await _undoMove(game);
-    }
-    _show(game, emit);
+    final game = _currentGame;
+    // Most recent last: the latest move goes in first, so redo, which takes
+    // from the end, plays the earlier one first.
+    _undone.addAll(game.record.moves.reversed.take(_movesPerUndo));
+    _show(await _undoMove(game, count: _movesPerUndo), emit);
   }
 
   /// Plays again the last [_movesPerUndo] moves taken back, if there are
