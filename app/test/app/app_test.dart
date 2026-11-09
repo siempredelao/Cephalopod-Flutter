@@ -33,7 +33,6 @@ void main() {
     final settings = SettingsModule(
       settingsRepository: InMemorySettingsRepository(),
     );
-    addTearDown(settings.cubit.close);
     final game = GameModule(
       cephalopodRules: CephalopodRules(),
       gameRepository: InMemoryGameRepository(),
@@ -45,7 +44,7 @@ void main() {
       initialLocation: location,
     );
     await tester.pumpWidget(
-      App(flavor: flavor, router: router, settings: settings.cubit),
+      App(flavor: flavor, router: router, settings: settings.store),
     );
     await tester.pumpAndSettle();
   }
@@ -191,8 +190,16 @@ void main() {
       await tester.tap(find.text('Dark'));
       await tester.pumpAndSettle();
 
-      final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
-      expect(app.themeMode, ThemeMode.dark);
+      ThemeMode themeMode() {
+        return tester.widget<MaterialApp>(find.byType(MaterialApp)).themeMode!;
+      }
+
+      expect(themeMode(), ThemeMode.dark);
+      // The settings page's cubit closes on the way back; the theme stays.
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.byType(SettingsPage), findsNothing);
+      expect(themeMode(), ThemeMode.dark);
     });
 
     testWidgets('opens games with the highlight the settings chose', (

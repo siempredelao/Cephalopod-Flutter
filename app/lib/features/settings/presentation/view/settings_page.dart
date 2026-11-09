@@ -6,8 +6,28 @@ import 'package:material_ui/material_ui.dart';
 
 /// The player's settings: the app's theme, and whether the board marks the
 /// last move. Changes apply, and are saved, at once.
+///
+/// It gets a `SettingsCubit` from [createCubit] for as long as it is on
+/// screen, and draws its [SettingsViewState].
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
+  const SettingsPage({required this.createCubit, super.key});
+
+  /// Builds the page's cubit. The settings module wires it to the app's
+  /// settings store.
+  final SettingsCubit Function() createCubit;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => createCubit(),
+      child: const _SettingsView(),
+    );
+  }
+}
+
+/// The settings, drawn from the cubit above it.
+class _SettingsView extends StatelessWidget {
+  const _SettingsView();
 
   static const double _spacing = 16;
 

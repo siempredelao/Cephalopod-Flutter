@@ -8,8 +8,8 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] 1. fix(game): stop a closed game from saving the computer's move (S)
 - [x] 4. feat(app): report uncaught errors (S)
 - [x] 5. fix(game): keep playing when the game cannot be saved (S), after 4
-- [ ] 6. refactor(settings): add one settings store for the whole app (M)
-- [ ] 7. refactor(settings): give the settings page its own cubit (S), after 6
+- [x] 6. refactor(settings): add one settings store for the whole app (M), with 7
+- [x] 7. refactor(settings): give the settings page its own cubit (S), done in 6's PR
 - [ ] 14. refactor(game): small game screen tweaks (S)
 - [ ] 15. perf(game): undo two moves with one replay and one save (S)
 - [ ] 17. test(engine): check that every agent runs on another isolate (S)

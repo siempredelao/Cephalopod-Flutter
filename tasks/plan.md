@@ -165,6 +165,9 @@ Files: `settings/domain/settings_store.dart` (new),
 
 **Task 7. `refactor(settings): give the settings page its own cubit`** (S)
 
+Done in the same pull request as Task 6: once `App` follows the store, it
+no longer needs to provide the cubit, so the page builds its own.
+
 - `SettingsCubit` is built for each visit by `SettingsModule.createCubit`. It
   reads and updates the store.
 - `App` no longer provides it.

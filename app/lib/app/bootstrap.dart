@@ -29,10 +29,13 @@ void bootstrap(Flavor flavor) {
   final settings = SettingsModule(
     settingsRepository: SharedPreferencesSettingsRepository(
       sharedPreferencesAsync: preferences,
+      // Storage that fails is reported, and the app goes on
+      // (docs/adr/0016).
+      errorReporter: logError,
     ),
   );
   // Shows the defaults for the moment the saved settings take to load.
-  unawaited(settings.cubit.load());
+  unawaited(settings.store.load());
 
   final game = GameModule(
     cephalopodRules: CephalopodRules(),
@@ -50,5 +53,5 @@ void bootstrap(Flavor flavor) {
     features: [game, settings, const AboutModule()],
   );
 
-  runApp(App(flavor: flavor, router: router, settings: settings.cubit));
+  runApp(App(flavor: flavor, router: router, settings: settings.store));
 }
