@@ -12,6 +12,7 @@ import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod/features/game/presentation/models/game_view_state.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:collection/collection.dart';
+import 'package:meta/meta.dart';
 
 /// The game screen's view model: turns taps into engine moves and works out
 /// what the screen shows. The rules stay in the engine; this class only asks
@@ -39,7 +40,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     GameViewStateMapper gameViewStateMapper = const GameViewStateMapper(),
     bool highlightLastMove = true,
     GameConfig config = GameConfig.standard,
-    GameState? position,
+    @visibleForTesting GameState? position,
   }) {
     return GameBloc._(
       cephalopodRules: cephalopodRules,

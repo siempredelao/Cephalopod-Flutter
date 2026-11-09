@@ -13,6 +13,23 @@ void main() {
       expect(AppTheme.dark.extension<BoardColors>(), dark);
     });
 
+    testWidgets('are read from the theme around a widget', (tester) async {
+      late BoardColors colors;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.dark,
+          home: Builder(
+            builder: (context) {
+              colors = BoardColors.of(context);
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
+
+      expect(colors, dark);
+    });
+
     test('copyWith replaces only the colours it is given', () {
       const red = Color(0xFFFF0000);
 

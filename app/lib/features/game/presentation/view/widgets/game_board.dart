@@ -26,7 +26,7 @@ class GameBoard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).extension<BoardColors>()!;
+    final colors = BoardColors.of(context);
     return AspectRatio(
       aspectRatio: 1,
       child: DecoratedBox(

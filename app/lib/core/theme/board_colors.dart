@@ -3,7 +3,7 @@ import 'package:material_ui/material_ui.dart';
 /// The colours of the game board and its dice.
 ///
 /// Registered on the app's light and dark themes, so board widgets read them
-/// with `Theme.of(context).extension<BoardColors>()` and hard-code none.
+/// with [BoardColors.of] and hard-code none.
 @immutable
 class BoardColors extends ThemeExtension<BoardColors> {
   const BoardColors({
@@ -21,6 +21,14 @@ class BoardColors extends ThemeExtension<BoardColors> {
     required this.captureOption,
     required this.captureSelected,
   });
+
+  /// The board colours of the theme around [context].
+  ///
+  /// Both of the app's themes register them (`AppTheme`), so a theme without
+  /// them is a bug, and this fails at once rather than drawing a blank board.
+  static BoardColors of(BuildContext context) {
+    return Theme.of(context).extension<BoardColors>()!;
+  }
 
   /// The palette of the repository's social preview and the app icon (see
   /// art/README.md): a dark teal board, coral and cream dice, and glowing
