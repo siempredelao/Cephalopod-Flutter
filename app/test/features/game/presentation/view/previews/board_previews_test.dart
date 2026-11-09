@@ -1,3 +1,4 @@
+import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/features/game/presentation/models/square_mark.dart';
 import 'package:cephalopod/features/game/presentation/view/previews/board_preview_wrapper.dart';
 import 'package:cephalopod/features/game/presentation/view/previews/board_square_previews.dart';
@@ -14,7 +15,11 @@ import 'package:material_ui/material_ui.dart';
 void main() {
   Future<void> pumpPreview(WidgetTester tester, Widget preview) {
     final wrapped = boardPreviewWrapper(preview);
-    final app = MaterialApp(home: Center(child: wrapped));
+    final app = MaterialApp(
+      localizationsDelegates: appLocalizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: Center(child: wrapped),
+    );
     return tester.pumpWidget(app);
   }
 

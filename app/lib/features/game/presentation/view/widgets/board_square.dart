@@ -1,3 +1,4 @@
+import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/core/theme/board_colors.dart';
 import 'package:cephalopod/features/game/presentation/models/square_mark.dart';
 import 'package:cephalopod/features/game/presentation/models/square_ui.dart';
@@ -43,7 +44,7 @@ class BoardSquare extends StatelessWidget {
       SquareMark.captureSelected => colors.captureSelected,
     };
     return Semantics(
-      label: _squareTextMapper.map(square),
+      label: _squareTextMapper.map(square, context.l10n),
       button: true,
       enabled: onTap != null,
       onTap: onTap,

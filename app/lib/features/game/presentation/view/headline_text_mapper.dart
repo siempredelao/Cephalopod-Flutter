@@ -1,8 +1,10 @@
+import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/features/game/presentation/models/headline_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/player_text_mapper.dart';
 
-/// Puts the headline above the board into words: what the game waits for,
-/// or how it ended, winner first. Against the computer, the person is "you".
+/// Puts the headline above the board into words, in the language on screen:
+/// what the game waits for, or how it ended, winner first. Against the
+/// computer, the person is "you".
 ///
 /// A text mapper (docs/adr/0015): the bloc's mappers decide what the
 /// headline means; this class only puts it into words.
@@ -14,16 +16,21 @@ final class HeadlineTextMapper {
   final PlayerTextMapper _playerTextMapper;
 
   /// The words for [headline], such as "Player 2 wins 13 to 12".
-  String map(HeadlineUi headline) => switch (headline) {
-    PlayerToMoveHeadline(:final player) =>
-      '${_playerTextMapper.map(player)} to move',
-    PersonToMoveHeadline() => 'Your turn',
-    ComputerToMoveHeadline() => 'The computer is thinking…',
+  String map(HeadlineUi headline, AppLocalizations l10n) => switch (headline) {
+    PlayerToMoveHeadline(:final player) => l10n.headlinePlayerToMove(
+      _playerTextMapper.map(player, l10n),
+    ),
+    PersonToMoveHeadline() => l10n.headlinePersonToMove,
+    ComputerToMoveHeadline() => l10n.headlineComputerToMove,
     PlayerWonHeadline(:final player, :final winnerDice, :final loserDice) =>
-      '${_playerTextMapper.map(player)} wins $winnerDice to $loserDice',
+      l10n.headlinePlayerWon(
+        _playerTextMapper.map(player, l10n),
+        winnerDice,
+        loserDice,
+      ),
     PersonWonHeadline(:final winnerDice, :final loserDice) =>
-      'You win $winnerDice to $loserDice',
+      l10n.headlinePersonWon(winnerDice, loserDice),
     ComputerWonHeadline(:final winnerDice, :final loserDice) =>
-      'The computer wins $winnerDice to $loserDice',
+      l10n.headlineComputerWon(winnerDice, loserDice),
   };
 }

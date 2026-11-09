@@ -1,3 +1,4 @@
+import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/core/navigation/app_route.dart';
 import 'package:cephalopod/core/navigation/dialog_page.dart';
 import 'package:cephalopod/features/game/presentation/view/new_game_dialog.dart';
@@ -34,7 +35,13 @@ void main() {
         ],
       );
       addTearDown(router.dispose);
-      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+      await tester.pumpWidget(
+        MaterialApp.router(
+          localizationsDelegates: appLocalizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: router,
+        ),
+      );
       await _tapText(tester, 'Open');
     }
 

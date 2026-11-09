@@ -67,5 +67,159 @@
   "aboutOfficialRules": "Official rules",
   "@aboutOfficialRules": {
     "description": "About: heading above the link to the official rule sheet."
+  },
+
+  "playerName": "Player {number}",
+  "@playerName": {
+    "description": "A player between two people on the same device, by number: Player 1 plays first.",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+
+  "headlinePlayerToMove": "{player} to move",
+  "@headlinePlayerToMove": {
+    "description": "Game: above the board, between two people. {player} is playerName.",
+    "placeholders": {
+      "player": {
+        "type": "String"
+      }
+    }
+  },
+  "headlinePersonToMove": "Your turn",
+  "@headlinePersonToMove": {
+    "description": "Game: above the board, against the computer, when the person is to move."
+  },
+  "headlineComputerToMove": "The computer is thinking…",
+  "@headlineComputerToMove": {
+    "description": "Game: above the board while the computer chooses its move."
+  },
+  "headlinePlayerWon": "{player} wins {winnerDice} to {loserDice}",
+  "@headlinePlayerWon": {
+    "description": "Game: above the board when a game between two people ends. The numbers are the dice each player has on the full board, the winner's first.",
+    "placeholders": {
+      "player": {
+        "type": "String"
+      },
+      "winnerDice": {
+        "type": "int"
+      },
+      "loserDice": {
+        "type": "int"
+      }
+    }
+  },
+  "headlinePersonWon": "You win {winnerDice} to {loserDice}",
+  "@headlinePersonWon": {
+    "description": "Game: above the board when the person beats the computer. Dice on the board, the person's first.",
+    "placeholders": {
+      "winnerDice": {
+        "type": "int"
+      },
+      "loserDice": {
+        "type": "int"
+      }
+    }
+  },
+  "headlineComputerWon": "The computer wins {winnerDice} to {loserDice}",
+  "@headlineComputerWon": {
+    "description": "Game: above the board when the computer wins. Dice on the board, the computer's first.",
+    "placeholders": {
+      "winnerDice": {
+        "type": "int"
+      },
+      "loserDice": {
+        "type": "int"
+      }
+    }
+  },
+
+  "captureSum": "Capture sum: {selectedSum} of up to {maxSum}",
+  "@captureSum": {
+    "description": "Game: while the player picks dice to capture, the sum of their pips so far and the most a capture may add up to.",
+    "placeholders": {
+      "selectedSum": {
+        "type": "int"
+      },
+      "maxSum": {
+        "type": "int"
+      }
+    }
+  },
+
+  "squareEmpty": "Row {row}, column {column}, empty",
+  "@squareEmpty": {
+    "description": "Game: what a screen reader says for an empty square. Rows and columns count from 1 at the top left.",
+    "placeholders": {
+      "row": {
+        "type": "int"
+      },
+      "column": {
+        "type": "int"
+      }
+    }
+  },
+  "squarePlayerDie": "Row {row}, column {column}, {player} die showing {pips}",
+  "@squarePlayerDie": {
+    "description": "Game: what a screen reader says for a square with a die, between two people. {player} is playerName; {pips} is the number on the die, 1 to 6.",
+    "placeholders": {
+      "row": {
+        "type": "int"
+      },
+      "column": {
+        "type": "int"
+      },
+      "player": {
+        "type": "String"
+      },
+      "pips": {
+        "type": "int"
+      }
+    }
+  },
+  "squareYourDie": "Row {row}, column {column}, your die showing {pips}",
+  "@squareYourDie": {
+    "description": "Game: what a screen reader says for a square with the person's die, against the computer. {pips} is 1 to 6.",
+    "placeholders": {
+      "row": {
+        "type": "int"
+      },
+      "column": {
+        "type": "int"
+      },
+      "pips": {
+        "type": "int"
+      }
+    }
+  },
+  "squareComputerDie": "Row {row}, column {column}, the computer's die showing {pips}",
+  "@squareComputerDie": {
+    "description": "Game: what a screen reader says for a square with the computer's die. {pips} is 1 to 6.",
+    "placeholders": {
+      "row": {
+        "type": "int"
+      },
+      "column": {
+        "type": "int"
+      },
+      "pips": {
+        "type": "int"
+      }
+    }
+  },
+
+  "tutorialProgress": "Step {step} of {stepCount}",
+  "@tutorialProgress": {
+    "description": "How to play: what a screen reader says for the dots under the pages. Steps count from 1.",
+    "placeholders": {
+      "step": {
+        "type": "int"
+      },
+      "stepCount": {
+        "type": "int"
+      }
+    }
   }
 }

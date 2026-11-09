@@ -1,10 +1,14 @@
+import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/features/game/presentation/models/role_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/side_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/square_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/player_text_mapper.dart';
 
-/// Words what screen readers announce for a square: where it is, counting
-/// rows and columns from 1, and what is on it.
+/// Words what screen readers announce for a square, in the language on
+/// screen: where it is, counting rows and columns from 1, and what is on it.
+///
+/// Whose die it is changes the whole sentence ("your die", "the computer's
+/// die"), so each owner has a message of its own rather than a word slotted
+/// into one: languages do not all build those phrases the same way.
 ///
 /// A text mapper (docs/adr/0015): UI model in, words out.
 final class SquareTextMapper {
@@ -14,18 +18,20 @@ final class SquareTextMapper {
 
   /// "Row 2, column 3, Player 1 die showing 5", "Row 2, column 3, your die
   /// showing 5", or "Row 1, column 3, empty".
-  String map(SquareUi square) {
-    final where = 'Row ${square.row + 1}, column ${square.col + 1}';
+  String map(SquareUi square, AppLocalizations l10n) {
+    final row = square.row + 1;
+    final column = square.col + 1;
     final die = square.die;
-    if (die == null) return '$where, empty';
-    return '$where, ${_ownerOf(die.owner)} die showing ${die.pips}';
+    if (die == null) return l10n.squareEmpty(row, column);
+    return switch (die.owner.role) {
+      RoleUi.player => l10n.squarePlayerDie(
+        row,
+        column,
+        _playerTextMapper.map(die.owner.player, l10n),
+        die.pips,
+      ),
+      RoleUi.person => l10n.squareYourDie(row, column, die.pips),
+      RoleUi.computer => l10n.squareComputerDie(row, column, die.pips),
+    };
   }
-
-  /// Whose a die is: "Player 1" between two people, or "your" and "the
-  /// computer's" against the computer.
-  String _ownerOf(SideUi side) => switch (side.role) {
-    RoleUi.player => _playerTextMapper.map(side.player),
-    RoleUi.person => 'your',
-    RoleUi.computer => "the computer's",
-  };
 }

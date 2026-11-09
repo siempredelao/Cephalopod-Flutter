@@ -1,3 +1,4 @@
+import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/core/theme/board_colors.dart';
 import 'package:cephalopod/features/game/presentation/bloc/tutorial_steps.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
@@ -9,6 +10,8 @@ void main() {
   Future<void> pumpTutorial(WidgetTester tester) {
     return tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: appLocalizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         theme: ThemeData(extensions: const [BoardColors.light]),
         home: const HowToPlayPage(),
       ),
@@ -72,6 +75,8 @@ void main() {
     testWidgets('closes with Got it on the last step', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: appLocalizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           theme: ThemeData(extensions: const [BoardColors.light]),
           routes: {
             '/': (_) => const Text('Home'),
