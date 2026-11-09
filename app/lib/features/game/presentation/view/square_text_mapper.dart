@@ -22,16 +22,16 @@ final class SquareTextMapper {
     final row = square.row + 1;
     final column = square.col + 1;
     final die = square.die;
-    if (die == null) return l10n.squareEmpty(row, column);
+    if (die == null) return l10n.gameSquareEmpty(row, column);
     return switch (die.owner.role) {
-      RoleUi.player => l10n.squarePlayerDie(
+      RoleUi.player => l10n.gameSquarePlayerDie(
         row,
         column,
         _playerTextMapper.map(die.owner.player, l10n),
         die.pips,
       ),
-      RoleUi.person => l10n.squareYourDie(row, column, die.pips),
-      RoleUi.computer => l10n.squareComputerDie(row, column, die.pips),
+      RoleUi.person => l10n.gameSquareYourDie(row, column, die.pips),
+      RoleUi.computer => l10n.gameSquareComputerDie(row, column, die.pips),
     };
   }
 }

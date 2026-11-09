@@ -9,6 +9,6 @@ final class CaptureTextMapper {
   const CaptureTextMapper();
 
   String map(CaptureUi capture, AppLocalizations l10n) {
-    return l10n.captureSum(capture.selectedSum, capture.maxSum);
+    return l10n.gameCaptureSum(capture.selectedSum, capture.maxSum);
   }
 }

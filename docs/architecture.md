@@ -108,6 +108,11 @@ Classes named above arrive in M1–M4; the table records how they will fit.
 - Words on screen live in `lib/core/l10n/app_*.arb`, one file per language,
   and widgets read them with `context.l10n`. English is the template and the
   fallback. See [ADR 0017](adr/0017-translations-with-gen-l10n.md).
+- Each message key starts with the name of its screen's route
+  (`core/navigation/app_route.dart`), or `app` for words shared across
+  screens: `homeNewGame`, `gameSquareEmpty`, `appTitle`. Each feature's
+  words stay together in the one file, and a test fails on any other
+  prefix.
 - Material widgets come from `package:material_ui`, not
   `package:flutter/material.dart`. See [ADR 0007](adr/0007-material-ui-package.md).
 - Generated files (`*.g.dart`, `*.freezed.dart`) are never committed.

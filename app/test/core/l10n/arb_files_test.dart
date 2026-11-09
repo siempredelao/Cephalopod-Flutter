@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cephalopod/core/navigation/app_route.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Where the translations live, from the app's folder, where tests run.
@@ -20,6 +21,25 @@ Set<String> _keysOf(String path) {
   };
 }
 
+/// What every message key starts with: the name of the screen it belongs
+/// to, as its route is named, or `app` for words shared across screens.
+/// A new screen gets its prefix with its route.
+final Set<String> _prefixes = {
+  'app',
+  for (final route in AppRoute.values) route.name,
+};
+
+/// Whether [key] starts with one of the [_prefixes], followed by the next
+/// word: `gameSquareEmpty` does, `gamesWon` and `squareEmpty` do not.
+bool _isPrefixed(String key) {
+  return _prefixes.any(
+    (prefix) =>
+        key.length > prefix.length &&
+        key.startsWith(prefix) &&
+        key[prefix.length].toUpperCase() == key[prefix.length],
+  );
+}
+
 void main() {
   group('The .arb files', () {
     final translations = [
@@ -27,6 +47,16 @@ void main() {
         if (file.path.endsWith('.arb') && !file.path.endsWith(_template))
           file.path,
     ];
+
+    test("start each message with its screen's name", () {
+      final english = _keysOf('$_arbFolder/$_template');
+
+      expect(
+        english.where((key) => !_isPrefixed(key)),
+        isEmpty,
+        reason: 'Start each key with one of $_prefixes',
+      );
+    });
 
     test('include a language besides English', () {
       expect(translations, isNotEmpty);

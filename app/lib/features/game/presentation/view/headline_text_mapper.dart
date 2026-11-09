@@ -17,20 +17,20 @@ final class HeadlineTextMapper {
 
   /// The words for [headline], such as "Player 2 wins 13 to 12".
   String map(HeadlineUi headline, AppLocalizations l10n) => switch (headline) {
-    PlayerToMoveHeadline(:final player) => l10n.headlinePlayerToMove(
+    PlayerToMoveHeadline(:final player) => l10n.gameHeadlinePlayerToMove(
       _playerTextMapper.map(player, l10n),
     ),
-    PersonToMoveHeadline() => l10n.headlinePersonToMove,
-    ComputerToMoveHeadline() => l10n.headlineComputerToMove,
+    PersonToMoveHeadline() => l10n.gameHeadlinePersonToMove,
+    ComputerToMoveHeadline() => l10n.gameHeadlineComputerToMove,
     PlayerWonHeadline(:final player, :final winnerDice, :final loserDice) =>
-      l10n.headlinePlayerWon(
+      l10n.gameHeadlinePlayerWon(
         _playerTextMapper.map(player, l10n),
         winnerDice,
         loserDice,
       ),
     PersonWonHeadline(:final winnerDice, :final loserDice) =>
-      l10n.headlinePersonWon(winnerDice, loserDice),
+      l10n.gameHeadlinePersonWon(winnerDice, loserDice),
     ComputerWonHeadline(:final winnerDice, :final loserDice) =>
-      l10n.headlineComputerWon(winnerDice, loserDice),
+      l10n.gameHeadlineComputerWon(winnerDice, loserDice),
   };
 }

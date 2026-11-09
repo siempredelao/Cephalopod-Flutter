@@ -9,7 +9,7 @@ final class PlayerTextMapper {
   const PlayerTextMapper();
 
   String map(PlayerUi player, AppLocalizations l10n) => switch (player) {
-    PlayerUi.one => l10n.playerName(1),
-    PlayerUi.two => l10n.playerName(2),
+    PlayerUi.one => l10n.gamePlayerName(1),
+    PlayerUi.two => l10n.gamePlayerName(2),
   };
 }

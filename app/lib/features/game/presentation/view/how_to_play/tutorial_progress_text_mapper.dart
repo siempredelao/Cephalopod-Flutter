@@ -13,6 +13,6 @@ final class TutorialProgressTextMapper {
     required int currentStep,
     required int stepCount,
   }) {
-    return l10n.tutorialProgress(currentStep + 1, stepCount);
+    return l10n.howToPlayProgress(currentStep + 1, stepCount);
   }
 }

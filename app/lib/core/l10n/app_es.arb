@@ -21,21 +21,21 @@
   "aboutCredit": "Mark Steere inventó Cephalopod el 25 de febrero de 2006. Esta aplicación sigue sus reglas sin cambios.",
   "aboutOfficialRules": "Reglas oficiales",
 
-  "playerName": "Jugador {number}",
+  "gamePlayerName": "Jugador {number}",
 
-  "headlinePlayerToMove": "Turno del {player}",
-  "headlinePersonToMove": "Tu turno",
-  "headlineComputerToMove": "El ordenador está pensando…",
-  "headlinePlayerWon": "Gana el {player} por {winnerDice} a {loserDice}",
-  "headlinePersonWon": "Ganas por {winnerDice} a {loserDice}",
-  "headlineComputerWon": "Gana el ordenador por {winnerDice} a {loserDice}",
+  "gameHeadlinePlayerToMove": "Turno del {player}",
+  "gameHeadlinePersonToMove": "Tu turno",
+  "gameHeadlineComputerToMove": "El ordenador está pensando…",
+  "gameHeadlinePlayerWon": "Gana el {player} por {winnerDice} a {loserDice}",
+  "gameHeadlinePersonWon": "Ganas por {winnerDice} a {loserDice}",
+  "gameHeadlineComputerWon": "Gana el ordenador por {winnerDice} a {loserDice}",
 
-  "captureSum": "Suma de la captura: {selectedSum} de {maxSum} como máximo",
+  "gameCaptureSum": "Suma de la captura: {selectedSum} de {maxSum} como máximo",
 
-  "squareEmpty": "Fila {row}, columna {column}, vacía",
-  "squarePlayerDie": "Fila {row}, columna {column}, dado del {player} con {pips, plural, =1{1 punto} other{{pips} puntos}}",
-  "squareYourDie": "Fila {row}, columna {column}, tu dado con {pips, plural, =1{1 punto} other{{pips} puntos}}",
-  "squareComputerDie": "Fila {row}, columna {column}, dado del ordenador con {pips, plural, =1{1 punto} other{{pips} puntos}}",
+  "gameSquareEmpty": "Fila {row}, columna {column}, vacía",
+  "gameSquarePlayerDie": "Fila {row}, columna {column}, dado del {player} con {pips, plural, =1{1 punto} other{{pips} puntos}}",
+  "gameSquareYourDie": "Fila {row}, columna {column}, tu dado con {pips, plural, =1{1 punto} other{{pips} puntos}}",
+  "gameSquareComputerDie": "Fila {row}, columna {column}, dado del ordenador con {pips, plural, =1{1 punto} other{{pips} puntos}}",
 
-  "tutorialProgress": "Paso {step} de {stepCount}"
+  "howToPlayProgress": "Paso {step} de {stepCount}"
 }

@@ -69,8 +69,8 @@
     "description": "About: heading above the link to the official rule sheet."
   },
 
-  "playerName": "Player {number}",
-  "@playerName": {
+  "gamePlayerName": "Player {number}",
+  "@gamePlayerName": {
     "description": "A player between two people on the same device, by number: Player 1 plays first.",
     "placeholders": {
       "number": {
@@ -79,25 +79,25 @@
     }
   },
 
-  "headlinePlayerToMove": "{player} to move",
-  "@headlinePlayerToMove": {
-    "description": "Game: above the board, between two people. {player} is playerName.",
+  "gameHeadlinePlayerToMove": "{player} to move",
+  "@gameHeadlinePlayerToMove": {
+    "description": "Game: above the board, between two people. {player} is gamePlayerName.",
     "placeholders": {
       "player": {
         "type": "String"
       }
     }
   },
-  "headlinePersonToMove": "Your turn",
-  "@headlinePersonToMove": {
+  "gameHeadlinePersonToMove": "Your turn",
+  "@gameHeadlinePersonToMove": {
     "description": "Game: above the board, against the computer, when the person is to move."
   },
-  "headlineComputerToMove": "The computer is thinking…",
-  "@headlineComputerToMove": {
+  "gameHeadlineComputerToMove": "The computer is thinking…",
+  "@gameHeadlineComputerToMove": {
     "description": "Game: above the board while the computer chooses its move."
   },
-  "headlinePlayerWon": "{player} wins {winnerDice} to {loserDice}",
-  "@headlinePlayerWon": {
+  "gameHeadlinePlayerWon": "{player} wins {winnerDice} to {loserDice}",
+  "@gameHeadlinePlayerWon": {
     "description": "Game: above the board when a game between two people ends. The numbers are the dice each player has on the full board, the winner's first.",
     "placeholders": {
       "player": {
@@ -111,8 +111,8 @@
       }
     }
   },
-  "headlinePersonWon": "You win {winnerDice} to {loserDice}",
-  "@headlinePersonWon": {
+  "gameHeadlinePersonWon": "You win {winnerDice} to {loserDice}",
+  "@gameHeadlinePersonWon": {
     "description": "Game: above the board when the person beats the computer. Dice on the board, the person's first.",
     "placeholders": {
       "winnerDice": {
@@ -123,8 +123,8 @@
       }
     }
   },
-  "headlineComputerWon": "The computer wins {winnerDice} to {loserDice}",
-  "@headlineComputerWon": {
+  "gameHeadlineComputerWon": "The computer wins {winnerDice} to {loserDice}",
+  "@gameHeadlineComputerWon": {
     "description": "Game: above the board when the computer wins. Dice on the board, the computer's first.",
     "placeholders": {
       "winnerDice": {
@@ -136,8 +136,8 @@
     }
   },
 
-  "captureSum": "Capture sum: {selectedSum} of up to {maxSum}",
-  "@captureSum": {
+  "gameCaptureSum": "Capture sum: {selectedSum} of up to {maxSum}",
+  "@gameCaptureSum": {
     "description": "Game: while the player picks dice to capture, the sum of their pips so far and the most a capture may add up to.",
     "placeholders": {
       "selectedSum": {
@@ -149,8 +149,8 @@
     }
   },
 
-  "squareEmpty": "Row {row}, column {column}, empty",
-  "@squareEmpty": {
+  "gameSquareEmpty": "Row {row}, column {column}, empty",
+  "@gameSquareEmpty": {
     "description": "Game: what a screen reader says for an empty square. Rows and columns count from 1 at the top left.",
     "placeholders": {
       "row": {
@@ -161,9 +161,9 @@
       }
     }
   },
-  "squarePlayerDie": "Row {row}, column {column}, {player} die showing {pips}",
-  "@squarePlayerDie": {
-    "description": "Game: what a screen reader says for a square with a die, between two people. {player} is playerName; {pips} is the number on the die, 1 to 6.",
+  "gameSquarePlayerDie": "Row {row}, column {column}, {player} die showing {pips}",
+  "@gameSquarePlayerDie": {
+    "description": "Game: what a screen reader says for a square with a die, between two people. {player} is gamePlayerName; {pips} is the number on the die, 1 to 6.",
     "placeholders": {
       "row": {
         "type": "int"
@@ -179,8 +179,8 @@
       }
     }
   },
-  "squareYourDie": "Row {row}, column {column}, your die showing {pips}",
-  "@squareYourDie": {
+  "gameSquareYourDie": "Row {row}, column {column}, your die showing {pips}",
+  "@gameSquareYourDie": {
     "description": "Game: what a screen reader says for a square with the person's die, against the computer. {pips} is 1 to 6.",
     "placeholders": {
       "row": {
@@ -194,8 +194,8 @@
       }
     }
   },
-  "squareComputerDie": "Row {row}, column {column}, the computer's die showing {pips}",
-  "@squareComputerDie": {
+  "gameSquareComputerDie": "Row {row}, column {column}, the computer's die showing {pips}",
+  "@gameSquareComputerDie": {
     "description": "Game: what a screen reader says for a square with the computer's die. {pips} is 1 to 6.",
     "placeholders": {
       "row": {
@@ -210,8 +210,8 @@
     }
   },
 
-  "tutorialProgress": "Step {step} of {stepCount}",
-  "@tutorialProgress": {
+  "howToPlayProgress": "Step {step} of {stepCount}",
+  "@howToPlayProgress": {
     "description": "How to play: what a screen reader says for the dots under the pages. Steps count from 1.",
     "placeholders": {
       "step": {
