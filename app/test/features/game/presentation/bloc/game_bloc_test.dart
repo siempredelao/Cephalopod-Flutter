@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc_test/bloc_test.dart';
+import 'package:cephalopod/features/game/data/best_effort_game_repository.dart';
 import 'package:cephalopod/features/game/data/in_memory_game_repository.dart';
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
@@ -14,6 +15,7 @@ import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:cephalopod_engine/testing.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../../../helpers/failing_game_repository.dart';
 import '../../../../helpers/game_bloc_factory.dart';
 
 void main() {
@@ -335,6 +337,24 @@ void main() {
       expect(await repository.load(), (record: record, opponent: friend));
       await bloc.close();
     });
+
+    test(
+      'keeps playing when the game cannot be saved, and reports it',
+      () async {
+        final reasons = <String?>[];
+        final bloc = createTestGameBloc(
+          repository: BestEffortGameRepository(
+            gameRepository: FailingGameRepository(Exception('Storage is full')),
+            errorReporter: (_, _, {reason}) => reasons.add(reason),
+          ),
+        )..add(tap(center));
+        await settle();
+
+        expect(bloc.state, played);
+        expect(reasons, ['saving the game']);
+        await bloc.close();
+      },
+    );
 
     blocTest<GameBloc, GameViewState>(
       'undo takes back the last move, and redo plays it again',

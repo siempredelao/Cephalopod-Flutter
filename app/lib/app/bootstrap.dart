@@ -6,6 +6,7 @@ import 'package:cephalopod/app/log_error.dart';
 import 'package:cephalopod/app/router.dart';
 import 'package:cephalopod/app/uncaught_error_reporting.dart';
 import 'package:cephalopod/features/about/about_module.dart';
+import 'package:cephalopod/features/game/data/best_effort_game_repository.dart';
 import 'package:cephalopod/features/game/data/saved_game_json_codec.dart';
 import 'package:cephalopod/features/game/data/shared_preferences_game_repository.dart';
 import 'package:cephalopod/features/game/game_module.dart';
@@ -36,9 +37,13 @@ void bootstrap(Flavor flavor) {
 
   final game = GameModule(
     cephalopodRules: CephalopodRules(),
-    gameRepository: SharedPreferencesGameRepository(
-      sharedPreferencesAsync: preferences,
-      savedGameJsonCodec: SavedGameJsonCodec(),
+    // Storage that fails is reported, and the game goes on (docs/adr/0016).
+    gameRepository: BestEffortGameRepository(
+      gameRepository: SharedPreferencesGameRepository(
+        sharedPreferencesAsync: preferences,
+        savedGameJsonCodec: SavedGameJsonCodec(),
+      ),
+      errorReporter: logError,
     ),
     highlightLastMove: settings.highlightLastMove,
   );

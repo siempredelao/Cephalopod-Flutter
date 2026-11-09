@@ -7,7 +7,7 @@ The numbers are the ones first planned, so they are not in order here.
 ## Before M5
 - [x] 1. fix(game): stop a closed game from saving the computer's move (S)
 - [x] 4. feat(app): report uncaught errors (S)
-- [ ] 5. fix(game): keep playing when the game cannot be saved (S), after 4
+- [x] 5. fix(game): keep playing when the game cannot be saved (S), after 4
 - [ ] 6. refactor(settings): add one settings store for the whole app (M)
 - [ ] 7. refactor(settings): give the settings page its own cubit (S), after 6
 - [ ] 14. refactor(game): small game screen tweaks (S)
