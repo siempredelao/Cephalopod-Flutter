@@ -83,40 +83,47 @@ final class SavedGameJsonCodec {
     };
   }
 
+  // Each map pattern below matches only a map that has every key it names,
+  // each holding a value of the type it names. Anything else falls through
+  // to `null`.
+
   Opponent? _decodeOpponent(Object? data) {
-    if (data is! Map<String, Object?>) return null;
-    return switch (data['type']) {
-      'friend' => const FriendOpponent(),
-      'computer' => _decodeComputer(data),
+    return switch (data) {
+      {'type': 'friend'} => const FriendOpponent(),
+      {
+        'type': 'computer',
+        'difficulty': final String difficulty,
+        'player': final String player,
+      } =>
+        _decodeComputer(difficulty, player),
       _ => null,
     };
   }
 
-  ComputerOpponent? _decodeComputer(Map<String, Object?> data) {
-    final difficulty = Difficulty.values.asNameMap()[data['difficulty']];
-    final player = Player.values.asNameMap()[data['player']];
+  ComputerOpponent? _decodeComputer(String difficultyName, String playerName) {
+    final difficulty = Difficulty.values.asNameMap()[difficultyName];
+    final player = Player.values.asNameMap()[playerName];
     if (difficulty == null || player == null) return null;
     return ComputerOpponent(difficulty: difficulty, player: player);
   }
 
   GameConfig? _decodeConfig(Object? data) {
-    if (data is! Map<String, Object?>) return null;
-    final boardSize = data['boardSize'];
-    final firstPlayer = Player.values.asNameMap()[data['firstPlayer']];
-    final maxCaptureSum = data['maxCaptureSum'];
-    final minCaptureDice = data['minCaptureDice'];
-    if (boardSize is! int ||
-        firstPlayer == null ||
-        maxCaptureSum is! int ||
-        minCaptureDice is! int) {
-      return null;
+    if (data case {
+      'boardSize': final int boardSize,
+      'firstPlayer': final String firstPlayerName,
+      'maxCaptureSum': final int maxCaptureSum,
+      'minCaptureDice': final int minCaptureDice,
+    }) {
+      final firstPlayer = Player.values.asNameMap()[firstPlayerName];
+      if (firstPlayer == null) return null;
+      return GameConfig(
+        boardSize: boardSize,
+        firstPlayer: firstPlayer,
+        maxCaptureSum: maxCaptureSum,
+        minCaptureDice: minCaptureDice,
+      );
     }
-    return GameConfig(
-      boardSize: boardSize,
-      firstPlayer: firstPlayer,
-      maxCaptureSum: maxCaptureSum,
-      minCaptureDice: minCaptureDice,
-    );
+    return null;
   }
 
   List<Move>? _decodeMoves(Object? data) {
@@ -131,12 +138,16 @@ final class SavedGameJsonCodec {
   }
 
   Move? _decodeMove(Object? data) {
-    if (data is! Map<String, Object?>) return null;
-    final row = data['row'];
-    final col = data['col'];
-    final captures = _decodeSquares(data['captures']);
-    if (row is! int || col is! int || captures == null) return null;
-    return Move(Position(row, col), captures: captures);
+    if (data case {
+      'row': final int row,
+      'col': final int col,
+      'captures': final Object? captureData,
+    }) {
+      final captures = _decodeSquares(captureData);
+      if (captures == null) return null;
+      return Move(Position(row, col), captures: captures);
+    }
+    return null;
   }
 
   Set<Position>? _decodeSquares(Object? data) {

@@ -74,11 +74,16 @@ void main() {
         _save(config: 'null'),
         _save(config: '{"boardSize": 5}'),
         _save(config: _config.replaceFirst('black', 'red')),
+        _save(config: _config.replaceFirst('"black"', '1')),
+        _save(config: _config.replaceFirst('5', '"5"')),
         '{"schemaVersion": 1, "config": $_config, "moves": []}',
         _save(opponent: 'null'),
         _save(opponent: '{"type": "stranger"}'),
         _save(opponent: '{"type": "computer", "player": "white"}'),
         _save(opponent: '{"type": "computer", "difficulty": "hard"}'),
+        _save(
+          opponent: '{"type": "computer", "difficulty": 3, "player": "white"}',
+        ),
         _save(
           opponent:
               '{"type": "computer", "difficulty": "expert", '
@@ -87,6 +92,7 @@ void main() {
         _save(moves: '"none"'),
         _save(moves: '[7]'),
         _save(moves: '[{"row": 2}]'),
+        _save(moves: '[{"row": "2", "col": 2, "captures": []}]'),
         _save(moves: '[{"row": 2, "col": 2, "captures": "none"}]'),
         _save(moves: '[{"row": 2, "col": 2, "captures": [[2]]}]'),
       ];
