@@ -448,6 +448,11 @@ Acceptance:
 - The link opens the rule sheet on Android.
 - A test replaces both plugins with fakes, so it runs without a device.
 
+Built as three PRs, one after the other, to keep each short to review:
+the About page drawn from a cubit (no new behaviour), then the version
+(`package_info_plus`, its own ADR), then the link (`url_launcher`, its own
+ADR). The task is ticked in `todo.md` with the last one.
+
 **Task 25. `test(app): add golden images of the main screens`** (M)
 
 - Goldens for Home, the dialog with the computer chosen, the game screen
