@@ -343,17 +343,109 @@ Depends on Tasks 9–11.
 
 ### The rest of M5, after the translations
 
-Not part of this plan, but its order follows from it:
+Order: accessibility first (it changes how the screens announce themselves),
+then colours, then animations (which need both), then About, then goldens
+last, when text and colours are final. Each is one pull request.
 
-1. **Accessibility:** screen reader labels already go through the text
-   mappers, so they are translated by then.
-2. **Light and dark board palettes:** change `BoardColors`, already tidied by
-   Task 14.
-3. **Placement and capture animations:** build on Tasks 14 and 15.
-4. **Rule-sheet link and app version on About:** new text goes straight into
-   the `.arb` files.
-5. **Goldens last:** text and colours are final by then. Take them in both
-   languages, light and dark.
+**Task 19. `feat(game): announce the game's changes to screen readers`** (S)
+
+- The headline above the board becomes a live region, so a screen reader
+  says "Your turn" or "The computer is thinking…" when it changes, without
+  the player hunting for it.
+- A move the computer makes is announced in words, such as "The computer
+  placed a 3 at row 2, column 4": the square's label already exists in
+  `SquareTextMapper`, and the new message goes through a text mapper too.
+
+Acceptance:
+- A widget test finds the headline's live-region flag, and the announcement
+  after a computer move, in both languages.
+
+**Task 20. `test(app): check accessibility on every screen`** (S)
+
+- Run Flutter's accessibility guidelines on Home, the dialog, the game
+  screen, How to play, Settings and About: tap targets (Android's 48 dp),
+  labelled tap targets, and text contrast.
+- The same screens at 200% text size, in both languages, with no overflow.
+
+Acceptance:
+- The guideline tests pass. Where one fails, the screen is fixed in this
+  pull request, and it says what was changed.
+
+**Task 21. `feat(app): give the board a palette for each theme`** (M)
+
+- `BoardColors.dark` stops being a copy of `light` (see
+  `board_colors.dart`). The board is dark teal in both themes today, so a
+  light-theme board needs its own colours: lighter squares, with the dice
+  keeping their colours.
+- A test checks that the contrast between a die and its square, and between
+  a marked square's ring and the board, passes in both palettes.
+
+Acceptance:
+- Both themes look right by hand (the screenshots go in the pull request).
+- Contrast of at least 3:1 for the rings and dice against the board, as
+  WCAG asks of graphics.
+
+Needs a decision first: see the questions at the end of this section.
+
+**Task 22. `feat(game): animate placing a die`** (S)
+
+- The new die grows into its square, and the player's tap gets an answer
+  right away.
+- No animation at all when the device asks for reduced motion
+  (`MediaQuery.disableAnimations`).
+
+**Task 23. `feat(game): animate a capture`** (M)
+
+- The captured dice shrink away and the new die shows its sum. Undo and redo
+  stay instant.
+- Same rule for reduced motion. Tests pump frames by hand rather than
+  `pumpAndSettle`, so they check the middle of an animation.
+
+Acceptance (22 and 23):
+- Moves, undo, redo and the computer's turn still behave the same: the
+  bloc's states do not change, only how the view draws the change.
+
+**Task 24. `feat(about): link the rule sheet and show the app's version`** (M)
+
+- The rule sheet's address becomes a link that opens in the browser
+  (`url_launcher`).
+- The version and build number appear under the title (`package_info_plus`).
+- The new words go straight into both `.arb` files.
+- An ADR records the two dependencies, since the app has had none beyond
+  Flutter's and storage until now.
+
+Acceptance:
+- The link opens the rule sheet on Android.
+- A test replaces both plugins with fakes, so it runs without a device.
+
+**Task 25. `test(app): add golden images of the main screens`** (M)
+
+- Goldens for Home, the dialog with the computer chosen, the game screen
+  and How to play, in English and Spanish, light and dark.
+- The images are made on Linux and checked by CI, which runs on Linux, so
+  they match. Tests draw text in the Ahem font, so the images show boxes
+  rather than letters. They lock in layout and colours, not typography.
+
+Acceptance:
+- `flutter test --update-goldens` is documented in the README's testing
+  section, and CI fails on a change nobody updated.
+
+**Task 26. `docs: mark M5 done`** (XS)
+
+- README status and roadmap, `docs/architecture.md`'s testing table.
+
+### Questions for M5
+
+1. **The light board (Task 21).** Keep the dark teal board in the light
+   theme, or make it light? Keeping it is the cheapest, and the icon and
+   social preview use that teal, but the roadmap says "light and dark board
+   palettes".
+2. **Two new dependencies (Task 24).** `url_launcher` and `package_info_plus`
+   are the standard choices and both are from the Flutter team's publisher.
+   Alternative for the version: pass it in at build time, which needs no
+   dependency but can drift from `pubspec.yaml`.
+3. **Goldens with Ahem text (Task 25).** Fine for layout and colours. Real
+   fonts would need the font files in the repository.
 
 ## M6, only if the web build happens
 
