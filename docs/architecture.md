@@ -135,6 +135,7 @@ Classes named above arrive in M1–M4; the table records how they will fit.
 | Repository contract | Every implementation behaves the same | `app/test/features/*/data` |
 | Bloc | Event to state sequences | `app/test/features/*/presentation` |
 | Widget and golden | Rendering, taps, semantics, light and dark | `app/test` |
+| Accessibility | Tap targets, labels and contrast on every screen; twice the text size; one-line choices, in both languages | `app/test/app` |
 
 Coverage gates: engine 100% of lines, app 85% of lines, generated files excluded.
 

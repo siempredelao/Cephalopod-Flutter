@@ -11,6 +11,12 @@ import 'package:material_ui/material_ui.dart';
 
 const double _spacing = 16;
 
+/// Whether the chosen segment of a choice shows a check mark. It does not:
+/// on a 360 dp phone the mark leaves too little room for the label, and
+/// "Medium" wraps over three lines. The chosen segment is still filled in,
+/// and a screen reader still reads it as selected.
+const bool _showSelectedIcon = false;
+
 /// Choosing who to play against: a friend on this device, or the computer
 /// at a difficulty, with the person moving first or second.
 ///
@@ -85,6 +91,7 @@ class _OpponentChoice extends StatelessWidget {
     return _Section(
       title: context.l10n.newGameOpponent,
       child: SegmentedButton<_OpponentSegment>(
+        showSelectedIcon: _showSelectedIcon,
         segments: [
           ButtonSegment(
             value: _OpponentSegment.friend,
@@ -128,6 +135,7 @@ class _DifficultyChoice extends StatelessWidget {
     return _Section(
       title: context.l10n.newGameDifficulty,
       child: SegmentedButton<DifficultyUi>(
+        showSelectedIcon: _showSelectedIcon,
         segments: [
           ButtonSegment(
             value: DifficultyUi.easy,
@@ -161,6 +169,7 @@ class _PersonMovesChoice extends StatelessWidget {
     return _Section(
       title: context.l10n.newGamePersonMoves,
       child: SegmentedButton<PersonMovesUi>(
+        showSelectedIcon: _showSelectedIcon,
         segments: [
           ButtonSegment(
             value: PersonMovesUi.first,

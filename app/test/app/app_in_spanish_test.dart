@@ -11,8 +11,8 @@ import '../helpers/pump_app.dart';
 ///
 /// Tests draw text in the Ahem font, where every letter is as wide as it is
 /// tall, about twice the width of a real font's. So a screen that fits here
-/// fits on a phone. One that wraps here may not wrap on a phone, which is
-/// why wrapped labels are a check by hand, not by test.
+/// fits on a phone. One that wraps here may not wrap on a phone, so wrapped
+/// labels are checked in `segment_labels_test.dart`, with a real font.
 const double _phoneWidth = 360;
 
 void main() {

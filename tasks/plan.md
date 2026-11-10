@@ -442,8 +442,12 @@ Acceptance:
 - Goldens for Home, the dialog with the computer chosen, the game screen
   and How to play, in English and Spanish, light and dark.
 - The images are made on Linux and checked by CI, which runs on Linux, so
-  they match. Tests draw text in the Ahem font, so the images show boxes
-  rather than letters. They lock in layout and colours, not typography.
+  they match.
+- Text is drawn in Roboto, with the `loadRealFonts` test helper that Task 20
+  added, so the images show real words and lock in typography too. Roboto
+  comes with the Flutter SDK, and the README pins one Flutter version, so
+  everyone's images match. This replaces the first idea, the test font Ahem,
+  whose letters are plain boxes.
 
 Acceptance:
 - `flutter test --update-goldens` is documented in the README's testing
@@ -459,8 +463,8 @@ Acceptance:
    stay coral and cream; the cream die gets a dark edge.
 2. **Two new dependencies (Task 24).** `url_launcher` and `package_info_plus`
    are added, and an ADR records them.
-3. **Goldens with Ahem text (Task 25).** Accepted. They lock in layout and
-   colours, not typography.
+3. **Goldens and the test font (Task 25).** Ahem text was accepted. Task 20
+   found that real Roboto loads in tests, so the goldens use it instead.
 
 ## Dropped: the web build
 
