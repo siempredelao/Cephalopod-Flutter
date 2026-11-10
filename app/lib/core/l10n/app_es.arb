@@ -30,6 +30,8 @@
   "gameHeadlinePersonWon": "Ganas por {winnerDice} a {loserDice}",
   "gameHeadlineComputerWon": "Gana el ordenador por {winnerDice} a {loserDice}",
 
+  "gameHeadlineAfterComputerMove": "El ordenador puso un {pips} en la fila {row}, columna {column}. {headline}",
+
   "gameCaptureSum": "Suma de la captura: {selectedSum} de {maxSum} como máximo",
 
   "gameSquareEmpty": "Fila {row}, columna {column}, vacía",

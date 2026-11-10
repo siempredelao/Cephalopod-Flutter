@@ -43,6 +43,7 @@ void main() {
     GameState game, {
     TurnPhase phase = const TurnPhase.awaitingPlacement(),
     Move? lastMove,
+    Move? computerMove,
     bool canUndo = false,
     bool canRedo = false,
     Opponent opponent = const FriendOpponent(),
@@ -55,6 +56,7 @@ void main() {
       highlightLastMove: true,
       canUndo: canUndo,
       canRedo: canRedo,
+      computerMove: computerMove,
     );
   }
 
@@ -477,6 +479,7 @@ void main() {
     final replied = screenOf(
       after(afterCenter, reply),
       lastMove: reply,
+      computerMove: reply,
       canUndo: true,
       opponent: whiteComputer,
     );
@@ -507,6 +510,7 @@ void main() {
           screenOf(
             after(start, opening),
             lastMove: opening,
+            computerMove: opening,
             opponent: blackComputer,
           ),
         ];
@@ -543,7 +547,8 @@ void main() {
         thinking,
         replied,
         waiting.copyWith(canRedo: true),
-        replied,
+        // The computer's move is back, but it did not just play it.
+        replied.copyWith(computerMove: null),
       ],
     );
 
