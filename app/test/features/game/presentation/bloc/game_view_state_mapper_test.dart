@@ -45,6 +45,7 @@ void main() {
     bool canUndo = false,
     bool canRedo = false,
     Move? computerMove,
+    bool movePlayed = false,
   }) {
     return mapper.map(
       game: figure4,
@@ -55,6 +56,7 @@ void main() {
       canUndo: canUndo,
       canRedo: canRedo,
       computerMove: computerMove,
+      movePlayed: movePlayed,
     );
   }
 
@@ -135,6 +137,11 @@ void main() {
         screen.computerMove,
         const ComputerMoveUi(row: 1, col: 2, pips: 5),
       );
+    });
+
+    test('passes on whether a move was just played', () {
+      expect(map().movePlayed, isFalse);
+      expect(map(movePlayed: true).movePlayed, isTrue);
     });
 
     test('passes on whether a turn can be undone or redone', () {

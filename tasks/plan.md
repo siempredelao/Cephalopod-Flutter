@@ -424,6 +424,13 @@ Acceptance (22 and 23):
 - Moves, undo, redo and the computer's turn still behave the same: the
   bloc's states do not change, only how the view draws the change.
 
+Changed while building Task 23: the state gained one field, `movePlayed`.
+The view cannot tell a move from a turn taken back by looking at the board:
+against the computer, taking back a capture of the die just placed looks
+like a move with a capture. So the bloc says whether a move was just
+played, and the board animates only then. Nothing else in the states
+changed.
+
 **Task 24. `feat(about): link the rule sheet and show the app's version`** (M)
 
 - The rule sheet's address becomes a link that opens in the browser

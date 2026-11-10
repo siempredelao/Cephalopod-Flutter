@@ -12,10 +12,15 @@ class GameBoard extends StatelessWidget {
   const GameBoard({
     required this.board,
     required this.onSquareTapped,
+    this.animateDice = false,
     super.key,
   });
 
   final BoardUi board;
+
+  /// Whether dice that appear or go away, now that [board] has changed, grow
+  /// in and shrink away. Otherwise they are drawn at once.
+  final bool animateDice;
 
   /// Told which square was tapped; `null` while the board takes no taps.
   final ValueChanged<SquareUi>? onSquareTapped;
@@ -64,6 +69,7 @@ class GameBoard extends StatelessWidget {
       child: BoardSquare(
         key: ValueKey((square.row, square.col)),
         square: square,
+        animateDie: animateDice,
         onTap: onSquareTapped == null ? null : () => onSquareTapped(square),
       ),
     );

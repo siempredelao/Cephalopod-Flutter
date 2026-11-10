@@ -46,6 +46,22 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  /// How big the die on [square] is drawn, from 0 to 1 of its full size.
+  double dieScale(WidgetTester tester, Position square) {
+    final transition = find.descendant(
+      of: find.byKey(ValueKey((square.row, square.col))),
+      matching: find.byType(ScaleTransition),
+    );
+    return tester.widget<ScaleTransition>(transition).scale.value;
+  }
+
+  /// Taps the button with [tooltip] and draws one frame, and no more: what
+  /// is on screen then was drawn at once.
+  Future<void> tapButtonOnce(WidgetTester tester, String tooltip) async {
+    await tester.tap(find.byTooltip(tooltip));
+    await tester.pump();
+  }
+
   FilledButton captureButton(WidgetTester tester) =>
       tester.widget<FilledButton>(find.byType(FilledButton));
 
@@ -84,24 +100,28 @@ void main() {
       // On the real screen, where the new die is also marked as the last
       // move: the square alone, without that mark, is not the whole story.
       await pumpGame(tester);
-      final square = find.byKey(const ValueKey((2, 2)));
-      double dieScale() {
-        final transition = find.descendant(
-          of: square,
-          matching: find.byType(ScaleTransition),
-        );
-        return tester.widget<ScaleTransition>(transition).scale.value;
-      }
+      const square = Position(2, 2);
 
-      await tester.tap(square);
+      await tester.tap(find.byKey(const ValueKey((2, 2))));
       await tester.pump();
-      expect(dieScale(), 0.5);
+      expect(dieScale(tester, square), 0.5);
 
       await tester.pump(const Duration(milliseconds: 100));
-      expect(dieScale(), allOf(greaterThan(0.5), lessThan(1)));
+      expect(dieScale(tester, square), allOf(greaterThan(0.5), lessThan(1)));
 
       await tester.pumpAndSettle();
-      expect(dieScale(), 1);
+      expect(dieScale(tester, square), 1);
+    });
+
+    testWidgets('takes a die back, and puts it back, at once', (tester) async {
+      await pumpGame(tester);
+      await tapSquare(tester, const Position(2, 2));
+
+      await tapButtonOnce(tester, 'Undo');
+      expect(find.byType(DieFace), findsNothing);
+
+      await tapButtonOnce(tester, 'Redo');
+      expect(dieScale(tester, const Position(2, 2)), 1);
     });
 
     testWidgets('takes back a move and plays it again', (tester) async {
@@ -183,6 +203,60 @@ void main() {
         expect(find.byType(DieFace), findsNWidgets(3));
         expect(find.byType(CaptureControls), findsNothing);
         expect(find.text('Player 2 to move'), findsOne);
+      });
+
+      testWidgets('shrinks the captured dice away as the new die grows', (
+        tester,
+      ) async {
+        const captured = [Position(0, 1), Position(1, 0)];
+        await tapSurroundedCentre(tester);
+        for (final square in captured) {
+          await tapSquare(tester, square);
+        }
+
+        await tester.tap(find.text('Capture'));
+        await tester.pump();
+        // The new die and the two it captured are all still drawn.
+        expect(find.byType(DieFace), findsNWidgets(5));
+        expect(dieScale(tester, const Position(1, 1)), 0.5);
+        expect(dieScale(tester, captured.first), 1);
+
+        await tester.pump(const Duration(milliseconds: 100));
+        for (final square in [const Position(1, 1), ...captured]) {
+          expect(
+            dieScale(tester, square),
+            allOf(greaterThan(0.5), lessThan(1)),
+          );
+        }
+        // A die that stays does not move.
+        expect(dieScale(tester, const Position(1, 2)), 1);
+
+        await tester.pumpAndSettle();
+        expect(find.byType(DieFace), findsNWidgets(3));
+        expect(dieScale(tester, const Position(1, 1)), 1);
+      });
+
+      testWidgets('takes a capture back, and plays it again, at once', (
+        tester,
+      ) async {
+        const captured = [Position(0, 1), Position(1, 0)];
+        await tapSurroundedCentre(tester);
+        for (final square in captured) {
+          await tapSquare(tester, square);
+        }
+        await tapText(tester, 'Capture');
+
+        // Back: the new die is gone and the captured dice are whole again.
+        await tapButtonOnce(tester, 'Undo');
+        expect(find.byType(DieFace), findsNWidgets(4));
+        for (final square in captured) {
+          expect(dieScale(tester, square), 1);
+        }
+
+        // Again: the captured dice are gone and the new die is whole.
+        await tapButtonOnce(tester, 'Redo');
+        expect(find.byType(DieFace), findsNWidgets(3));
+        expect(dieScale(tester, const Position(1, 1)), 1);
       });
 
       testWidgets('backs out without placing a die', (tester) async {

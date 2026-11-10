@@ -1,7 +1,9 @@
 import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/core/theme/board_colors.dart';
+import 'package:cephalopod/features/game/presentation/models/die_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/square_mark.dart';
 import 'package:cephalopod/features/game/presentation/models/square_ui.dart';
+import 'package:cephalopod/features/game/presentation/view/game_durations.dart';
 import 'package:cephalopod/features/game/presentation/view/square_text_mapper.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
 import 'package:material_ui/material_ui.dart';
@@ -10,13 +12,15 @@ import 'package:material_ui/material_ui.dart';
 /// around it when it has a mark. Screen readers announce where it is and what
 /// is on it.
 ///
-/// A die that appears on a square grows into it, unless the device asks for
-/// less motion. A die that goes away, and a die already there when the
-/// square first shows, are drawn at once.
-class BoardSquare extends StatelessWidget {
+/// With [animateDie], a die that appears grows into the square and a die
+/// that goes away shrinks out of it, unless the device asks for less motion.
+/// Without it, and for a die already there when the square first shows, the
+/// change is drawn at once.
+class BoardSquare extends StatefulWidget {
   const BoardSquare({
     required this.square,
     required this.onTap,
+    this.animateDie = false,
     this._squareTextMapper = const SquareTextMapper(),
     super.key,
   });
@@ -25,9 +29,19 @@ class BoardSquare extends StatelessWidget {
 
   final SquareUi square;
 
+  /// Whether the die that appears or goes away, now that [square] has
+  /// changed, grows in or shrinks away.
+  final bool animateDie;
+
   /// Called when the square is tapped; `null` when it takes no taps.
   final VoidCallback? onTap;
 
+  @override
+  State<BoardSquare> createState() => _BoardSquareState();
+}
+
+class _BoardSquareState extends State<BoardSquare>
+    with SingleTickerProviderStateMixin {
   static const double _ringWidth = 3;
   static const double _ringGlow = 8;
   static const double _glowOpacity = 0.4;
@@ -36,20 +50,75 @@ class BoardSquare extends StatelessWidget {
   /// Room for the ring, so the tile is the same size whether marked or not.
   static const double _ringInset = 6;
 
-  /// How long a new die takes to grow into its square: long enough to see,
-  /// short enough that the next move is not kept waiting.
-  static const Duration _growDuration = Duration(milliseconds: 200);
+  /// The size a die grows from and shrinks to, as a fraction of its full
+  /// size.
+  static const double _smallestDie = 0.5;
 
-  /// The size a die starts growing from, as a fraction of its full size.
-  static const double _growFrom = 0.5;
+  /// How much of the die is there, from 0, none of it, to 1, all of it.
+  /// Growing runs it up and shrinking runs it down.
+  late final AnimationController _presence;
 
-  static const Key _emptyKey = ValueKey('empty');
-  static const Key _dieKey = ValueKey('die');
+  /// [_presence] slowing down as the die reaches its full size.
+  late final CurvedAnimation _opacity;
+  late final Animation<double> _scale;
+
+  /// The die drawn on the tile: the square's own, or the one that was on it
+  /// and is still shrinking away.
+  DieUi? _drawnDie;
+
+  @override
+  void initState() {
+    super.initState();
+    _drawnDie = widget.square.die;
+    _presence = AnimationController(
+      vsync: this,
+      duration: dieAnimationDuration,
+      value: _drawnDie == null ? 0 : 1,
+    );
+    _opacity = CurvedAnimation(parent: _presence, curve: Curves.easeOutCubic);
+    _scale = Tween<double>(begin: _smallestDie, end: 1).animate(_opacity);
+  }
+
+  @override
+  void didUpdateWidget(BoardSquare oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final before = oldWidget.square.die;
+    final now = widget.square.die;
+    if (now == before) return;
+
+    final animate =
+        widget.animateDie && !MediaQuery.disableAnimationsOf(context);
+    if (now == null) {
+      if (animate) {
+        // The die stays drawn while it shrinks.
+        _presence.reverse();
+      } else {
+        _drawnDie = null;
+        _presence.value = 0;
+      }
+    } else {
+      _drawnDie = now;
+      if (before == null && animate) {
+        _presence.forward(from: 0);
+      } else {
+        _presence.value = 1;
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _opacity.dispose();
+    _presence.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final colors = BoardColors.of(context);
-    final die = square.die;
+    final square = widget.square;
+    final onTap = widget.onTap;
+    final die = _drawnDie;
     final markColor = switch (square.mark) {
       SquareMark.none => null,
       SquareMark.lastMove => colors.lastMove,
@@ -58,7 +127,7 @@ class BoardSquare extends StatelessWidget {
       SquareMark.captureSelected => colors.captureSelected,
     };
     return Semantics(
-      label: _squareTextMapper.map(square, context.l10n),
+      label: widget._squareTextMapper.map(square, context.l10n),
       button: true,
       enabled: onTap != null,
       onTap: onTap,
@@ -68,53 +137,34 @@ class BoardSquare extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         // The ring's box is there even without a ring. A box that came and
         // went with the mark would make Flutter build everything inside it
-        // again, and a die built again does not grow: it is simply there.
+        // again, and the die would lose its place in the animation.
         child: DecoratedBox(
           decoration: _ringOf(markColor),
           child: Padding(
             padding: const EdgeInsets.all(_ringInset),
             // The tile stays under the die, so the die grows out of the
-            // square it is placed on.
+            // square it is placed on, and shrinks back into it.
             child: DecoratedBox(
               decoration: _tileOf(colors.square),
-              child: AnimatedSwitcher(
-                duration: MediaQuery.disableAnimationsOf(context)
-                    ? Duration.zero
-                    : _growDuration,
-                // A die that goes away does so at once; capturing has its
-                // own animation.
-                reverseDuration: Duration.zero,
-                switchInCurve: Curves.easeOutCubic,
-                transitionBuilder: _grow,
-                layoutBuilder: _fill,
-                child: die == null
-                    ? const SizedBox.expand(key: _emptyKey)
-                    : DieFace(key: _dieKey, die: die),
+              child: AnimatedBuilder(
+                animation: _presence,
+                // Built here, not on every frame of the animation.
+                child: die == null ? null : DieFace(die: die),
+                builder: (context, dieFace) {
+                  // No die, or one that has finished shrinking away.
+                  if (dieFace == null || _presence.isDismissed) {
+                    return const SizedBox.expand();
+                  }
+                  return FadeTransition(
+                    opacity: _opacity,
+                    child: ScaleTransition(scale: _scale, child: dieFace),
+                  );
+                },
               ),
             ),
           ),
         ),
       ),
-    );
-  }
-
-  /// Fades and scales a die in as it appears.
-  static Widget _grow(Widget child, Animation<double> animation) {
-    if (child.key != _dieKey) return child;
-    return FadeTransition(
-      opacity: animation,
-      child: ScaleTransition(
-        scale: Tween<double>(begin: _growFrom, end: 1).animate(animation),
-        child: child,
-      ),
-    );
-  }
-
-  /// Stacks the old and the new child, each filling the square.
-  static Widget _fill(Widget? current, List<Widget> previous) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [...previous, ?current],
     );
   }
 
