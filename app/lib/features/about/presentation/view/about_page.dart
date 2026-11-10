@@ -5,8 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Credits the game's inventor, as his rule sheet asks of anyone who
-/// programs the game, shows the app's version, and shows the address of the
-/// official rules.
+/// programs the game, shows the app's version, and links to the official
+/// rules.
 ///
 /// It gets an `AboutCubit` from [createCubit] for as long as it is on
 /// screen, and draws its [AboutViewState].
@@ -52,7 +52,29 @@ class _AboutView extends StatelessWidget {
               const SizedBox(height: 24),
               Text(l10n.aboutOfficialRules, style: textTheme.titleMedium),
               const SizedBox(height: 4),
-              SelectableText(state.ruleSheetAddress),
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: TextButton(
+                  // Lined up with the text above it, and tall enough to
+                  // tap.
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  onPressed: context.read<AboutCubit>().openRuleSheet,
+                  child: Text(
+                    state.ruleSheetAddress,
+                    style: const TextStyle(
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ),
+              if (state.linkFailed) ...[
+                const SizedBox(height: 8),
+                Text(l10n.aboutLinkFailed),
+                const SizedBox(height: 4),
+                SelectableText(state.ruleSheetAddress),
+              ],
             ],
           );
         },

@@ -7,9 +7,15 @@ import '../../../../helpers/pump_app.dart';
 
 void main() {
   final address = AboutModule.ruleSheet.toString();
+  final opened = <Uri>[];
+
+  setUp(opened.clear);
+
+  /// The link to the rule sheet: the address, as a button.
+  Finder link() => find.widgetWithText(TextButton, address);
 
   group('AboutPage', () {
-    testWidgets('credits the inventor and shows the rule sheet address', (
+    testWidgets('credits the inventor and links to the rule sheet', (
       tester,
     ) async {
       await pumpApp(tester, location: '/about');
@@ -17,7 +23,9 @@ void main() {
       expect(find.text('About'), findsOne);
       expect(find.textContaining('Mark Steere'), findsOne);
       expect(find.text('Official rules'), findsOne);
-      expect(find.widgetWithText(SelectableText, address), findsOne);
+      expect(link(), findsOne);
+      // The address to copy shows only when the link does not open.
+      expect(find.byType(SelectableText), findsNothing);
     });
 
     testWidgets('shows the version and build number under the title', (
@@ -39,15 +47,56 @@ void main() {
       expect(find.textContaining('Mark Steere'), findsOne);
     });
 
+    testWidgets('opens the rule sheet when its link is tapped', (tester) async {
+      await pumpApp(
+        tester,
+        location: '/about',
+        linkOpener: (address) async {
+          opened.add(address);
+          return true;
+        },
+      );
+
+      await tester.tap(link());
+      await tester.pumpAndSettle();
+
+      expect(opened, [AboutModule.ruleSheet]);
+      expect(find.textContaining('could not be opened'), findsNothing);
+    });
+
+    testWidgets('says so, and shows the address to copy, when it cannot', (
+      tester,
+    ) async {
+      await pumpApp(
+        tester,
+        location: '/about',
+        linkOpener: (_) async => false,
+      );
+
+      await tester.tap(link());
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('could not be opened'), findsOne);
+      expect(find.widgetWithText(SelectableText, address), findsOne);
+    });
+
     testWidgets('speaks Spanish', (tester) async {
       useSmallPhone(tester, const Locale('es', 'ES'));
 
-      await pumpApp(tester, location: '/about');
+      await pumpApp(
+        tester,
+        location: '/about',
+        linkOpener: (_) async => false,
+      );
 
       expect(find.text('Versión 1.2.0 (compilación 14)'), findsOne);
       expect(find.text('Acerca de'), findsOne);
       expect(find.text('Reglas oficiales'), findsOne);
-      expect(find.widgetWithText(SelectableText, address), findsOne);
+
+      await tester.tap(link());
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('No se pudo abrir el enlace'), findsOne);
     });
   });
 }

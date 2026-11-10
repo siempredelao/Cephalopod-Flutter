@@ -7,6 +7,7 @@ import 'package:cephalopod/app/router.dart';
 import 'package:cephalopod/app/uncaught_error_reporting.dart';
 import 'package:cephalopod/features/about/about_module.dart';
 import 'package:cephalopod/features/about/data/package_info_app_version_source.dart';
+import 'package:cephalopod/features/about/data/url_launcher_link_opener.dart';
 import 'package:cephalopod/features/game/data/saved_game_json_codec.dart';
 import 'package:cephalopod/features/game/data/shared_preferences_game_repository.dart';
 import 'package:cephalopod/features/game/game_module.dart';
@@ -51,6 +52,7 @@ void bootstrap(Flavor flavor) {
   );
   final about = AboutModule(
     appVersionSource: packageInfoAppVersionSource(errorReporter: logError),
+    linkOpener: urlLauncherLinkOpener(errorReporter: logError),
   );
   final router = createRouter(
     home: HomeModule(hasGameToContinue: game.hasGameToContinue),

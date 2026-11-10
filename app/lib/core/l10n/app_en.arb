@@ -82,6 +82,10 @@
       }
     }
   },
+  "aboutLinkFailed": "The link could not be opened. Here is the address, to copy:",
+  "@aboutLinkFailed": {
+    "description": "About: shown above the rule sheet's address when the browser could not be opened."
+  },
 
   "gamePlayerName": "Player {number}",
   "@gamePlayerName": {

@@ -26,3 +26,4 @@ supersedes an earlier one instead. Start new records from
 | [0017](0017-translations-with-gen-l10n.md) | Translations with gen-l10n, English by default | Accepted |
 | [0018](0018-how-to-play-text-is-translated.md) | How to play's pages name a topic, and the view words it | Accepted |
 | [0019](0019-package-info-plus-for-the-app-version.md) | The app's version from package_info_plus | Accepted |
+| [0020](0020-url-launcher-for-the-rule-sheet-link.md) | The rule sheet link opens with url_launcher | Accepted |
