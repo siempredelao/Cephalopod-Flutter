@@ -62,5 +62,18 @@
 
   "howToPlayTitle": "Cómo se juega",
   "howToPlayNext": "Siguiente",
-  "howToPlayDone": "Entendido"
+  "howToPlayDone": "Entendido",
+
+  "howToPlayTakeTurnsTitle": "Se juega por turnos",
+  "howToPlayTakeTurnsBody": "El Jugador 1 lleva los dados coral y el Jugador 2, los crema. En tu turno, coloca un dado en cualquier casilla vacía. No puedes pasar.",
+  "howToPlayPlaceAOneTitle": "¿Nada que capturar? Pon un 1",
+  "howToPlayPlaceAOneBody": "Un dado toca las casillas de arriba, abajo, izquierda y derecha, nunca en diagonal. Cuando no hay dos de esos dados que sumen 6 o menos, tu dado nuevo muestra un 1.",
+  "howToPlayCaptureWhenYouCanTitle": "Captura cuando puedas",
+  "howToPlayCaptureWhenYouCanBody": "Cuando dos o más de esos dados suman 6 o menos, debes capturarlos, sean del color que sean.",
+  "howToPlayDieShowsTheSumTitle": "Tu dado muestra la suma",
+  "howToPlayDieShowsTheSumBody": "Los dados capturados salen del tablero, y tu dado nuevo muestra su total. Aquí, 2 + 3 = 5.",
+  "howToPlayChooseYourCaptureTitle": "Elige tu captura",
+  "howToPlayChooseYourCaptureBody": "Cuando más de un grupo suma 6 o menos, eliges cuál: toca sus dados y luego Capturar. Aquí, los dos 1, o un 1 con el 5.",
+  "howToPlayFillTheBoardTitle": "Llena el tablero para ganar",
+  "howToPlayFillTheBoardBody": "La partida termina cuando todas las casillas están ocupadas. Gana quien tenga más dados en el tablero: aquí, el Jugador 1 por 13 a 12."
 }

@@ -35,7 +35,10 @@ Inside presentation, views render UI models
 ([ADR 0015](adr/0015-views-render-ui-models.md)). Widgets in `view/` and the
 UI models in `models/` import neither the engine nor `domain/`; only the
 blocs and their mappers in `bloc/` do. Views reach `models/` and `bloc/`, UI
-models only other UI models, and blocs `models/` but never `view/`.
+models only other UI models, and blocs `models/` but never `view/`. No UI
+model carries finished text: it names a meaning, and a text mapper in
+`view/` words it, How to play's pages included
+([ADR 0018](adr/0018-how-to-play-text-is-translated.md)).
 
 Dependencies are wired by hand, in two levels
 ([ADR 0013](adr/0013-hand-written-feature-modules.md)):

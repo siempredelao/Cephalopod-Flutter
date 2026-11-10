@@ -24,3 +24,4 @@ supersedes an earlier one instead. Start new records from
 | [0015](0015-views-render-ui-models.md) | Views render UI models | Accepted |
 | [0016](0016-storage-failures-do-not-stop-the-game.md) | Storage failures are reported, and the game goes on | Accepted |
 | [0017](0017-translations-with-gen-l10n.md) | Translations with gen-l10n, English by default | Accepted |
+| [0018](0018-how-to-play-text-is-translated.md) | How to play's pages name a topic, and the view words it | Accepted |

@@ -1,5 +1,6 @@
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod/features/game/presentation/bloc/tutorial_steps.dart';
+import 'package:cephalopod/features/game/presentation/models/tutorial_topic.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -16,6 +17,12 @@ void main() {
   ];
 
   group('tutorialSteps', () {
+    test('teach every topic once, in order', () {
+      expect([
+        for (final step in tutorialSteps) step.topic,
+      ], TutorialTopic.values);
+    });
+
     test('R5: show exactly the capture choices the rules allow', () {
       final choosing = [
         for (final step in tutorialSteps)
@@ -44,7 +51,11 @@ void main() {
           status: step.example.game.status,
         );
 
-        expect(capturesAt(before, square), [<Position>{}], reason: step.title);
+        expect(
+          capturesAt(before, square),
+          [<Position>{}],
+          reason: step.topic.name,
+        );
       }
     });
 
