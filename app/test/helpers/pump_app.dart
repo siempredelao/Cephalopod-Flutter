@@ -30,16 +30,13 @@ Future<void> pumpApp(
     gameRepository: InMemoryGameRepository(),
     highlightLastMove: settings.highlightLastMove,
   );
+  final about = AboutModule(
+    appVersionSource:
+        appVersionSource ?? () async => (name: '1.2.0', buildNumber: '14'),
+  );
   final router = createRouter(
     home: HomeModule(hasGameToContinue: game.hasGameToContinue),
-    features: [
-      game,
-      settings,
-      AboutModule(
-        appVersionSource:
-            appVersionSource ?? () async => (name: '1.2.0', buildNumber: '14'),
-      ),
-    ],
+    features: [game, settings, about],
     initialLocation: location,
   );
   await tester.pumpWidget(

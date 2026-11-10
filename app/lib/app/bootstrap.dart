@@ -49,15 +49,12 @@ void bootstrap(Flavor flavor) {
     ),
     highlightLastMove: settings.highlightLastMove,
   );
+  final about = AboutModule(
+    appVersionSource: packageInfoAppVersionSource(errorReporter: logError),
+  );
   final router = createRouter(
     home: HomeModule(hasGameToContinue: game.hasGameToContinue),
-    features: [
-      game,
-      settings,
-      AboutModule(
-        appVersionSource: packageInfoAppVersionSource(errorReporter: logError),
-      ),
-    ],
+    features: [game, settings, about],
   );
 
   runApp(App(flavor: flavor, router: router, settings: settings.store));
