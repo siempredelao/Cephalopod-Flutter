@@ -1,10 +1,25 @@
 import 'package:bloc/bloc.dart';
+import 'package:cephalopod/features/about/domain/app_version_source.dart';
 import 'package:cephalopod/features/about/presentation/models/about_view_state.dart';
 
-/// The About page's view model. For now it only holds what the page shows;
-/// the app's version and the link to the rule sheet come next, and will
-/// change its state.
+/// The About page's view model: it looks up the app's version and shows it
+/// beside the address of the rule sheet.
 class AboutCubit extends Cubit<AboutViewState> {
-  AboutCubit({required Uri ruleSheet})
-    : super(AboutViewState(ruleSheetAddress: ruleSheet.toString()));
+  AboutCubit({
+    required this._appVersionSource,
+    required Uri ruleSheet,
+  }) : super(AboutViewState(ruleSheetAddress: ruleSheet.toString()));
+
+  final AppVersionSource _appVersionSource;
+
+  /// Shows the app's version, if it can be known.
+  Future<void> load() async {
+    final version = await _appVersionSource();
+    if (isClosed || version == null) return;
+    emit(
+      state.copyWith(
+        version: (version: version.name, build: version.buildNumber),
+      ),
+    );
+  }
 }

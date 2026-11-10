@@ -1,13 +1,18 @@
+import 'dart:async';
+
 import 'package:cephalopod/core/navigation/app_route.dart';
 import 'package:cephalopod/core/navigation/feature_module.dart';
+import 'package:cephalopod/features/about/domain/app_version_source.dart';
 import 'package:cephalopod/features/about/presentation/bloc/about_cubit.dart';
 import 'package:cephalopod/features/about/presentation/view/about_page.dart';
 import 'package:go_router/go_router.dart';
 
-/// Wires the about feature, which has no dependencies. Each visit to the
-/// page gets its own `AboutCubit`.
+/// Wires the about feature on the version source the composition root
+/// picks. Each visit to the page gets its own `AboutCubit`.
 final class AboutModule implements FeatureModule {
-  const AboutModule();
+  AboutModule({required this._appVersionSource});
+
+  final AppVersionSource _appVersionSource;
 
   /// The official rule sheet by Mark Steere, the game's inventor.
   static final Uri ruleSheet = Uri.parse(
@@ -23,5 +28,13 @@ final class AboutModule implements FeatureModule {
     ),
   ];
 
-  AboutCubit _createCubit() => AboutCubit(ruleSheet: ruleSheet);
+  AboutCubit _createCubit() {
+    final cubit = AboutCubit(
+      appVersionSource: _appVersionSource,
+      ruleSheet: ruleSheet,
+    );
+    // The version shows when it arrives; the page does not wait for it.
+    unawaited(cubit.load());
+    return cubit;
+  }
 }
