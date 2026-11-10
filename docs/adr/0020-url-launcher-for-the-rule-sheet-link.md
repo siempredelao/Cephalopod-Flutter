@@ -6,8 +6,9 @@
 ## Context
 
 The About page shows the address of Mark Steere's official rule sheet. Until
-now it was text that a person had to copy into a browser. Opening a browser
-is a platform call, which Dart alone cannot make.
+now it was text that a person had to copy into a browser. The page should
+also link to his website, as the app of his other game, Dipole, does.
+Opening a browser is a platform call, which Dart alone cannot make.
 
 [ADR 0019](0019-package-info-plus-for-the-app-version.md) added the first
 plugin of this kind, for the app's version, and set how such plugins are
@@ -16,8 +17,8 @@ kept apart from the rest of the app.
 ## Decision
 
 Add `url_launcher`, a plugin published by the Flutter team, and open the rule
-sheet with it in the phone's browser, outside the app
-(`LaunchMode.externalApplication`).
+sheet and Mark Steere's website with it in the phone's browser, outside the
+app (`LaunchMode.externalApplication`).
 
 As with the version, the plugin is used in one place, the data layer, and
 sits behind a type that the domain owns: `LinkOpener`, a function that opens
@@ -26,8 +27,8 @@ exists.
 
 It fails quietly ([ADR 0016](0016-storage-failures-do-not-stop-the-game.md)):
 a plugin that throws an `Exception` is reported and counts as "did not
-open". The page then says the link could not be opened, and shows the
-address as text to copy. An `Error` is a bug, so it goes on to the app-wide
+open". The page then says the link could not be opened, and shows that
+link's address as text to copy. An `Error` is a bug, so it goes on to the app-wide
 error reporting.
 
 ## Consequences

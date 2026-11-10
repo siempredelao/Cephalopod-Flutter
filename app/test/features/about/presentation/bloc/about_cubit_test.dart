@@ -6,11 +6,9 @@ import 'package:cephalopod/features/about/presentation/models/about_view_state.d
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  final website = Uri.parse('https://example.org');
   final ruleSheet = Uri.parse('https://example.org/rules.pdf');
-  const start = AboutViewState(
-    ruleSheetAddress: 'https://example.org/rules.pdf',
-  );
-
+  const start = AboutViewState();
   final opened = <Uri>[];
 
   AboutCubit build({
@@ -26,6 +24,7 @@ void main() {
             opened.add(address);
             return true;
           },
+      website: website,
       ruleSheet: ruleSheet,
     );
   }
@@ -33,7 +32,7 @@ void main() {
   setUp(opened.clear);
 
   group('AboutCubit', () {
-    test('starts with the rule sheet address and no version yet', () {
+    test('starts with no version and no failed link', () {
       expect(build().state, start);
     });
 
@@ -68,30 +67,33 @@ void main() {
       expect(cubit.state, start);
     });
 
-    test(
-      'opens the rule sheet, and has nothing to say when it opens',
-      () async {
-        final cubit = build();
+    test('opens the website and the rule sheet, each its own', () async {
+      final cubit = build();
 
-        await cubit.openRuleSheet();
+      await cubit.openWebsite();
+      await cubit.openRuleSheet();
 
-        expect(opened, [ruleSheet]);
-        expect(cubit.state.linkFailed, isFalse);
-        await cubit.close();
-      },
-    );
+      expect(opened, [website, ruleSheet]);
+      expect(cubit.state.failedLinkAddress, isNull);
+      await cubit.close();
+    });
 
     blocTest<AboutCubit, AboutViewState>(
-      'says the link failed when it does not open, and no more once it does',
+      'gives the address of a link that does not open, until one does',
       build: () {
         var opens = 0;
-        return build(linkOpener: (_) async => ++opens > 1);
+        return build(linkOpener: (_) async => ++opens > 2);
       },
       act: (cubit) async {
         await cubit.openRuleSheet();
-        await cubit.openRuleSheet();
+        await cubit.openWebsite();
+        await cubit.openWebsite();
       },
-      expect: () => [start.copyWith(linkFailed: true), start],
+      expect: () => [
+        start.copyWith(failedLinkAddress: 'https://example.org/rules.pdf'),
+        start.copyWith(failedLinkAddress: 'https://example.org'),
+        start,
+      ],
     );
 
     test('does not report a link that answers after it closes', () async {

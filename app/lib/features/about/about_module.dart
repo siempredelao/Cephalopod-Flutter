@@ -16,7 +16,10 @@ final class AboutModule implements FeatureModule {
   final AppVersionSource _appVersionSource;
   final LinkOpener _linkOpener;
 
-  /// The official rule sheet by Mark Steere, the game's inventor.
+  /// The website of Mark Steere, the game's designer.
+  static final Uri website = Uri.parse('https://www.marksteeregames.com');
+
+  /// The official rule sheet, on his website.
   static final Uri ruleSheet = Uri.parse(
     'https://www.marksteeregames.com/Cephalopod_rules.pdf',
   );
@@ -34,6 +37,7 @@ final class AboutModule implements FeatureModule {
     final cubit = AboutCubit(
       appVersionSource: _appVersionSource,
       linkOpener: _linkOpener,
+      website: website,
       ruleSheet: ruleSheet,
     );
     // The version shows when it arrives; the page does not wait for it.

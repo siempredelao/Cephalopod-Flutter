@@ -60,13 +60,23 @@
   "@aboutTitle": {
     "description": "About: the page's title."
   },
-  "aboutCredit": "Cephalopod was invented by Mark Steere on February 25, 2006. This app follows his rules without changes.",
-  "@aboutCredit": {
-    "description": "About: credits the game's inventor, as his rule sheet asks of anyone who programs the game."
+  "aboutDesignedBy": "Cephalopod was designed by Mark Steere.",
+  "@aboutDesignedBy": {
+    "description": "About: credits the game's designer, as his rule sheet asks of anyone who programs the game. The same wording as Mark Steere's other game in this family of apps, Dipole."
   },
-  "aboutOfficialRules": "Official rules",
+  "aboutMoreGames": "More games by Mark Steere: {website}",
+  "@aboutMoreGames": {
+    "description": "About: link to Mark Steere's website. {website} is its name, marksteeregames.com, which is not translated.",
+    "placeholders": {
+      "website": {
+        "type": "String",
+        "example": "marksteeregames.com"
+      }
+    }
+  },
+  "aboutOfficialRules": "Official rules (PDF)",
   "@aboutOfficialRules": {
-    "description": "About: heading above the link to the official rule sheet."
+    "description": "About: link that opens the official rule sheet, a PDF."
   },
   "aboutVersion": "Version {version} (build {build})",
   "@aboutVersion": {
@@ -84,7 +94,7 @@
   },
   "aboutLinkFailed": "The link could not be opened. Here is the address, to copy:",
   "@aboutLinkFailed": {
-    "description": "About: shown above the rule sheet's address when the browser could not be opened."
+    "description": "About: shown above a link's address when the browser could not open it."
   },
 
   "gamePlayerName": "Player {number}",

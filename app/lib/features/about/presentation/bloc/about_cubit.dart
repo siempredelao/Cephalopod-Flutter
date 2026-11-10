@@ -4,16 +4,19 @@ import 'package:cephalopod/features/about/domain/link_opener.dart';
 import 'package:cephalopod/features/about/presentation/models/about_view_state.dart';
 
 /// The About page's view model: it looks up the app's version, and opens
-/// the official rule sheet in the browser when asked.
+/// Mark Steere's website and the official rule sheet in the browser when
+/// asked.
 class AboutCubit extends Cubit<AboutViewState> {
   AboutCubit({
     required this._appVersionSource,
     required this._linkOpener,
+    required this._website,
     required this._ruleSheet,
-  }) : super(AboutViewState(ruleSheetAddress: _ruleSheet.toString()));
+  }) : super(const AboutViewState());
 
   final AppVersionSource _appVersionSource;
   final LinkOpener _linkOpener;
+  final Uri _website;
   final Uri _ruleSheet;
 
   /// Shows the app's version, if it can be known.
@@ -27,10 +30,17 @@ class AboutCubit extends Cubit<AboutViewState> {
     );
   }
 
-  /// Opens the rule sheet. When it does not open, the page says so.
-  Future<void> openRuleSheet() async {
-    final opened = await _linkOpener(_ruleSheet);
+  /// Opens Mark Steere's website.
+  Future<void> openWebsite() => _open(_website);
+
+  /// Opens the official rule sheet.
+  Future<void> openRuleSheet() => _open(_ruleSheet);
+
+  /// Opens [address]. When it does not open, the page says so and shows the
+  /// address; when it does, that note goes away.
+  Future<void> _open(Uri address) async {
+    final opened = await _linkOpener(address);
     if (isClosed) return;
-    emit(state.copyWith(linkFailed: !opened));
+    emit(state.copyWith(failedLinkAddress: opened ? null : '$address'));
   }
 }
