@@ -4,7 +4,11 @@ import 'package:cephalopod/features/game/presentation/models/player_ui.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// A [die] drawn as a rounded block with its pips on top, in its owner's
-/// colours. It fills the space it is given.
+/// colours, and an outline in the colour of its edge. It fills the space it
+/// is given.
+///
+/// The outline is what shows a die whose face is close to the square under
+/// it, such as the cream die on the light board.
 class DieFace extends StatelessWidget {
   const DieFace({required this.die, super.key});
 
@@ -57,6 +61,7 @@ class _DiePainter extends CustomPainter {
   static const double _edgeHeight = 0.08;
   static const double _pipRadius = 0.09;
   static const double _pipSpacing = 0.25;
+  static const double _outlineWidth = 0.05;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -73,10 +78,23 @@ class _DiePainter extends CustomPainter {
     );
     final radius = Radius.circular(side * _cornerRadius);
     final pip = Paint()..color = pipColor;
+    // Strokes are centred on the line, so the line sits half a width in.
+    final outlineWidth = side * _outlineWidth;
+    final outline = RRect.fromRectAndRadius(
+      body.deflate(outlineWidth / 2),
+      radius,
+    );
 
     canvas
       ..drawRRect(RRect.fromRectAndRadius(body, radius), Paint()..color = edge)
-      ..drawRRect(RRect.fromRectAndRadius(top, radius), Paint()..color = face);
+      ..drawRRect(RRect.fromRectAndRadius(top, radius), Paint()..color = face)
+      ..drawRRect(
+        outline,
+        Paint()
+          ..color = edge
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = outlineWidth,
+      );
     for (final (col, row) in _layouts[pips]!) {
       final centre = Offset(
         top.width * _pipSpacing * (col + 1),
