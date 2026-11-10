@@ -106,6 +106,10 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// one. Anything else that changes the game clears it.
   Move? _computerMove;
 
+  /// Whether a move just played, by either side, led to the game on screen.
+  /// Anything else that changes the game clears it.
+  bool _movePlayed = false;
+
   /// What the screen is waiting for.
   TurnPhase _turnPhase = const TurnPhase.awaitingPlacement();
 
@@ -255,7 +259,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   Future<void> _play(Move move, Emitter<GameViewState> emit) async {
     if (await _playMove(_currentGame, move) case Ok(:final value)) {
       _undone.clear();
-      _show(value, emit);
+      _show(value, emit, movePlayed: true);
     }
   }
 
@@ -297,7 +301,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     if (isClosed) return;
     switch (await _playMove(game, move)) {
       case Ok(:final value):
-        _show(value, emit, computerMove: move);
+        _show(value, emit, computerMove: move, movePlayed: true);
       case Err(:final error):
         throw StateError('The agent chose $move: $error');
     }
@@ -305,13 +309,17 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
 
   /// Keeps [game], the result of a use case, for the next move, and shows
   /// it. [computerMove] is the computer's move that led to it, if one did.
+  /// [movePlayed] says a move just played led to it, the computer's or the
+  /// person's, and not a turn taken back or played again, or another game.
   void _show(
     CurrentGame game,
     Emitter<GameViewState> emit, {
     Move? computerMove,
+    bool movePlayed = false,
   }) {
     _currentGame = game;
     _computerMove = computerMove;
+    _movePlayed = movePlayed;
     _turnPhase = _phaseOf(game);
     _emitScreen(emit);
   }
@@ -328,6 +336,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
       canUndo: _canUndo,
       canRedo: _undone.isNotEmpty,
       computerMove: _computerMove,
+      movePlayed: _movePlayed,
     );
     emit(screen);
   }

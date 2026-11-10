@@ -20,9 +20,10 @@ final class GameViewStateMapper {
 
   /// The screen for [game] against [opponent], waiting for [phase]. The
   /// board marks [lastMove] when [highlightLastMove] is on. Whether a turn
-  /// can be taken back or played again is the bloc's to say, and so is
+  /// can be taken back or played again is the bloc's to say. So is
   /// [computerMove], the move the computer played to reach this screen, if
-  /// it did.
+  /// it did, and [movePlayed], whether a move just played by either side led
+  /// here.
   GameViewState map({
     required GameState game,
     required Opponent opponent,
@@ -32,6 +33,7 @@ final class GameViewStateMapper {
     required bool canUndo,
     required bool canRedo,
     Move? computerMove,
+    bool movePlayed = false,
   }) {
     final boardUi = _boardUiMapper.map(
       game: game,
@@ -48,6 +50,7 @@ final class GameViewStateMapper {
       headline: headlineUi,
       capture: captureUi,
       computerMove: _computerMoveUiOf(computerMove, game),
+      movePlayed: movePlayed,
       canTap: canTap,
       canUndo: canUndo,
       canRedo: canRedo,

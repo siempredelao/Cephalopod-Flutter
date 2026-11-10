@@ -80,6 +80,7 @@ class GameView extends StatelessWidget {
                   child: Center(
                     child: GameBoard(
                       board: state.board,
+                      animateDice: state.movePlayed,
                       onSquareTapped: _tapHandlerOf(context, state),
                     ),
                   ),

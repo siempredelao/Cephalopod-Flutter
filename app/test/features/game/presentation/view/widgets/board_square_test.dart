@@ -24,8 +24,13 @@ void main() {
   );
 
   /// Shows [square] in a square of its own. Showing another one after it
-  /// updates the same widget, as the board does when a move is played.
-  Future<void> pumpSquare(WidgetTester tester, SquareUi square) {
+  /// updates the same widget, as the board does when the game changes:
+  /// with [animateDie] after a move, without it after anything else.
+  Future<void> pumpSquare(
+    WidgetTester tester,
+    SquareUi square, {
+    bool animateDie = true,
+  }) {
     return tester.pumpWidget(
       MaterialApp(
         localizationsDelegates: appLocalizationsDelegates,
@@ -34,7 +39,11 @@ void main() {
         home: Center(
           child: SizedBox.square(
             dimension: 80,
-            child: BoardSquare(square: square, onTap: null),
+            child: BoardSquare(
+              square: square,
+              animateDie: animateDie,
+              onTap: null,
+            ),
           ),
         ),
       ),
@@ -48,6 +57,22 @@ void main() {
       matching: find.byType(ScaleTransition),
     );
     return tester.widget<ScaleTransition>(transition).scale.value;
+  }
+
+  /// How solid the die on screen is drawn, from 0, unseen, to 1.
+  double dieOpacity(WidgetTester tester) {
+    final transition = find.descendant(
+      of: find.byType(BoardSquare),
+      matching: find.byType(FadeTransition),
+    );
+    return tester.widget<FadeTransition>(transition).opacity.value;
+  }
+
+  /// Tells the app that the device asks for less motion.
+  void askForLessMotion(WidgetTester tester) {
+    tester.platformDispatcher.accessibilityFeaturesTestValue =
+        const FakeAccessibilityFeatures(disableAnimations: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
   }
 
   group('BoardSquare', () {
@@ -80,14 +105,10 @@ void main() {
       await pumpSquare(tester, empty);
 
       await pumpSquare(tester, withDie);
-      final fade = find.descendant(
-        of: find.byType(BoardSquare),
-        matching: find.byType(FadeTransition),
-      );
 
-      expect(tester.widget<FadeTransition>(fade).opacity.value, 0);
+      expect(dieOpacity(tester), 0);
       await tester.pumpAndSettle();
-      expect(tester.widget<FadeTransition>(fade).opacity.value, 1);
+      expect(dieOpacity(tester), 1);
     });
 
     testWidgets('keeps the tile under the die while it grows', (tester) async {
@@ -116,27 +137,128 @@ void main() {
       expect(dieScale(tester), 1);
     });
 
-    testWidgets('takes a die away at once', (tester) async {
-      await pumpSquare(tester, withDie);
-      await tester.pumpAndSettle();
-
+    testWidgets('draws at once a die that appears without a move', (
+      tester,
+    ) async {
+      // A turn taken back brings captured dice back, for one.
       await pumpSquare(tester, empty);
 
-      expect(find.byType(DieFace), findsNothing);
+      await pumpSquare(tester, withDie, animateDie: false);
+
+      expect(dieScale(tester), 1);
+      expect(tester.hasRunningAnimations, isFalse);
     });
 
     testWidgets('draws the die at once when the device asks for less motion', (
       tester,
     ) async {
-      tester.platformDispatcher.accessibilityFeaturesTestValue =
-          const FakeAccessibilityFeatures(disableAnimations: true);
-      addTearDown(
-        tester.platformDispatcher.clearAccessibilityFeaturesTestValue,
-      );
+      askForLessMotion(tester);
       await pumpSquare(tester, empty);
 
       await pumpSquare(tester, withDie);
 
+      expect(dieScale(tester), 1);
+      expect(tester.hasRunningAnimations, isFalse);
+    });
+
+    testWidgets('shrinks a die out of its square when it goes away', (
+      tester,
+    ) async {
+      await pumpSquare(tester, withDie);
+
+      await pumpSquare(tester, empty);
+      // The die that was there is still drawn, whole.
+      expect(dieScale(tester), 1);
+      expect(dieOpacity(tester), 1);
+
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(dieScale(tester), allOf(greaterThan(0.5), lessThan(1)));
+      expect(dieOpacity(tester), allOf(greaterThan(0), lessThan(1)));
+
+      await tester.pumpAndSettle();
+      expect(find.byType(DieFace), findsNothing);
+    });
+
+    testWidgets('keeps the tile under the die while it shrinks', (
+      tester,
+    ) async {
+      await pumpSquare(tester, withDie);
+
+      await pumpSquare(tester, empty);
+      await tester.pump(const Duration(milliseconds: 100));
+
+      final square = tester.getSize(find.byType(BoardSquare));
+      final boxes = find.descendant(
+        of: find.byType(BoardSquare),
+        matching: find.byType(DecoratedBox),
+      );
+      expect(tester.getSize(boxes.at(1)), square - const Offset(12, 12));
+    });
+
+    testWidgets('takes a die away at once without a move', (tester) async {
+      // A turn taken back, or a new game.
+      await pumpSquare(tester, withDie);
+
+      await pumpSquare(tester, empty, animateDie: false);
+
+      expect(find.byType(DieFace), findsNothing);
+      expect(tester.hasRunningAnimations, isFalse);
+    });
+
+    testWidgets('takes a die away at once when the device asks for less '
+        'motion', (tester) async {
+      askForLessMotion(tester);
+      await pumpSquare(tester, withDie);
+
+      await pumpSquare(tester, empty);
+
+      expect(find.byType(DieFace), findsNothing);
+      expect(tester.hasRunningAnimations, isFalse);
+    });
+
+    testWidgets('grows a new die on a square whose die is still shrinking', (
+      tester,
+    ) async {
+      await pumpSquare(tester, withDie);
+      await pumpSquare(tester, empty);
+      await tester.pump(const Duration(milliseconds: 100));
+
+      const other = DieUi(
+        pips: 1,
+        owner: SideUi(player: PlayerUi.two, role: RoleUi.player),
+      );
+      await pumpSquare(tester, withDie.copyWith(die: other));
+
+      expect(tester.widget<DieFace>(find.byType(DieFace)).die, other);
+      expect(dieScale(tester), 0.5);
+      await tester.pumpAndSettle();
+      expect(dieScale(tester), 1);
+    });
+
+    testWidgets('brings back at once a die that was shrinking away', (
+      tester,
+    ) async {
+      // A capture taken back before its dice have gone.
+      await pumpSquare(tester, withDie);
+      await pumpSquare(tester, empty);
+      await tester.pump(const Duration(milliseconds: 100));
+
+      await pumpSquare(tester, withDie, animateDie: false);
+
+      expect(dieScale(tester), 1);
+      expect(tester.hasRunningAnimations, isFalse);
+    });
+
+    testWidgets('changes the die on a square at once', (tester) async {
+      await pumpSquare(tester, withDie);
+
+      const other = DieUi(
+        pips: 5,
+        owner: SideUi(player: PlayerUi.two, role: RoleUi.player),
+      );
+      await pumpSquare(tester, withDie.copyWith(die: other));
+
+      expect(tester.widget<DieFace>(find.byType(DieFace)).die, other);
       expect(dieScale(tester), 1);
       expect(tester.hasRunningAnimations, isFalse);
     });

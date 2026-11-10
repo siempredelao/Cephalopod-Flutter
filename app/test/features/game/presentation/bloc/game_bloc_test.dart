@@ -44,6 +44,7 @@ void main() {
     TurnPhase phase = const TurnPhase.awaitingPlacement(),
     Move? lastMove,
     Move? computerMove,
+    bool movePlayed = false,
     bool canUndo = false,
     bool canRedo = false,
     Opponent opponent = const FriendOpponent(),
@@ -57,6 +58,7 @@ void main() {
       canUndo: canUndo,
       canRedo: canRedo,
       computerMove: computerMove,
+      movePlayed: movePlayed,
     );
   }
 
@@ -124,6 +126,7 @@ void main() {
         screenOf(
           after(rules.newGame(), Move(center)),
           lastMove: Move(center),
+          movePlayed: true,
           canUndo: true,
         ),
       ],
@@ -156,6 +159,7 @@ void main() {
         screenOf(
           after(oneCapture, captureBoth),
           lastMove: captureBoth,
+          movePlayed: true,
           canUndo: true,
         ),
       ],
@@ -218,6 +222,7 @@ void main() {
         screenOf(
           after(figure4, Move(top, captures: {left, right})),
           lastMove: Move(top, captures: {left, right}),
+          movePlayed: true,
           canUndo: true,
         ),
       ],
@@ -274,6 +279,7 @@ void main() {
           after(lastSquare, Move(const Position(1, 1))),
           phase: const TurnPhase.gameEnded(blackWins),
           lastMove: Move(const Position(1, 1)),
+          movePlayed: true,
         ),
       ],
     );
@@ -322,6 +328,7 @@ void main() {
     final played = screenOf(
       after(rules.newGame(), Move(center)),
       lastMove: Move(center),
+      movePlayed: true,
       canUndo: true,
     );
     final undone = placing(rules.newGame()).copyWith(canRedo: true);
@@ -371,7 +378,12 @@ void main() {
         ..add(tap(center))
         ..add(const UndoRequested())
         ..add(const RedoRequested()),
-      expect: () => [played, undone, played],
+      expect: () => [
+        played,
+        undone,
+        // The move is back, but it was not just played.
+        played.copyWith(movePlayed: false),
+      ],
     );
 
     blocTest<GameBloc, GameViewState>(
@@ -387,6 +399,7 @@ void main() {
         screenOf(
           after(rules.newGame(), Move(top)),
           lastMove: Move(top),
+          movePlayed: true,
           canUndo: true,
         ),
       ],
@@ -474,11 +487,13 @@ void main() {
       afterCenter,
       phase: const TurnPhase.computerThinking(),
       lastMove: Move(center),
+      movePlayed: true,
       opponent: whiteComputer,
     );
     final replied = screenOf(
       after(afterCenter, reply),
       lastMove: reply,
+      movePlayed: true,
       computerMove: reply,
       canUndo: true,
       opponent: whiteComputer,
@@ -510,6 +525,7 @@ void main() {
           screenOf(
             after(start, opening),
             lastMove: opening,
+            movePlayed: true,
             computerMove: opening,
             opponent: blackComputer,
           ),
@@ -547,8 +563,8 @@ void main() {
         thinking,
         replied,
         waiting.copyWith(canRedo: true),
-        // The computer's move is back, but it did not just play it.
-        replied.copyWith(computerMove: null),
+        // Both moves are back, but they were not just played.
+        replied.copyWith(computerMove: null, movePlayed: false),
       ],
     );
 
