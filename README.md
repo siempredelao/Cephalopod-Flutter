@@ -97,8 +97,7 @@ rm -f test/widget_test.dart          # sample test from the template; not used h
 identifier `gc.david.cephalopod`.
 
 Commit the new `android/` and `ios/` folders and `.metadata`. CI then also runs
-an Android smoke build. The web is not a target: `app/web/` is left over from an
-earlier setup, and nothing builds or tests it.
+an Android smoke build. The web is not a target, so there is no `web/` folder.
 
 ## Quality gates
 
