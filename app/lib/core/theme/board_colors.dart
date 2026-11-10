@@ -30,10 +30,35 @@ class BoardColors extends ThemeExtension<BoardColors> {
     return Theme.of(context).extension<BoardColors>()!;
   }
 
-  /// The palette of the repository's social preview and the app icon (see
-  /// art/README.md): a dark teal board, coral and cream dice, and glowing
-  /// rings around marked squares.
+  /// The light theme's board: pale sage, with the dice in the same coral and
+  /// cream as on the dark board.
+  ///
+  /// The cream die is almost white, so on a pale square only its edge shows
+  /// it: that is a dark brown here, and `DieFace` draws it around the whole
+  /// die. The rings are darker than the dark board's glowing ones, to show
+  /// on a pale board. Every edge and ring has at least 3 to 1 contrast
+  /// against what it sits on (WCAG 1.4.11), which `board_colors_test.dart`
+  /// checks.
   static const BoardColors light = BoardColors(
+    board: Color(0xFFC9DED8),
+    boardEdge: Color(0xFF8FB3AA),
+    square: Color(0xFFEAF3F0),
+    blackDie: Color(0xFFFF7A5C),
+    blackDieEdge: Color(0xFFC24A30),
+    blackPips: Color(0xFF3A1208),
+    whiteDie: Color(0xFFF6F0E2),
+    whiteDieEdge: Color(0xFF7A6A44),
+    whitePips: Color(0xFF12312D),
+    lastMove: Color(0xFF0B7A6B),
+    captureTarget: Color(0xFFC2410C),
+    captureOption: Color(0xFF0B7A6B),
+    captureSelected: Color(0xFFB42318),
+  );
+
+  /// The dark theme's board, the palette of the repository's social preview
+  /// and the app icon (see art/README.md): a dark teal board, coral and
+  /// cream dice, and glowing rings around marked squares.
+  static const BoardColors dark = BoardColors(
     board: Color(0xFF0C3D37),
     boardEdge: Color(0xFF1D5E55),
     square: Color(0xFF082C28),
@@ -48,9 +73,6 @@ class BoardColors extends ThemeExtension<BoardColors> {
     captureOption: Color(0xFF5EEAD4),
     captureSelected: Color(0xFFFF7A5C),
   );
-
-  /// The board is already dark, so the dark theme keeps the same colours.
-  static const BoardColors dark = light;
 
   /// The panel the squares sit on, showing in the gaps between them.
   final Color board;
