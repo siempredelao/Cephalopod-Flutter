@@ -102,6 +102,10 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// it here; its state only describes the screen.
   CurrentGame _currentGame;
 
+  /// The move the computer played to reach the screen, while it is the last
+  /// one. Anything else that changes the game clears it.
+  Move? _computerMove;
+
   /// What the screen is waiting for.
   TurnPhase _turnPhase = const TurnPhase.awaitingPlacement();
 
@@ -293,16 +297,21 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     if (isClosed) return;
     switch (await _playMove(game, move)) {
       case Ok(:final value):
-        _show(value, emit);
+        _show(value, emit, computerMove: move);
       case Err(:final error):
         throw StateError('The agent chose $move: $error');
     }
   }
 
   /// Keeps [game], the result of a use case, for the next move, and shows
-  /// it.
-  void _show(CurrentGame game, Emitter<GameViewState> emit) {
+  /// it. [computerMove] is the computer's move that led to it, if one did.
+  void _show(
+    CurrentGame game,
+    Emitter<GameViewState> emit, {
+    Move? computerMove,
+  }) {
     _currentGame = game;
+    _computerMove = computerMove;
     _turnPhase = _phaseOf(game);
     _emitScreen(emit);
   }
@@ -318,6 +327,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
       highlightLastMove: _highlightLastMove,
       canUndo: _canUndo,
       canRedo: _undone.isNotEmpty,
+      computerMove: _computerMove,
     );
     emit(screen);
   }

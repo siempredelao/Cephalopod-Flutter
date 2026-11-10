@@ -5,6 +5,7 @@ import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/models/game_view_state.dart';
 import 'package:cephalopod/features/game/presentation/models/square_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/headline_text_mapper.dart';
+import 'package:cephalopod/features/game/presentation/view/spoken_headline_text_mapper.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/capture_controls.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,10 +18,12 @@ import 'package:material_ui/material_ui.dart';
 class GameView extends StatelessWidget {
   const GameView({
     this._headlineTextMapper = const HeadlineTextMapper(),
+    this._spokenHeadlineTextMapper = const SpokenHeadlineTextMapper(),
     super.key,
   });
 
   final HeadlineTextMapper _headlineTextMapper;
+  final SpokenHeadlineTextMapper _spokenHeadlineTextMapper;
 
   static const double _spacing = 16;
 
@@ -55,9 +58,22 @@ class GameView extends StatelessWidget {
           child: BlocBuilder<GameBloc, GameViewState>(
             builder: (context, state) => Column(
               children: [
-                Text(
-                  _headlineTextMapper.map(state.headline, context.l10n),
-                  style: Theme.of(context).textTheme.titleLarge,
+                // A live region: a screen reader says the line again whenever
+                // it changes, so the player hears whose turn it is, and what
+                // the computer did, without searching the screen. What it
+                // says is a little more than what is written.
+                Semantics(
+                  liveRegion: true,
+                  label: _spokenHeadlineTextMapper.map(
+                    state.headline,
+                    state.computerMove,
+                    context.l10n,
+                  ),
+                  excludeSemantics: true,
+                  child: Text(
+                    _headlineTextMapper.map(state.headline, context.l10n),
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
                 ),
                 const SizedBox(height: _spacing),
                 Expanded(

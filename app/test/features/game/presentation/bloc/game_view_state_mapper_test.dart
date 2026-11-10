@@ -4,6 +4,7 @@ import 'package:cephalopod/features/game/presentation/bloc/board_ui_mapper.dart'
 import 'package:cephalopod/features/game/presentation/bloc/game_view_state_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod/features/game/presentation/models/capture_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/computer_move_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/game_view_state.dart';
 import 'package:cephalopod/features/game/presentation/models/headline_ui.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
@@ -16,6 +17,7 @@ void main() {
   const left = Position(0, 1);
   const right = Position(0, 3);
   const center = Position(2, 2);
+  const below = Position(1, 2);
   const placing = TurnPhase.awaitingPlacement();
   const computer = ComputerOpponent(
     difficulty: Difficulty.easy,
@@ -42,6 +44,7 @@ void main() {
     Opponent opponent = const FriendOpponent(),
     bool canUndo = false,
     bool canRedo = false,
+    Move? computerMove,
   }) {
     return mapper.map(
       game: figure4,
@@ -51,6 +54,7 @@ void main() {
       highlightLastMove: true,
       canUndo: canUndo,
       canRedo: canRedo,
+      computerMove: computerMove,
     );
   }
 
@@ -117,6 +121,20 @@ void main() {
       );
 
       expect(map(phase: const TurnPhase.gameEnded(blackWins)).canTap, isFalse);
+    });
+
+    test('reports no computer move unless the computer just played', () {
+      expect(map().computerMove, isNull);
+    });
+
+    test('reports where the computer placed its die and what it shows', () {
+      // The 5 on the square below the top centre is the die that moved.
+      final screen = map(opponent: computer, computerMove: Move(below));
+
+      expect(
+        screen.computerMove,
+        const ComputerMoveUi(row: 1, col: 2, pips: 5),
+      );
     });
 
     test('passes on whether a turn can be undone or redone', () {

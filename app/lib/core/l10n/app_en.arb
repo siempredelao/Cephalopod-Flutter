@@ -136,6 +136,25 @@
     }
   },
 
+  "gameHeadlineAfterComputerMove": "The computer placed a {pips} at row {row}, column {column}. {headline}",
+  "@gameHeadlineAfterComputerMove": {
+    "description": "Game: what a screen reader says for the line above the board right after the computer moved, so one announcement tells both what it did and whose turn it is. {pips} is the number on the die it placed, 1 to 6; rows and columns count from 1 at the top left; {headline} is the line above the board, such as gameHeadlinePersonToMove.",
+    "placeholders": {
+      "pips": {
+        "type": "int"
+      },
+      "row": {
+        "type": "int"
+      },
+      "column": {
+        "type": "int"
+      },
+      "headline": {
+        "type": "String"
+      }
+    }
+  },
+
   "gameCaptureSum": "Capture sum: {selectedSum} of up to {maxSum}",
   "@gameCaptureSum": {
     "description": "Game: while the player picks dice to capture, the sum of their pips so far and the most a capture may add up to.",

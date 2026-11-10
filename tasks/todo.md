@@ -24,7 +24,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] 10. feat(game): translate the game screen and new-game dialog (S), after 8
 - [x] 11. feat(game): translate How to play (M), after 8
 - [x] 12. test(app): check the app in Spanish (S), after 9–11
-- [ ] 19. feat(game): announce the game's changes to screen readers (S)
+- [x] 19. feat(game): announce the game's changes to screen readers (S)
 - [ ] 20. test(app): check accessibility on every screen (S)
 - [ ] 21. feat(app): give the board a palette for each theme (M)
 - [ ] 22. feat(game): animate placing a die (S)

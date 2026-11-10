@@ -58,6 +58,19 @@ void main() {
       expect(find.byType(CaptureControls), findsNothing);
     });
 
+    testWidgets('announces the line above the board as it changes', (
+      tester,
+    ) async {
+      final semantics = tester.ensureSemantics();
+      await pumpGame(tester);
+
+      expect(
+        tester.getSemantics(find.text('Player 1 to move')),
+        matchesSemantics(label: 'Player 1 to move', isLiveRegion: true),
+      );
+      semantics.dispose();
+    });
+
     testWidgets('places a die on the tapped square', (tester) async {
       await pumpGame(tester);
 
@@ -222,6 +235,34 @@ void main() {
         await pumpAgainst(tester, Player.white);
 
         expect(find.text('Your turn'), findsOne);
+      });
+
+      testWidgets('says what the computer played, with whose turn it is', (
+        tester,
+      ) async {
+        final semantics = tester.ensureSemantics();
+        await pumpAgainst(tester, Player.black);
+
+        // The computer's first legal move is the top left square.
+        expect(
+          tester.getSemantics(find.text('Your turn')),
+          matchesSemantics(
+            label: 'The computer placed a 1 at row 1, column 1. Your turn',
+            isLiveRegion: true,
+          ),
+        );
+
+        // The person moves and the computer replies: the line is about its
+        // new move, not the old one.
+        await tapSquare(tester, const Position(2, 2));
+        expect(
+          tester.getSemantics(find.text('Your turn')),
+          matchesSemantics(
+            label: 'The computer placed a 1 at row 1, column 2. Your turn',
+            isLiveRegion: true,
+          ),
+        );
+        semantics.dispose();
       });
 
       testWidgets('R8: says when the person won', (tester) async {
