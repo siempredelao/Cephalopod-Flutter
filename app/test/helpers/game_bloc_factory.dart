@@ -7,6 +7,7 @@ import 'package:cephalopod/features/game/domain/use_cases/play_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/resume_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/start_new_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/undo_move.dart';
+import 'package:cephalopod/features/game/presentation/bloc/countdown_timer.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
@@ -17,7 +18,8 @@ import 'computer_turns.dart';
 ///
 /// The computer plays its first legal move, unless [agentFactory] gives
 /// another agent, on the test's isolate unless [backgroundRunner] says
-/// otherwise. The bloc starts from a new game under [config], or from
+/// otherwise. After a move, the bloc runs [moveCountdown], which has no
+/// length by default. The bloc starts from a new game under [config], or from
 /// [position] when given.
 GameBloc createTestGameBloc({
   GameRepository? repository,
@@ -25,6 +27,7 @@ GameBloc createTestGameBloc({
   GameState? position,
   BackgroundRunner backgroundRunner = runHere,
   AgentFactory? agentFactory,
+  CountdownTimer? moveCountdown,
 }) {
   final rules = CephalopodRules();
   final games = repository ?? InMemoryGameRepository();
@@ -46,6 +49,7 @@ GameBloc createTestGameBloc({
     undoMove: undoMove,
     resumeGame: resumeGame,
     chooseAgentMove: chooseAgentMove,
+    moveCountdown: moveCountdown,
     config: config,
     position: position,
   );
