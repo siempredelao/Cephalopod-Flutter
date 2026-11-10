@@ -20,11 +20,31 @@ void main() {
       expect(find.widgetWithText(SelectableText, address), findsOne);
     });
 
+    testWidgets('shows the version and build number under the title', (
+      tester,
+    ) async {
+      await pumpApp(tester, location: '/about');
+
+      expect(find.text('Version 1.2.0 (build 14)'), findsOne);
+    });
+
+    testWidgets('shows no version when it cannot be known', (tester) async {
+      await pumpApp(
+        tester,
+        location: '/about',
+        appVersionSource: () async => null,
+      );
+
+      expect(find.textContaining('Version'), findsNothing);
+      expect(find.textContaining('Mark Steere'), findsOne);
+    });
+
     testWidgets('speaks Spanish', (tester) async {
       useSmallPhone(tester, const Locale('es', 'ES'));
 
       await pumpApp(tester, location: '/about');
 
+      expect(find.text('Versión 1.2.0 (compilación 14)'), findsOne);
       expect(find.text('Acerca de'), findsOne);
       expect(find.text('Reglas oficiales'), findsOne);
       expect(find.widgetWithText(SelectableText, address), findsOne);

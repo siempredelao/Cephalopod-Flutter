@@ -68,6 +68,20 @@
   "@aboutOfficialRules": {
     "description": "About: heading above the link to the official rule sheet."
   },
+  "aboutVersion": "Version {version} (build {build})",
+  "@aboutVersion": {
+    "description": "About: under the game's name, the app's version and its build number.",
+    "placeholders": {
+      "version": {
+        "type": "String",
+        "example": "1.2.0"
+      },
+      "build": {
+        "type": "String",
+        "example": "14"
+      }
+    }
+  },
 
   "gamePlayerName": "Player {number}",
   "@gamePlayerName": {

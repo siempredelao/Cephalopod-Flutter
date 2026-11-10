@@ -20,6 +20,7 @@
   "aboutTitle": "Acerca de",
   "aboutCredit": "Mark Steere inventó Cephalopod el 25 de febrero de 2006. Esta aplicación sigue sus reglas sin cambios.",
   "aboutOfficialRules": "Reglas oficiales",
+  "aboutVersion": "Versión {version} (compilación {build})",
 
   "gamePlayerName": "Jugador {number}",
 
