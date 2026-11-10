@@ -21,7 +21,7 @@ void main() {
           tester,
         ) async {
           final semantics = tester.ensureSemantics();
-          usePhone(tester, locale);
+          useSmallPhone(tester, locale);
           await screen.open(tester, words);
 
           await expectLater(tester, meetsGuideline(androidTapTargetGuideline));

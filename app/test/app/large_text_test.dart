@@ -21,7 +21,7 @@ void main() {
         testWidgets('${screen.name} fits at twice the text size', (
           tester,
         ) async {
-          usePhone(tester, locale);
+          useSmallPhone(tester, locale);
           tester.platformDispatcher.textScaleFactorTestValue = 2;
           addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
           await screen.open(tester, words);

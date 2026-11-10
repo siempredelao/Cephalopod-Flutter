@@ -33,7 +33,7 @@ void main() {
       tester,
     ) async {
       final words = lookupAppLocalizations(locale);
-      usePhone(tester, locale);
+      useSmallPhone(tester, locale);
       await pumpApp(tester);
       await tester.tap(find.byType(FilledButton));
       await tester.pumpAndSettle();

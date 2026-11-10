@@ -6,7 +6,7 @@ const Size smallPhone = Size(360, 800);
 
 /// Shows the test on a [smallPhone] whose language is [locale]. The test puts
 /// both back when it ends.
-void usePhone(WidgetTester tester, Locale locale) {
+void useSmallPhone(WidgetTester tester, Locale locale) {
   tester.view
     ..physicalSize = smallPhone
     ..devicePixelRatio = 1;
