@@ -6,9 +6,13 @@ import 'package:cephalopod/features/game/presentation/view/square_text_mapper.da
 import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// One [square] of the board: a dark tile or the die on it, with a glowing
-/// ring around it when it has a mark. Screen readers announce where it is
-/// and what is on it.
+/// One [square] of the board: a tile or the die on it, with a glowing ring
+/// around it when it has a mark. Screen readers announce where it is and what
+/// is on it.
+///
+/// A die that appears on a square grows into it, unless the device asks for
+/// less motion. A die that goes away, and a die already there when the
+/// square first shows, are drawn at once.
 class BoardSquare extends StatelessWidget {
   const BoardSquare({
     required this.square,
@@ -31,6 +35,16 @@ class BoardSquare extends StatelessWidget {
 
   /// Room for the ring, so the tile is the same size whether marked or not.
   static const double _ringInset = 6;
+
+  /// How long a new die takes to grow into its square: long enough to see,
+  /// short enough that the next move is not kept waiting.
+  static const Duration _growDuration = Duration(milliseconds: 200);
+
+  /// The size a die starts growing from, as a fraction of its full size.
+  static const double _growFrom = 0.5;
+
+  static const Key _emptyKey = ValueKey('empty');
+  static const Key _dieKey = ValueKey('die');
 
   @override
   Widget build(BuildContext context) {
@@ -55,11 +69,47 @@ class BoardSquare extends StatelessWidget {
         child: Container(
           decoration: _ringOf(markColor),
           padding: const EdgeInsets.all(_ringInset),
-          child: die == null
-              ? DecoratedBox(decoration: _tileOf(colors.square))
-              : DieFace(die: die),
+          // The tile stays under the die, so the die grows out of the square
+          // it is placed on.
+          child: DecoratedBox(
+            decoration: _tileOf(colors.square),
+            child: AnimatedSwitcher(
+              duration: MediaQuery.disableAnimationsOf(context)
+                  ? Duration.zero
+                  : _growDuration,
+              // A die that goes away does so at once; capturing has its own
+              // animation.
+              reverseDuration: Duration.zero,
+              switchInCurve: Curves.easeOutCubic,
+              transitionBuilder: _grow,
+              layoutBuilder: _fill,
+              child: die == null
+                  ? const SizedBox.expand(key: _emptyKey)
+                  : DieFace(key: _dieKey, die: die),
+            ),
+          ),
         ),
       ),
+    );
+  }
+
+  /// Fades and scales a die in as it appears.
+  static Widget _grow(Widget child, Animation<double> animation) {
+    if (child.key != _dieKey) return child;
+    return FadeTransition(
+      opacity: animation,
+      child: ScaleTransition(
+        scale: Tween<double>(begin: _growFrom, end: 1).animate(animation),
+        child: child,
+      ),
+    );
+  }
+
+  /// Stacks the old and the new child, each filling the square.
+  static Widget _fill(Widget? current, List<Widget> previous) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [...previous, ?current],
     );
   }
 
