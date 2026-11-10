@@ -2,9 +2,8 @@ import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/features/game/presentation/bloc/how_to_play_cubit.dart';
 import 'package:cephalopod/features/game/presentation/models/how_to_play_view_state.dart';
 import 'package:cephalopod/features/game/presentation/models/tutorial_right_button_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/tutorial_step_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/step_dots.dart';
-import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
+import 'package:cephalopod/features/game/presentation/view/how_to_play/tutorial_step_view.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -83,7 +82,8 @@ class _TutorialPagesState extends State<_TutorialPages> {
                   controller: _pageController,
                   onPageChanged: cubit.showStep,
                   children: [
-                    for (final step in state.steps) _StepView(step: step),
+                    for (final step in state.steps)
+                      TutorialStepView(step: step),
                   ],
                 ),
               ),
@@ -108,63 +108,6 @@ class _TutorialPagesState extends State<_TutorialPages> {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// One page: the example board, then the title and the explanation.
-class _StepView extends StatelessWidget {
-  const _StepView({required this.step});
-
-  final TutorialStepUi step;
-
-  /// The board and the text get fixed shares of the page, whatever the text
-  /// says, so the board is in the same place on every page.
-  static const int _boardShare = 3;
-  static const int _textShare = 2;
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    return Padding(
-      padding: const EdgeInsets.all(_spacing),
-      child: Column(
-        children: [
-          // An illustration: the text says everything a screen reader needs,
-          // and its squares do nothing when tapped.
-          Expanded(
-            flex: _boardShare,
-            child: Center(
-              child: ExcludeSemantics(
-                child: IgnorePointer(
-                  child: GameBoard(board: step.board, onSquareTapped: null),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: _spacing),
-          Expanded(
-            flex: _textShare,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Text(
-                    step.title,
-                    style: textTheme.headlineSmall,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: _spacing / 2),
-                  Text(
-                    step.body,
-                    style: textTheme.bodyLarge,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

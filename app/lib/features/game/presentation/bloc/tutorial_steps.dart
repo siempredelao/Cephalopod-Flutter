@@ -1,5 +1,6 @@
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod/features/game/presentation/bloc/tutorial_step.dart';
+import 'package:cephalopod/features/game/presentation/models/tutorial_topic.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
 const Position _centre = Position(2, 2);
@@ -8,52 +9,29 @@ const Position _left = Position(2, 1);
 const Position _right = Position(2, 3);
 const Position _below = Position(3, 2);
 
-/// The pages of the how-to-play tutorial, in order. Every example is a real
-/// position, and the tests check it against the engine's rules.
+/// The pages of the how-to-play tutorial, in order: one per [TutorialTopic].
+/// Every example is a real position, and the tests check it against the
+/// engine's rules.
+///
+/// The words for each topic are in the translation files, and they describe
+/// these examples: their colours, "2 + 3 = 5", "13 to 12". A test checks that
+/// the numbers still match after a change here.
 final List<TutorialStep> tutorialSteps = [
+  TutorialStep(topic: TutorialTopic.takeTurns, example: _takingTurns()),
+  TutorialStep(topic: TutorialTopic.placeAOne, example: _placingAOne()),
   TutorialStep(
-    title: 'Take turns',
-    body:
-        'Player 1 plays the coral dice and Player 2 the cream ones. On your '
-        'turn, place one die on any empty square. You cannot pass.',
-    example: _takingTurns(),
-  ),
-  TutorialStep(
-    title: 'Nothing to capture? Place a 1',
-    body:
-        'A die touches the squares above, below, left and right of it, never '
-        'diagonally. When no two of those dice add up to 6 or less, your new '
-        'die shows 1.',
-    example: _placingAOne(),
-  ),
-  TutorialStep(
-    title: 'Capture when you can',
-    body:
-        'When two or more of those dice add up to 6 or less, you must '
-        'capture them, whatever their colour.',
+    topic: TutorialTopic.captureWhenYouCan,
     example: _mustCapture(),
   ),
   TutorialStep(
-    title: 'Your die shows the sum',
-    body:
-        'The captured dice leave the board, and your new die shows their '
-        'total. Here, 2 + 3 = 5.',
+    topic: TutorialTopic.dieShowsTheSum,
     example: _showingTheSum(),
   ),
   TutorialStep(
-    title: 'Choose your capture',
-    body:
-        'When more than one set adds up to 6 or less, you choose which: tap '
-        'its dice, then Capture. Here, the two 1s, or a 1 with the 5.',
+    topic: TutorialTopic.chooseYourCapture,
     example: _choosingACapture(),
   ),
-  TutorialStep(
-    title: 'Fill the board to win',
-    body:
-        'The game ends when every square is full. The player with more dice '
-        'on the board wins: here, Player 1 by 13 to 12.',
-    example: _fullBoard(),
-  ),
+  TutorialStep(topic: TutorialTopic.fillTheBoard, example: _fullBoard()),
 ];
 
 TutorialExample _takingTurns() {

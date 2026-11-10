@@ -312,5 +312,54 @@
   "howToPlayDone": "Got it",
   "@howToPlayDone": {
     "description": "How to play: button on the last page that leaves the tutorial."
+  },
+
+  "howToPlayTakeTurnsTitle": "Take turns",
+  "@howToPlayTakeTurnsTitle": {
+    "description": "How to play, page 1: its title. The board under it shows a few dice of both colours."
+  },
+  "howToPlayTakeTurnsBody": "Player 1 plays the coral dice and Player 2 the cream ones. On your turn, place one die on any empty square. You cannot pass.",
+  "@howToPlayTakeTurnsBody": {
+    "description": "How to play, page 1: its explanation. Name the players as the game screen does, and the colours as the dice are drawn."
+  },
+  "howToPlayPlaceAOneTitle": "Nothing to capture? Place a 1",
+  "@howToPlayPlaceAOneTitle": {
+    "description": "How to play, page 2: its title. The board shows a new die with 1 pip next to a 5 and a 4."
+  },
+  "howToPlayPlaceAOneBody": "A die touches the squares above, below, left and right of it, never diagonally. When no two of those dice add up to 6 or less, your new die shows 1.",
+  "@howToPlayPlaceAOneBody": {
+    "description": "How to play, page 2: its explanation. 'Those dice' are the ones on the squares the new die touches."
+  },
+  "howToPlayCaptureWhenYouCanTitle": "Capture when you can",
+  "@howToPlayCaptureWhenYouCanTitle": {
+    "description": "How to play, page 3: its title. The board shows an empty square next to a 2 and a 3, which can be captured, and a 5."
+  },
+  "howToPlayCaptureWhenYouCanBody": "When two or more of those dice add up to 6 or less, you must capture them, whatever their colour.",
+  "@howToPlayCaptureWhenYouCanBody": {
+    "description": "How to play, page 3: its explanation. 'Those dice' are the ones on the squares the new die touches, as on page 2."
+  },
+  "howToPlayDieShowsTheSumTitle": "Your die shows the sum",
+  "@howToPlayDieShowsTheSumTitle": {
+    "description": "How to play, page 4: its title. The board shows page 3's capture done: the 2 and the 3 are gone, and the new die shows 5."
+  },
+  "howToPlayDieShowsTheSumBody": "The captured dice leave the board, and your new die shows their total. Here, 2 + 3 = 5.",
+  "@howToPlayDieShowsTheSumBody": {
+    "description": "How to play, page 4: its explanation. Keep '2 + 3 = 5' as it is: a test checks it against the board."
+  },
+  "howToPlayChooseYourCaptureTitle": "Choose your capture",
+  "@howToPlayChooseYourCaptureTitle": {
+    "description": "How to play, page 5: its title. The board shows an empty square next to two 1s and a 5, with one of the 1s picked."
+  },
+  "howToPlayChooseYourCaptureBody": "When more than one set adds up to 6 or less, you choose which: tap its dice, then Capture. Here, the two 1s, or a 1 with the 5.",
+  "@howToPlayChooseYourCaptureBody": {
+    "description": "How to play, page 5: its explanation. 'Capture' is the game screen's button, so word it as that button is worded."
+  },
+  "howToPlayFillTheBoardTitle": "Fill the board to win",
+  "@howToPlayFillTheBoardTitle": {
+    "description": "How to play, page 6: its title. The board is full: 13 dice of Player 1 and 12 of Player 2."
+  },
+  "howToPlayFillTheBoardBody": "The game ends when every square is full. The player with more dice on the board wins: here, Player 1 by 13 to 12.",
+  "@howToPlayFillTheBoardBody": {
+    "description": "How to play, page 6: its explanation. Keep the numbers 13 and 12 as they are: a test checks them against the board."
   }
 }

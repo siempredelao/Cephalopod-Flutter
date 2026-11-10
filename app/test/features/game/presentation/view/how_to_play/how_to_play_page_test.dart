@@ -6,10 +6,16 @@ import 'package:cephalopod/features/game/presentation/view/widgets/game_board.da
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../../../helpers/translations.dart';
+
 void main() {
-  Future<void> pumpTutorial(WidgetTester tester) {
+  Future<void> pumpTutorial(
+    WidgetTester tester, {
+    Locale locale = const Locale('en'),
+  }) {
     return tester.pumpWidget(
       MaterialApp(
+        locale: locale,
         localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         theme: ThemeData(extensions: const [BoardColors.light]),
@@ -27,8 +33,17 @@ void main() {
     testWidgets('starts on the first step, with its board', (tester) async {
       await pumpTutorial(tester);
 
-      expect(find.text(tutorialSteps.first.title), findsOne);
+      expect(find.text(english.howToPlayTakeTurnsTitle), findsOne);
       expect(find.byType(GameBoard), findsOne);
+    });
+
+    testWidgets('speaks Spanish', (tester) async {
+      await pumpTutorial(tester, locale: const Locale('es'));
+
+      expect(find.widgetWithText(AppBar, 'Cómo se juega'), findsOne);
+      expect(find.text('Se juega por turnos'), findsOne);
+      expect(find.textContaining('coloca un dado'), findsOne);
+      expect(find.widgetWithText(FilledButton, 'Siguiente'), findsOne);
     });
 
     testWidgets('turns the page on Next', (tester) async {
@@ -36,8 +51,8 @@ void main() {
 
       await tapNext(tester);
 
-      expect(find.text(tutorialSteps[1].title), findsOne);
-      expect(find.text(tutorialSteps.first.title), findsNothing);
+      expect(find.text(english.howToPlayPlaceAOneTitle), findsOne);
+      expect(find.text(english.howToPlayTakeTurnsTitle), findsNothing);
     });
 
     testWidgets('keeps the board in the same place on every page', (
@@ -58,7 +73,7 @@ void main() {
       await tester.fling(find.byType(PageView), const Offset(-400, 0), 1000);
       await tester.pumpAndSettle();
 
-      expect(find.text(tutorialSteps[1].title), findsOne);
+      expect(find.text(english.howToPlayPlaceAOneTitle), findsOne);
     });
 
     testWidgets('says which step is showing', (tester) async {
@@ -89,7 +104,7 @@ void main() {
       for (var step = 1; step < tutorialSteps.length; step++) {
         await tapNext(tester);
       }
-      expect(find.text(tutorialSteps.last.title), findsOne);
+      expect(find.text(english.howToPlayFillTheBoardTitle), findsOne);
       await tester.tap(find.widgetWithText(FilledButton, 'Got it'));
       await tester.pumpAndSettle();
 

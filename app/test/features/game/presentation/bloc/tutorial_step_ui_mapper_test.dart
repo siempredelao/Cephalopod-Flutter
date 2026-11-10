@@ -6,6 +6,7 @@ import 'package:cephalopod/features/game/presentation/models/player_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/role_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/side_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/square_mark.dart';
+import 'package:cephalopod/features/game/presentation/models/tutorial_topic.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:cephalopod_engine/testing.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,8 +17,7 @@ void main() {
 
   /// A step whose example has Player 2 just placed on the centre.
   final step = TutorialStep(
-    title: 'Take turns',
-    body: 'On your turn, place one die on any empty square.',
+    topic: TutorialTopic.takeTurns,
     example: (
       game: stateFromAscii('''
         .  .  .
@@ -30,11 +30,8 @@ void main() {
   );
 
   group('TutorialStepUiMapper', () {
-    test("keeps the step's title and body", () {
-      final stepUi = mapper.map(step);
-
-      expect(stepUi.title, step.title);
-      expect(stepUi.body, step.body);
+    test("keeps the step's topic", () {
+      expect(mapper.map(step).topic, TutorialTopic.takeTurns);
     });
 
     test('draws the example between two people, last move marked', () {
