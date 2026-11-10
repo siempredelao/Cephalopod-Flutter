@@ -48,10 +48,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: web
-            command: >-
-              flutter build web --release
-              --base-href /${{ github.event.repository.name }}/
           - platform: android
             command: flutter build apk --debug
     steps:

@@ -89,15 +89,16 @@ Generate them once from `app/`:
 
 ```sh
 cd app
-flutter create --platforms=android,ios,web --org gc.david --project-name cephalopod .
+flutter create --platforms=android,ios --org gc.david --project-name cephalopod .
 rm -f test/widget_test.dart          # sample test from the template; not used here
 ```
 
 `--org gc.david` plus the project name gives the application ID and bundle
 identifier `gc.david.cephalopod`.
 
-Commit the new `android/`, `ios/`, `web/` folders and `.metadata`. CI then also
-runs Android and web smoke builds.
+Commit the new `android/` and `ios/` folders and `.metadata`. CI then also runs
+an Android smoke build. The web is not a target: `app/web/` is left over from an
+earlier setup, and nothing builds or tests it.
 
 ## Quality gates
 
@@ -109,7 +110,7 @@ Every push and pull request runs, in order:
 4. Architecture check
 5. Engine tests, 100% line coverage required
 6. App tests, 85% line coverage required
-7. Android APK and web smoke builds
+7. Android APK smoke build
 
 Run the same checks locally with `dart run melos run verify`. Optional git
 hooks: install [lefthook](https://lefthook.dev) and run `lefthook install`.
@@ -125,9 +126,9 @@ hooks: install [lefthook](https://lefthook.dev) and run `lefthook install`.
 - [ ] **M5 · Polish**: accessibility, English and Spanish, placement and capture
   animations, light and dark board palettes, rule-sheet link and app version on
   About, goldens
-- [ ] **M6 · Release v1.0**: launcher icons and splash screen, playable web
-  build on GitHub Pages
-- [ ] **M7 · Google Play**: crash reporting, release signing, store listing
+- [ ] ~~**M6 · Release v1.0**~~ Dropped: the web build is not planned
+- [ ] **M7 · Google Play**: launcher icons and splash screen, crash reporting,
+  release signing, store listing and screenshots
 
 ## Contributing
 
