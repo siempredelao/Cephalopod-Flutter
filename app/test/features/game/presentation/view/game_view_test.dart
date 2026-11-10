@@ -80,6 +80,30 @@ void main() {
       expect(find.text('Player 2 to move'), findsOne);
     });
 
+    testWidgets('grows the die placed by a tap', (tester) async {
+      // On the real screen, where the new die is also marked as the last
+      // move: the square alone, without that mark, is not the whole story.
+      await pumpGame(tester);
+      final square = find.byKey(const ValueKey((2, 2)));
+      double dieScale() {
+        final transition = find.descendant(
+          of: square,
+          matching: find.byType(ScaleTransition),
+        );
+        return tester.widget<ScaleTransition>(transition).scale.value;
+      }
+
+      await tester.tap(square);
+      await tester.pump();
+      expect(dieScale(), 0.5);
+
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(dieScale(), allOf(greaterThan(0.5), lessThan(1)));
+
+      await tester.pumpAndSettle();
+      expect(dieScale(), 1);
+    });
+
     testWidgets('takes back a move and plays it again', (tester) async {
       await pumpGame(tester);
       await tapSquare(tester, const Position(2, 2));

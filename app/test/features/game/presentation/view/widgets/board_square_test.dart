@@ -64,6 +64,18 @@ void main() {
       expect(dieScale(tester), 1);
     });
 
+    testWidgets('grows a die that gets a ring as it appears', (tester) async {
+      // In a game the new die is also the last move, so its ring appears in
+      // the same frame. The ring must not stop the die from growing.
+      await pumpSquare(tester, empty);
+
+      await pumpSquare(tester, withDie.copyWith(mark: SquareMark.lastMove));
+      expect(dieScale(tester), 0.5);
+
+      await tester.pumpAndSettle();
+      expect(dieScale(tester), 1);
+    });
+
     testWidgets('fades the die in as it grows', (tester) async {
       await pumpSquare(tester, empty);
 
@@ -84,13 +96,14 @@ void main() {
       await pumpSquare(tester, withDie);
       await tester.pump(const Duration(milliseconds: 50));
 
-      // The tile is the square's whole size, and the die is drawn over it.
+      // The first box is the ring's, the second the tile. The tile fills
+      // the square but for the ring's room, and the die is drawn over it.
       final square = tester.getSize(find.byType(BoardSquare));
-      final tile = find.descendant(
+      final boxes = find.descendant(
         of: find.byType(BoardSquare),
         matching: find.byType(DecoratedBox),
       );
-      expect(tester.getSize(tile.first), square - const Offset(12, 12));
+      expect(tester.getSize(boxes.at(1)), square - const Offset(12, 12));
       expect(find.byType(DieFace), findsOne);
     });
 

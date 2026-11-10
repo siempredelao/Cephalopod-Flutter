@@ -66,26 +66,31 @@ class BoardSquare extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
-        child: Container(
+        // The ring's box is there even without a ring. A box that came and
+        // went with the mark would make Flutter build everything inside it
+        // again, and a die built again does not grow: it is simply there.
+        child: DecoratedBox(
           decoration: _ringOf(markColor),
-          padding: const EdgeInsets.all(_ringInset),
-          // The tile stays under the die, so the die grows out of the square
-          // it is placed on.
-          child: DecoratedBox(
-            decoration: _tileOf(colors.square),
-            child: AnimatedSwitcher(
-              duration: MediaQuery.disableAnimationsOf(context)
-                  ? Duration.zero
-                  : _growDuration,
-              // A die that goes away does so at once; capturing has its own
-              // animation.
-              reverseDuration: Duration.zero,
-              switchInCurve: Curves.easeOutCubic,
-              transitionBuilder: _grow,
-              layoutBuilder: _fill,
-              child: die == null
-                  ? const SizedBox.expand(key: _emptyKey)
-                  : DieFace(key: _dieKey, die: die),
+          child: Padding(
+            padding: const EdgeInsets.all(_ringInset),
+            // The tile stays under the die, so the die grows out of the
+            // square it is placed on.
+            child: DecoratedBox(
+              decoration: _tileOf(colors.square),
+              child: AnimatedSwitcher(
+                duration: MediaQuery.disableAnimationsOf(context)
+                    ? Duration.zero
+                    : _growDuration,
+                // A die that goes away does so at once; capturing has its
+                // own animation.
+                reverseDuration: Duration.zero,
+                switchInCurve: Curves.easeOutCubic,
+                transitionBuilder: _grow,
+                layoutBuilder: _fill,
+                child: die == null
+                    ? const SizedBox.expand(key: _emptyKey)
+                    : DieFace(key: _dieKey, die: die),
+              ),
             ),
           ),
         ),
@@ -113,9 +118,10 @@ class BoardSquare extends StatelessWidget {
     );
   }
 
-  /// A glowing ring in [color] around the tile, or none without a colour.
-  static BoxDecoration? _ringOf(Color? color) {
-    if (color == null) return null;
+  /// A glowing ring in [color] around the tile, or nothing drawn without a
+  /// colour.
+  static BoxDecoration _ringOf(Color? color) {
+    if (color == null) return const BoxDecoration();
     return BoxDecoration(
       borderRadius: BorderRadius.circular(_cornerRadius + _ringInset),
       border: Border.all(color: color, width: _ringWidth),
