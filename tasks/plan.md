@@ -11,8 +11,9 @@ roadmap:
 - **Inside M5:** translations, which are M5's "English and Spanish" item.
   They are done first within M5, because accessibility labels, the About
   page and goldens all show text.
-- **M6, only if the web build happens:** the two problems that exist only on
-  the web.
+- **The web build is dropped** (2026-11-10), so the two problems that exist
+  only on the web are not planned. They stay written down below in case that
+  changes.
 - **M7:** crash reporting plugs into the error reporter added before M5.
 
 Each task is one pull request, as usual here: a Conventional Commits title,
@@ -48,9 +49,10 @@ planned, so they can be referred to. The checklist is in `tasks/todo.md`.
   `TutorialTopic`, which a text mapper in `view/` words.
 - **No full on-device test for now** (Task 17, changed). See "Why no full
   on-device test" below.
-- **The two web-only problems wait for M6** (Tasks 2 and 3). Android declares
-  no deep links and does not restore routes, so a `/game` link or a refresh
-  only happens on the web. `compute` blocks the screen only on the web too.
+- **The two web-only problems are dropped with the web build** (Tasks 2 and
+  3). Android declares no deep links and does not restore routes, so a
+  `/game` link or a refresh only happens on the web. `compute` blocks the
+  screen only on the web too.
 
 ## Why no full on-device test
 
@@ -343,21 +345,128 @@ Depends on Tasks 9–11.
 
 ### The rest of M5, after the translations
 
-Not part of this plan, but its order follows from it:
+Order: accessibility first (it changes how the screens announce themselves),
+then colours, then animations (which need both), then About, then goldens
+last, when text and colours are final. Each is one pull request.
 
-1. **Accessibility:** screen reader labels already go through the text
-   mappers, so they are translated by then.
-2. **Light and dark board palettes:** change `BoardColors`, already tidied by
-   Task 14.
-3. **Placement and capture animations:** build on Tasks 14 and 15.
-4. **Rule-sheet link and app version on About:** new text goes straight into
-   the `.arb` files.
-5. **Goldens last:** text and colours are final by then. Take them in both
-   languages, light and dark.
+**Task 19. `feat(game): announce the game's changes to screen readers`** (S)
 
-## M6, only if the web build happens
+- The headline above the board becomes a live region, so a screen reader
+  says "Your turn" or "The computer is thinking…" when it changes, without
+  the player hunting for it.
+- A move the computer makes is announced in words, such as "The computer
+  placed a 3 at row 2, column 4": the square's label already exists in
+  `SquareTextMapper`, and the new message goes through a text mapper too.
 
-Skip both tasks if the web build is dropped. Nothing else depends on them.
+Acceptance:
+- A widget test finds the headline's live-region flag, and the announcement
+  after a computer move, in both languages.
+
+**Task 20. `test(app): check accessibility on every screen`** (S)
+
+- Run Flutter's accessibility guidelines on Home, the dialog, the game
+  screen, How to play, Settings and About: tap targets (Android's 48 dp),
+  labelled tap targets, and text contrast.
+- The same screens at 200% text size, in both languages, with no overflow.
+
+Acceptance:
+- The guideline tests pass. Where one fails, the screen is fixed in this
+  pull request, and it says what was changed.
+
+**Task 21. `feat(app): give the board a palette for each theme`** (M)
+
+- `BoardColors.dark` stops being a copy of `light` (see
+  `board_colors.dart`). The board is dark teal in both themes today, so the
+  light theme gets its own board: pale sage, with lighter squares.
+- The dice keep their colours, coral and cream, in both themes, so the
+  tutorial's words ("the coral dice and the cream ones") stay true. On the
+  pale squares the cream die needs a dark brown edge, since its face is
+  almost white. The coral die's edge stays.
+- Rings change too, to darker shades that show on a pale board.
+- A test checks that the contrast between a die's edge and its square, and
+  between a marked square's ring and the board, passes in both palettes.
+
+The colours were drawn and agreed on before the task (the numbers are in
+the sketch of 2026-11-10); the starting values are:
+
+| | Dark (now) | Light |
+| --- | --- | --- |
+| Board / edge | `0C3D37` / `1D5E55` | `C9DED8` / `8FB3AA` |
+| Square | `082C28` | `EAF3F0` |
+| Cream die edge | `CBBE9F` | `7A6A44` |
+| Last move / target / option / selected ring | `5EEAD4` / `FFB199` / `5EEAD4` / `FF7A5C` | `0B7A6B` / `C2410C` / `0B7A6B` / `B42318` |
+
+Acceptance:
+- Both themes look right by hand (the screenshots go in the pull request).
+- Contrast of at least 3:1 for the rings and the dice's edges against the
+  board and squares, as WCAG asks of graphics.
+- Player 2's dice are still cream and Player 1's coral in both themes.
+
+Considered and left out: brown, green or blue for Player 2. Green is
+almost the same as coral to a red-blind player, brown falls below 3:1 on
+the dark board, and blue works but means rewording the tutorial.
+
+**Task 22. `feat(game): animate placing a die`** (S)
+
+- The new die grows into its square, and the player's tap gets an answer
+  right away.
+- No animation at all when the device asks for reduced motion
+  (`MediaQuery.disableAnimations`).
+
+**Task 23. `feat(game): animate a capture`** (M)
+
+- The captured dice shrink away and the new die shows its sum. Undo and redo
+  stay instant.
+- Same rule for reduced motion. Tests pump frames by hand rather than
+  `pumpAndSettle`, so they check the middle of an animation.
+
+Acceptance (22 and 23):
+- Moves, undo, redo and the computer's turn still behave the same: the
+  bloc's states do not change, only how the view draws the change.
+
+**Task 24. `feat(about): link the rule sheet and show the app's version`** (M)
+
+- The rule sheet's address becomes a link that opens in the browser
+  (`url_launcher`).
+- The version and build number appear under the title (`package_info_plus`).
+- The new words go straight into both `.arb` files.
+- An ADR records the two dependencies, since the app has had none beyond
+  Flutter's and storage until now.
+
+Acceptance:
+- The link opens the rule sheet on Android.
+- A test replaces both plugins with fakes, so it runs without a device.
+
+**Task 25. `test(app): add golden images of the main screens`** (M)
+
+- Goldens for Home, the dialog with the computer chosen, the game screen
+  and How to play, in English and Spanish, light and dark.
+- The images are made on Linux and checked by CI, which runs on Linux, so
+  they match. Tests draw text in the Ahem font, so the images show boxes
+  rather than letters. They lock in layout and colours, not typography.
+
+Acceptance:
+- `flutter test --update-goldens` is documented in the README's testing
+  section, and CI fails on a change nobody updated.
+
+**Task 26. `docs: mark M5 done`** (XS)
+
+- README status and roadmap, `docs/architecture.md`'s testing table.
+
+### Decisions for M5 (answered 2026-11-10)
+
+1. **The light board (Task 21).** The light theme gets a light board. Dice
+   stay coral and cream; the cream die gets a dark edge.
+2. **Two new dependencies (Task 24).** `url_launcher` and `package_info_plus`
+   are added, and an ADR records them.
+3. **Goldens with Ahem text (Task 25).** Accepted. They lock in layout and
+   colours, not typography.
+
+## Dropped: the web build
+
+The web is not a priority of this project (2026-11-10), so these two tasks
+are not planned. Nothing else depends on them. They are kept here, with
+their fix, in case a web build comes back.
 
 **Task 2. `fix(game): make the game route always show the saved game`** (M,
 mostly deletions)
@@ -391,8 +500,20 @@ Acceptance:
 ## M7: Google Play
 
 - Crash reporting goes into Task 4's reporter.
-- Consider then a full game, saved and resumed, on a real device, as a
-  release check.
+- **Play Store screenshots, made by a test.** An `integration_test` runs the
+  real app on an emulator, sets up each moment (a game mid-capture, the
+  new-game dialog with the computer chosen, How to play, the dark theme),
+  and saves the screen with `takeScreenshot`. `flutter drive` runs it once
+  per language and writes the images to `art/play-store/`. On a device the
+  text is drawn in the real font, unlike widget tests. After a visual
+  change, one command makes them again. Needs checking when built: how the
+  test sets the language on the emulator.
+- **The same test is the release check.** It plays a game, saves it and
+  resumes it on a real device, which is the full on-device test that
+  "Why no full on-device test" leaves for M7. Build the screenshots after
+  the screens have settled, once M5 is done.
+- The store needs a 1024 × 500 feature graphic as well; that one is made
+  by hand from the art in `art/`.
 
 ## Not planned, and why
 
@@ -422,5 +543,5 @@ Acceptance:
    device and has no language setting.
 3. The full on-device test: not now. One isolate test covers the real gap,
    and the full test can be revisited at M7.
-4. The web search: decided at M6, if the web build happens.
+4. The web search: dropped with the web build (2026-11-10).
 5. Spanish: Spain's.

@@ -24,12 +24,20 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] 10. feat(game): translate the game screen and new-game dialog (S), after 8
 - [x] 11. feat(game): translate How to play (M), after 8
 - [x] 12. test(app): check the app in Spanish (S), after 9–11
-- [ ] Then the rest of M5: accessibility, palettes, animations, About, goldens last
+- [ ] 19. feat(game): announce the game's changes to screen readers (S)
+- [ ] 20. test(app): check accessibility on every screen (S)
+- [ ] 21. feat(app): give the board a palette for each theme (M)
+- [ ] 22. feat(game): animate placing a die (S)
+- [ ] 23. feat(game): animate a capture (M), after 22
+- [ ] 24. feat(about): link the rule sheet and show the app's version (M)
+- [ ] 25. test(app): add golden images of the main screens (M), after 19–24
+- [ ] 26. docs: mark M5 done (XS)
 
-## M6, only if the web build happens
-- [ ] 2. fix(game): make the game route always show the saved game (M)
-- [ ] 3. fix(game): show "thinking" before the computer searches on the web (XS)
+## Dropped: the web build (2026-11-10)
+- ~~2. fix(game): make the game route always show the saved game (M)~~
+- ~~3. fix(game): show "thinking" before the computer searches on the web (XS)~~
 
 ## M7: Google Play
 - [ ] Crash reporting into Task 4's reporter
-- [ ] Consider a full game on a real device as a release check
+- [ ] Play Store screenshots made by an integration test, in both languages
+- [ ] The same test plays, saves and resumes a game on a device, as the release check
