@@ -25,3 +25,4 @@ supersedes an earlier one instead. Start new records from
 | [0016](0016-storage-failures-do-not-stop-the-game.md) | Storage failures are reported, and the game goes on | Accepted |
 | [0017](0017-translations-with-gen-l10n.md) | Translations with gen-l10n, English by default | Accepted |
 | [0018](0018-how-to-play-text-is-translated.md) | How to play's pages name a topic, and the view words it | Accepted |
+| [0019](0019-two-plugins-for-the-about-page.md) | Two plugins for the About page: url_launcher and package_info_plus | Accepted |

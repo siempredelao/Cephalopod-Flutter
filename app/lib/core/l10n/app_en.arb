@@ -68,6 +68,24 @@
   "@aboutOfficialRules": {
     "description": "About: heading above the link to the official rule sheet."
   },
+  "aboutVersion": "Version {version} (build {build})",
+  "@aboutVersion": {
+    "description": "About: under the game's name, the app's version and its build number.",
+    "placeholders": {
+      "version": {
+        "type": "String",
+        "example": "1.2.0"
+      },
+      "build": {
+        "type": "String",
+        "example": "14"
+      }
+    }
+  },
+  "aboutLinkFailed": "The link could not be opened. Here is the address, to copy:",
+  "@aboutLinkFailed": {
+    "description": "About: shown above the rule sheet's address when the browser could not be opened."
+  },
 
   "gamePlayerName": "Player {number}",
   "@gamePlayerName": {

@@ -29,7 +29,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] 21. feat(app): give the board a palette for each theme (M)
 - [x] 22. feat(game): animate placing a die (S)
 - [x] 23. feat(game): animate a capture (M), after 22
-- [ ] 24. feat(about): link the rule sheet and show the app's version (M)
+- [x] 24. feat(about): link the rule sheet and show the app's version (M)
 - [ ] 25. test(app): add golden images of the main screens (M), after 19–24
 - [ ] 26. docs: mark M5 done (XS)
 
