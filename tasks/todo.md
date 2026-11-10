@@ -23,7 +23,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] 9. feat(game): translate the text mappers (M), after 8
 - [x] 10. feat(game): translate the game screen and new-game dialog (S), after 8
 - [x] 11. feat(game): translate How to play (M), after 8
-- [ ] 12. test(app): check the app in Spanish (S), after 9–11
+- [x] 12. test(app): check the app in Spanish (S), after 9–11
 - [ ] Then the rest of M5: accessibility, palettes, animations, About, goldens last
 
 ## M6, only if the web build happens

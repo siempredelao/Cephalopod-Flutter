@@ -1,12 +1,7 @@
-import 'package:cephalopod/app/app.dart';
 import 'package:cephalopod/app/flavor.dart';
-import 'package:cephalopod/app/router.dart';
-import 'package:cephalopod/features/about/about_module.dart';
 import 'package:cephalopod/features/about/presentation/view/about_page.dart';
-import 'package:cephalopod/features/game/data/in_memory_game_repository.dart';
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
-import 'package:cephalopod/features/game/game_module.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/models/square_mark.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
@@ -14,41 +9,15 @@ import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_pl
 import 'package:cephalopod/features/game/presentation/view/new_game_dialog.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
-import 'package:cephalopod/features/home/home_module.dart';
 import 'package:cephalopod/features/home/presentation/view/home_page.dart';
-import 'package:cephalopod/features/settings/data/in_memory_settings_repository.dart';
 import 'package:cephalopod/features/settings/presentation/view/settings_page.dart';
-import 'package:cephalopod/features/settings/settings_module.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
-void main() {
-  Future<void> pumpApp(
-    WidgetTester tester, {
-    Flavor flavor = Flavor.prod,
-    String location = '/',
-  }) async {
-    // Wired as bootstrap wires it, with storage in memory.
-    final settings = SettingsModule(
-      settingsRepository: InMemorySettingsRepository(),
-    );
-    final game = GameModule(
-      cephalopodRules: CephalopodRules(),
-      gameRepository: InMemoryGameRepository(),
-      highlightLastMove: settings.highlightLastMove,
-    );
-    final router = createRouter(
-      home: HomeModule(hasGameToContinue: game.hasGameToContinue),
-      features: [game, settings, const AboutModule()],
-      initialLocation: location,
-    );
-    await tester.pumpWidget(
-      App(flavor: flavor, router: router, settings: settings.store),
-    );
-    await tester.pumpAndSettle();
-  }
+import '../helpers/pump_app.dart';
 
+void main() {
   /// From home, opens the new-game dialog and starts a game against a
   /// friend.
   Future<void> startNewGame(WidgetTester tester) async {
