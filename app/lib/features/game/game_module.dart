@@ -11,9 +11,11 @@ import 'package:cephalopod/features/game/domain/use_cases/play_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/resume_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/start_new_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/undo_move.dart';
+import 'package:cephalopod/features/game/presentation/bloc/countdown_timer.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/bloc/opponent_query_codec.dart';
+import 'package:cephalopod/features/game/presentation/view/game_durations.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
 import 'package:cephalopod/features/game/presentation/view/new_game_dialog.dart';
@@ -119,6 +121,7 @@ final class GameModule implements FeatureModule {
       resumeGame: _resumeGame,
       chooseAgentMove: _chooseAgentMove,
       highlightLastMove: _highlightLastMove(),
+      moveCountdown: CountdownTimer(moveSettleDuration),
     );
   }
 

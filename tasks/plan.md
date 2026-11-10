@@ -431,6 +431,10 @@ like a move with a capture. So the bloc says whether a move was just
 played, and the board animates only then. Nothing else in the states
 changed.
 
+Also changed: the dice take 500 ms, not 200, and after every move the bloc
+waits that long (`moveSettleTime`) before the next move: taps are ignored
+and the computer does not reply until the board has stopped moving.
+
 **Task 24. `feat(about): link the rule sheet and show the app's version`** (M)
 
 - The rule sheet's address becomes a link that opens in the browser

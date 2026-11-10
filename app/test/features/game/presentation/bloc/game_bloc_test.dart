@@ -6,6 +6,7 @@ import 'package:cephalopod/features/game/data/saved_game_json_codec.dart';
 import 'package:cephalopod/features/game/data/shared_preferences_game_repository.dart';
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
+import 'package:cephalopod/features/game/presentation/bloc/countdown_timer.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_view_state_mapper.dart';
@@ -469,6 +470,112 @@ void main() {
     });
   });
 
+  group('GameBloc after a move', () {
+    const computer = ComputerOpponent(
+      difficulty: Difficulty.easy,
+      player: Player.white,
+    );
+    final afterCenter = after(rules.newGame(), Move(center));
+    final afterTop = after(afterCenter, Move(top));
+    final centerPlayed = screenOf(
+      afterCenter,
+      lastMove: Move(center),
+      movePlayed: true,
+      canUndo: true,
+    );
+    late _ManualCountdown countdown;
+
+    setUp(() => countdown = _ManualCountdown());
+
+    GameBloc buildCounting() => createTestGameBloc(moveCountdown: countdown);
+
+    /// Lets the bloc finish the events it was given.
+    Future<void> settle() => Future<void>.delayed(Duration.zero);
+
+    test('starts the countdown after a move', () async {
+      final bloc = buildCounting()..add(tap(center));
+      await settle();
+
+      expect(countdown.isActive, isTrue);
+      await bloc.close();
+    });
+
+    test('ignores taps until the countdown ends', () async {
+      final bloc = buildCounting()
+        ..add(tap(center))
+        ..add(tap(top));
+      await settle();
+
+      expect(bloc.state, centerPlayed);
+
+      countdown.cancel();
+      bloc.add(tap(top));
+      await settle();
+
+      expect(
+        bloc.state,
+        screenOf(
+          afterTop,
+          lastMove: Move(top),
+          movePlayed: true,
+          canUndo: true,
+        ),
+      );
+      await bloc.close();
+    });
+
+    test('lets the computer reply only once the countdown ends', () async {
+      final bloc = buildCounting()
+        ..add(const GameStarted(opponent: computer))
+        ..add(tap(center));
+      await settle();
+
+      expect(bloc.state.canTap, isFalse);
+      expect(bloc.state.computerMove, isNull);
+
+      countdown.cancel();
+      await bloc.stream.firstWhere((state) => state.computerMove != null);
+
+      expect(bloc.state.movePlayed, isTrue);
+      await bloc.close();
+    });
+
+    test('ends the countdown on undo, so a tap after it works', () async {
+      final bloc = buildCounting()
+        ..add(tap(center))
+        ..add(const UndoRequested());
+      await settle();
+
+      expect(countdown.isActive, isFalse);
+      expect(bloc.state, placing(rules.newGame()).copyWith(canRedo: true));
+
+      bloc.add(tap(center));
+      await settle();
+
+      expect(bloc.state, centerPlayed);
+      await bloc.close();
+    });
+
+    test('ends the countdown on a new game', () async {
+      final bloc = buildCounting()
+        ..add(tap(center))
+        ..add(const GameRestarted());
+      await settle();
+
+      expect(countdown.isActive, isFalse);
+      await bloc.close();
+    });
+
+    test('ends the countdown when it closes', () async {
+      final bloc = buildCounting()..add(tap(center));
+      await settle();
+
+      await bloc.close();
+
+      expect(countdown.isActive, isFalse);
+    });
+  });
+
   group('GameBloc against the computer', () {
     late InMemoryGameRepository repository;
     const blackComputer = ComputerOpponent(
@@ -664,4 +771,31 @@ void main() {
 final class _OffBoardAgent implements GameAgent {
   @override
   Move chooseMove(GameState state) => Move(const Position(9, 9));
+}
+
+/// A countdown that runs until a test ends it, with [cancel].
+final class _ManualCountdown implements CountdownTimer {
+  Completer<void>? _running;
+
+  @override
+  Duration get duration => Duration.zero;
+
+  @override
+  bool get isActive => _running != null;
+
+  @override
+  Future<void> get done => _running?.future ?? Future<void>.value();
+
+  @override
+  void start() {
+    cancel();
+    _running = Completer<void>();
+  }
+
+  @override
+  void cancel() {
+    final running = _running;
+    _running = null;
+    running?.complete();
+  }
 }

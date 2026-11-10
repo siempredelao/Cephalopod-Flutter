@@ -6,6 +6,7 @@ import 'package:cephalopod/features/game/domain/use_cases/play_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/resume_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/start_new_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/undo_move.dart';
+import 'package:cephalopod/features/game/presentation/bloc/countdown_timer.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_view_state_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
@@ -24,7 +25,10 @@ import 'package:meta/meta.dart';
 class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// Shows a new game under [config] until the opening event replaces it,
   /// or the given [position], which tests use to start mid-game. The board
-  /// marks the last move when [highlightLastMove] is on.
+  /// marks the last move when [highlightLastMove] is on. After every move,
+  /// the game runs [moveCountdown], so the player sees what changed before
+  /// anything else moves: taps are ignored, and the computer does not
+  /// reply, until it ends. By default it has no length.
   ///
   /// A factory, so that it builds the starting game once and hands it to
   /// `GameBloc._`, which both keeps it and maps the first screen from it.
@@ -39,6 +43,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     required ChooseAgentMove chooseAgentMove,
     GameViewStateMapper gameViewStateMapper = const GameViewStateMapper(),
     bool highlightLastMove = true,
+    CountdownTimer? moveCountdown,
     GameConfig config = GameConfig.standard,
     @visibleForTesting GameState? position,
   }) {
@@ -51,6 +56,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
       chooseAgentMove: chooseAgentMove,
       gameViewStateMapper: gameViewStateMapper,
       highlightLastMove: highlightLastMove,
+      moveCountdown: moveCountdown ?? CountdownTimer(Duration.zero),
       currentGame: (
         record: GameRecord(config: config),
         opponent: const FriendOpponent(),
@@ -70,6 +76,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     required this._chooseAgentMove,
     required this._gameViewStateMapper,
     required this._highlightLastMove,
+    required this._moveCountdown,
     required this._currentGame,
   }) : super(
          _gameViewStateMapper.map(
@@ -97,6 +104,9 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
 
   /// Whether the board marks the last move, as the player's settings say.
   final bool _highlightLastMove;
+
+  /// Runs after every move, so the player sees it before the next one.
+  final CountdownTimer _moveCountdown;
 
   /// The game on screen, as the use cases take and give it. The bloc keeps
   /// it here; its state only describes the screen.
@@ -136,6 +146,8 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   };
 
   Future<void> _onEvent(GameEvent event, Emitter<GameViewState> emit) async {
+    // A move is not started while the last one is still being watched.
+    if (_moveCountdown.isActive && event is SquareTapped) return;
     switch (event) {
       case GameStarted(:final opponent, :final config):
         await _start(opponent, config, emit);
@@ -295,6 +307,8 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     if (_turnPhase is! ComputerThinking) return;
     final game = _currentGame;
     final move = await _chooseAgentMove(game);
+    // Wait for the person's move to be seen, if it still has not been.
+    await _moveCountdown.done;
     // The screen may have closed while the computer thought, and a new game
     // may be saved since. Playing the move now would save this old game
     // over it, so the move is dropped.
@@ -321,7 +335,18 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     _computerMove = computerMove;
     _movePlayed = movePlayed;
     _turnPhase = _phaseOf(game);
+    if (movePlayed) {
+      _moveCountdown.start();
+    } else {
+      _moveCountdown.cancel();
+    }
     _emitScreen(emit);
+  }
+
+  @override
+  Future<void> close() {
+    _moveCountdown.cancel();
+    return super.close();
   }
 
   /// Emits what the screen shows of the game and the turn phase.
