@@ -374,18 +374,35 @@ Acceptance:
 **Task 21. `feat(app): give the board a palette for each theme`** (M)
 
 - `BoardColors.dark` stops being a copy of `light` (see
-  `board_colors.dart`). The board is dark teal in both themes today, so a
-  light-theme board needs its own colours: lighter squares, with the dice
-  keeping their colours.
-- A test checks that the contrast between a die and its square, and between
-  a marked square's ring and the board, passes in both palettes.
+  `board_colors.dart`). The board is dark teal in both themes today, so the
+  light theme gets its own board: pale sage, with lighter squares.
+- The dice keep their colours, coral and cream, in both themes, so the
+  tutorial's words ("the coral dice and the cream ones") stay true. On the
+  pale squares the cream die needs a dark brown edge, since its face is
+  almost white. The coral die's edge stays.
+- Rings change too, to darker shades that show on a pale board.
+- A test checks that the contrast between a die's edge and its square, and
+  between a marked square's ring and the board, passes in both palettes.
+
+The colours were drawn and agreed on before the task (the numbers are in
+the sketch of 2026-11-10); the starting values are:
+
+| | Dark (now) | Light |
+| --- | --- | --- |
+| Board / edge | `0C3D37` / `1D5E55` | `C9DED8` / `8FB3AA` |
+| Square | `082C28` | `EAF3F0` |
+| Cream die edge | `CBBE9F` | `7A6A44` |
+| Last move / target / option / selected ring | `5EEAD4` / `FFB199` / `5EEAD4` / `FF7A5C` | `0B7A6B` / `C2410C` / `0B7A6B` / `B42318` |
 
 Acceptance:
 - Both themes look right by hand (the screenshots go in the pull request).
-- Contrast of at least 3:1 for the rings and dice against the board, as
-  WCAG asks of graphics.
+- Contrast of at least 3:1 for the rings and the dice's edges against the
+  board and squares, as WCAG asks of graphics.
+- Player 2's dice are still cream and Player 1's coral in both themes.
 
-Needs a decision first: see the questions at the end of this section.
+Considered and left out: brown, green or blue for Player 2. Green is
+almost the same as coral to a red-blind player, brown falls below 3:1 on
+the dark board, and blue works but means rewording the tutorial.
 
 **Task 22. `feat(game): animate placing a die`** (S)
 
@@ -434,18 +451,14 @@ Acceptance:
 
 - README status and roadmap, `docs/architecture.md`'s testing table.
 
-### Questions for M5
+### Decisions for M5 (answered 2026-11-10)
 
-1. **The light board (Task 21).** Keep the dark teal board in the light
-   theme, or make it light? Keeping it is the cheapest, and the icon and
-   social preview use that teal, but the roadmap says "light and dark board
-   palettes".
+1. **The light board (Task 21).** The light theme gets a light board. Dice
+   stay coral and cream; the cream die gets a dark edge.
 2. **Two new dependencies (Task 24).** `url_launcher` and `package_info_plus`
-   are the standard choices and both are from the Flutter team's publisher.
-   Alternative for the version: pass it in at build time, which needs no
-   dependency but can drift from `pubspec.yaml`.
-3. **Goldens with Ahem text (Task 25).** Fine for layout and colours. Real
-   fonts would need the font files in the repository.
+   are added, and an ADR records them.
+3. **Goldens with Ahem text (Task 25).** Accepted. They lock in layout and
+   colours, not typography.
 
 ## M6, only if the web build happens
 
