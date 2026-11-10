@@ -11,8 +11,9 @@ roadmap:
 - **Inside M5:** translations, which are M5's "English and Spanish" item.
   They are done first within M5, because accessibility labels, the About
   page and goldens all show text.
-- **M6, only if the web build happens:** the two problems that exist only on
-  the web.
+- **The web build is dropped** (2026-11-10), so the two problems that exist
+  only on the web are not planned. They stay written down below in case that
+  changes.
 - **M7:** crash reporting plugs into the error reporter added before M5.
 
 Each task is one pull request, as usual here: a Conventional Commits title,
@@ -48,9 +49,10 @@ planned, so they can be referred to. The checklist is in `tasks/todo.md`.
   `TutorialTopic`, which a text mapper in `view/` words.
 - **No full on-device test for now** (Task 17, changed). See "Why no full
   on-device test" below.
-- **The two web-only problems wait for M6** (Tasks 2 and 3). Android declares
-  no deep links and does not restore routes, so a `/game` link or a refresh
-  only happens on the web. `compute` blocks the screen only on the web too.
+- **The two web-only problems are dropped with the web build** (Tasks 2 and
+  3). Android declares no deep links and does not restore routes, so a
+  `/game` link or a refresh only happens on the web. `compute` blocks the
+  screen only on the web too.
 
 ## Why no full on-device test
 
@@ -460,9 +462,11 @@ Acceptance:
 3. **Goldens with Ahem text (Task 25).** Accepted. They lock in layout and
    colours, not typography.
 
-## M6, only if the web build happens
+## Dropped: the web build
 
-Skip both tasks if the web build is dropped. Nothing else depends on them.
+The web is not a priority of this project (2026-11-10), so these two tasks
+are not planned. Nothing else depends on them. They are kept here, with
+their fix, in case a web build comes back.
 
 **Task 2. `fix(game): make the game route always show the saved game`** (M,
 mostly deletions)
@@ -496,8 +500,20 @@ Acceptance:
 ## M7: Google Play
 
 - Crash reporting goes into Task 4's reporter.
-- Consider then a full game, saved and resumed, on a real device, as a
-  release check.
+- **Play Store screenshots, made by a test.** An `integration_test` runs the
+  real app on an emulator, sets up each moment (a game mid-capture, the
+  new-game dialog with the computer chosen, How to play, the dark theme),
+  and saves the screen with `takeScreenshot`. `flutter drive` runs it once
+  per language and writes the images to `art/play-store/`. On a device the
+  text is drawn in the real font, unlike widget tests. After a visual
+  change, one command makes them again. Needs checking when built: how the
+  test sets the language on the emulator.
+- **The same test is the release check.** It plays a game, saves it and
+  resumes it on a real device, which is the full on-device test that
+  "Why no full on-device test" leaves for M7. Build the screenshots after
+  the screens have settled, once M5 is done.
+- The store needs a 1024 × 500 feature graphic as well; that one is made
+  by hand from the art in `art/`.
 
 ## Not planned, and why
 
@@ -527,5 +543,5 @@ Acceptance:
    device and has no language setting.
 3. The full on-device test: not now. One isolate test covers the real gap,
    and the full test can be revisited at M7.
-4. The web search: decided at M6, if the web build happens.
+4. The web search: dropped with the web build (2026-11-10).
 5. Spanish: Spain's.
