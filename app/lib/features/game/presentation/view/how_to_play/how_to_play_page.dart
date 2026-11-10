@@ -1,3 +1,4 @@
+import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/features/game/presentation/bloc/how_to_play_cubit.dart';
 import 'package:cephalopod/features/game/presentation/models/how_to_play_view_state.dart';
 import 'package:cephalopod/features/game/presentation/models/tutorial_right_button_ui.dart';
@@ -57,11 +58,14 @@ class _TutorialPagesState extends State<_TutorialPages> {
     }
   }
 
-  /// The words on [rightButton].
-  static String _rightButtonLabelOf(TutorialRightButtonUi rightButton) {
+  /// The words on [rightButton], in the language on screen.
+  static String _rightButtonLabelOf(
+    TutorialRightButtonUi rightButton,
+    AppLocalizations l10n,
+  ) {
     return switch (rightButton) {
-      TutorialRightButtonUi.next => 'Next',
-      TutorialRightButtonUi.finish => 'Got it',
+      TutorialRightButtonUi.next => l10n.howToPlayNext,
+      TutorialRightButtonUi.finish => l10n.howToPlayDone,
     };
   }
 
@@ -69,7 +73,7 @@ class _TutorialPagesState extends State<_TutorialPages> {
   Widget build(BuildContext context) {
     final cubit = context.read<HowToPlayCubit>();
     return Scaffold(
-      appBar: AppBar(title: const Text('How to play')),
+      appBar: AppBar(title: Text(context.l10n.howToPlayTitle)),
       body: SafeArea(
         child: BlocBuilder<HowToPlayCubit, HowToPlayViewState>(
           builder: (context, state) => Column(
@@ -94,7 +98,9 @@ class _TutorialPagesState extends State<_TutorialPages> {
                     const Spacer(),
                     FilledButton(
                       onPressed: () => _pressRightButton(state.rightButton),
-                      child: Text(_rightButtonLabelOf(state.rightButton)),
+                      child: Text(
+                        _rightButtonLabelOf(state.rightButton, context.l10n),
+                      ),
                     ),
                   ],
                 ),

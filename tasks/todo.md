@@ -21,7 +21,7 @@ The numbers are the ones first planned, so they are not in order here.
 ## M5: English and Spanish (first within M5)
 - [x] 8. feat(app): set up translations (M), after 7
 - [x] 9. feat(game): translate the text mappers (M), after 8
-- [ ] 10. feat(game): translate the game screen and new-game dialog (S), after 8
+- [x] 10. feat(game): translate the game screen and new-game dialog (S), after 8
 - [ ] 11. feat(game): translate How to play (M), after 8
 - [ ] 12. test(app): check the app in Spanish (S), after 9–11
 - [ ] Then the rest of M5: accessibility, palettes, animations, About, goldens last

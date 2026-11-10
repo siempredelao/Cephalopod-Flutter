@@ -221,5 +221,96 @@
         "type": "int"
       }
     }
+  },
+
+  "gameHowToPlayTooltip": "How to play",
+  "@gameHowToPlayTooltip": {
+    "description": "Game: tooltip of the app bar button that opens the rules tutorial."
+  },
+  "gameRestartTooltip": "New game",
+  "@gameRestartTooltip": {
+    "description": "Game: tooltip of the app bar button that starts again, against the same opponent."
+  },
+  "gameUndoTooltip": "Undo",
+  "@gameUndoTooltip": {
+    "description": "Game: tooltip of the button that takes back the last turn."
+  },
+  "gameRedoTooltip": "Redo",
+  "@gameRedoTooltip": {
+    "description": "Game: tooltip of the button that plays again a turn taken back."
+  },
+  "gameCaptureCancel": "Cancel",
+  "@gameCaptureCancel": {
+    "description": "Game: button that backs out of choosing which dice to capture."
+  },
+  "gameCaptureConfirm": "Capture",
+  "@gameCaptureConfirm": {
+    "description": "Game: button that captures the dice picked."
+  },
+
+  "newGameTitle": "New game",
+  "@newGameTitle": {
+    "description": "New-game dialog: its title."
+  },
+  "newGameOpponent": "Opponent",
+  "@newGameOpponent": {
+    "description": "New-game dialog: heading above the choice of who to play."
+  },
+  "newGameFriend": "A friend",
+  "@newGameFriend": {
+    "description": "New-game dialog: playing another person on the same device."
+  },
+  "newGameComputer": "The computer",
+  "@newGameComputer": {
+    "description": "New-game dialog: playing the computer."
+  },
+  "newGameDifficulty": "Difficulty",
+  "@newGameDifficulty": {
+    "description": "New-game dialog: heading above how strongly the computer plays."
+  },
+  "newGameEasy": "Easy",
+  "@newGameEasy": {
+    "description": "New-game dialog: the weakest computer."
+  },
+  "newGameMedium": "Medium",
+  "@newGameMedium": {
+    "description": "New-game dialog: the middle computer."
+  },
+  "newGameHard": "Hard",
+  "@newGameHard": {
+    "description": "New-game dialog: the strongest computer."
+  },
+  "newGamePersonMoves": "You move",
+  "@newGamePersonMoves": {
+    "description": "New-game dialog: heading above whether the person moves first or second against the computer."
+  },
+  "newGameFirst": "First",
+  "@newGameFirst": {
+    "description": "New-game dialog: the person moves first."
+  },
+  "newGameSecond": "Second",
+  "@newGameSecond": {
+    "description": "New-game dialog: the person moves second."
+  },
+  "newGameCancel": "Cancel",
+  "@newGameCancel": {
+    "description": "New-game dialog: button that closes it without starting a game."
+  },
+  "newGameStart": "Start",
+  "@newGameStart": {
+    "description": "New-game dialog: button that starts the game chosen."
+  },
+
+  "howToPlayTitle": "How to play",
+  "@howToPlayTitle": {
+    "description": "How to play: the page's title."
+  },
+  "howToPlayNext": "Next",
+  "@howToPlayNext": {
+    "description": "How to play: button that turns to the next page."
+  },
+  "howToPlayDone": "Got it",
+  "@howToPlayDone": {
+    "description": "How to play: button on the last page that leaves the tutorial."
   }
 }
