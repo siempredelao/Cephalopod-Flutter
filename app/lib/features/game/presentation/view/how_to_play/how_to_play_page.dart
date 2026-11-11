@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/features/game/presentation/bloc/how_to_play_cubit.dart';
 import 'package:cephalopod/features/game/presentation/models/how_to_play_view_state.dart';
@@ -11,14 +13,23 @@ const double _spacing = 16;
 
 /// How to play, one idea per page: swipe, or tap Next and Previous, through
 /// the tutorial's steps, each with a board that shows it. It draws the
-/// [HowToPlayViewState] of the [HowToPlayCubit] it creates.
+/// [HowToPlayViewState] of the [HowToPlayCubit] it gets from [createCubit],
+/// and tells the cubit it opened.
 class HowToPlayPage extends StatelessWidget {
-  const HowToPlayPage({super.key});
+  const HowToPlayPage({required this.createCubit, super.key});
+
+  /// Builds the screen's cubit. The composition root wires it to the
+  /// device's storage; tests wire it to memory.
+  final HowToPlayCubit Function() createCubit;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => HowToPlayCubit(),
+      create: (_) {
+        final cubit = createCubit();
+        unawaited(cubit.opened());
+        return cubit;
+      },
       child: const _TutorialPages(),
     );
   }

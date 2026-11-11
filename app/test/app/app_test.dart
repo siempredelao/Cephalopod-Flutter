@@ -40,6 +40,35 @@ void main() {
       expect(find.byType(HomePage), findsOneWidget);
     });
 
+    testWidgets('opens How to play over Home on a first launch', (
+      tester,
+    ) async {
+      await pumpApp(tester, firstLaunch: true);
+
+      expect(find.byType(HowToPlayPage), findsOneWidget);
+
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+
+      expect(find.byType(HomePage), findsOneWidget);
+      expect(find.byType(HowToPlayPage), findsNothing);
+    });
+
+    testWidgets('opens How to play by itself only once', (tester) async {
+      await pumpApp(tester, firstLaunch: true);
+      await tester.tap(find.widgetWithText(TextButton, 'Skip'));
+      await tester.pumpAndSettle();
+
+      // Back from a game, Home asks again whether there is one to continue,
+      // but not about How to play.
+      await startNewGame(tester);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+
+      expect(find.byType(HomePage), findsOneWidget);
+      expect(find.byType(HowToPlayPage), findsNothing);
+    });
+
     testWidgets('speaks Spanish on a Spanish device', (tester) async {
       tester.platformDispatcher.localesTestValue = [const Locale('es', 'ES')];
       addTearDown(tester.platformDispatcher.clearLocalesTestValue);
