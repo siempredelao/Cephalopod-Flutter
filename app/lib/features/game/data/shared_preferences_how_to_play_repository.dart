@@ -1,8 +1,8 @@
 import 'package:cephalopod/core/errors/error_reporter.dart';
-import 'package:cephalopod/features/home/domain/first_launch_repository.dart';
+import 'package:cephalopod/features/game/domain/how_to_play_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// A [FirstLaunchRepository] on shared_preferences (docs/adr/0012), with one
+/// A [HowToPlayRepository] on shared_preferences (docs/adr/0012), with one
 /// key for How to play.
 ///
 /// Storage never stops the app (docs/adr/0016). When shared_preferences
@@ -13,9 +13,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 ///
 /// Only `Exception`s are caught, which is how storage reports a failure. An
 /// `Error` is a bug, so it goes on to the app-wide error reporting.
-final class SharedPreferencesFirstLaunchRepository
-    implements FirstLaunchRepository {
-  SharedPreferencesFirstLaunchRepository({
+final class SharedPreferencesHowToPlayRepository
+    implements HowToPlayRepository {
+  SharedPreferencesHowToPlayRepository({
     required this._sharedPreferencesAsync,
     required this._errorReporter,
   });
@@ -30,7 +30,11 @@ final class SharedPreferencesFirstLaunchRepository
     try {
       return await _sharedPreferencesAsync.getBool(_howToPlaySeenKey) ?? false;
     } on Exception catch (error, stackTrace) {
-      _errorReporter(error, stackTrace, reason: 'reading the first launch');
+      _errorReporter(
+        error,
+        stackTrace,
+        reason: 'reading whether How to play was seen',
+      );
       return true;
     }
   }
@@ -40,7 +44,11 @@ final class SharedPreferencesFirstLaunchRepository
     try {
       await _sharedPreferencesAsync.setBool(_howToPlaySeenKey, true);
     } on Exception catch (error, stackTrace) {
-      _errorReporter(error, stackTrace, reason: 'saving the first launch');
+      _errorReporter(
+        error,
+        stackTrace,
+        reason: 'saving that How to play was seen',
+      );
     }
   }
 }

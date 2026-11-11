@@ -1,17 +1,17 @@
-import 'package:cephalopod/features/home/domain/first_launch_repository.dart';
+import 'package:cephalopod/features/game/domain/how_to_play_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// What every [FirstLaunchRepository] must do. Each implementation's test
+/// What every [HowToPlayRepository] must do. Each implementation's test
 /// calls this with a way to create a fresh, empty repository.
-void testFirstLaunchRepositoryContract(
-  Future<FirstLaunchRepository> Function() create,
+void testHowToPlayRepositoryContract(
+  Future<HowToPlayRepository> Function() create,
 ) {
-  group('FirstLaunchRepository contract', () {
-    late FirstLaunchRepository repository;
+  group('HowToPlayRepository contract', () {
+    late HowToPlayRepository repository;
 
     setUp(() async => repository = await create());
 
-    test('has not shown How to play on a first launch', () async {
+    test('has not shown How to play before it is marked', () async {
       expect(await repository.hasSeenHowToPlay(), isFalse);
     });
 
