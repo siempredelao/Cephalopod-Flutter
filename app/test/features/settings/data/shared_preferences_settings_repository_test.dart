@@ -37,6 +37,18 @@ void main() {
       expect((await repository.load()).theme, defaultSettings.theme);
       expect(reports, isEmpty);
     });
+
+    test('turns sounds on for settings saved before sounds came', () async {
+      final repository = create();
+      await SharedPreferencesAsync().setString('theme', 'dark');
+      await SharedPreferencesAsync().setBool('highlightLastMove', false);
+
+      expect(await repository.load(), (
+        theme: ThemePreference.dark,
+        highlightLastMove: false,
+        sound: true,
+      ));
+    });
   });
 
   group('SharedPreferencesSettingsRepository when storage fails', () {
@@ -57,6 +69,7 @@ void main() {
       await repository.save((
         theme: ThemePreference.dark,
         highlightLastMove: false,
+        sound: false,
       ));
 
       expect(reports, [(storage.failure, 'saving the settings')]);

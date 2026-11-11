@@ -25,6 +25,7 @@ final class SharedPreferencesSettingsRepository implements SettingsRepository {
 
   static const String _themeKey = 'theme';
   static const String _highlightKey = 'highlightLastMove';
+  static const String _soundKey = 'sound';
 
   /// The saved settings. A setting never saved, or saved with a value this
   /// version does not know, keeps its default; so does every setting when
@@ -33,9 +34,11 @@ final class SharedPreferencesSettingsRepository implements SettingsRepository {
   Future<AppSettings> load() async {
     final String? theme;
     final bool? highlight;
+    final bool? sound;
     try {
       theme = await _sharedPreferencesAsync.getString(_themeKey);
       highlight = await _sharedPreferencesAsync.getBool(_highlightKey);
+      sound = await _sharedPreferencesAsync.getBool(_soundKey);
     } on Exception catch (error, stackTrace) {
       _errorReporter(error, stackTrace, reason: 'loading the settings');
       return defaultSettings;
@@ -43,6 +46,7 @@ final class SharedPreferencesSettingsRepository implements SettingsRepository {
     return (
       theme: ThemePreference.values.asNameMap()[theme] ?? defaultSettings.theme,
       highlightLastMove: highlight ?? defaultSettings.highlightLastMove,
+      sound: sound ?? defaultSettings.sound,
     );
   }
 
@@ -54,6 +58,7 @@ final class SharedPreferencesSettingsRepository implements SettingsRepository {
         _highlightKey,
         settings.highlightLastMove,
       );
+      await _sharedPreferencesAsync.setBool(_soundKey, settings.sound);
     } on Exception catch (error, stackTrace) {
       _errorReporter(error, stackTrace, reason: 'saving the settings');
     }

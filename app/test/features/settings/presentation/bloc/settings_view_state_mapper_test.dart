@@ -18,7 +18,7 @@ void main() {
 
     test('shows every theme as itself', () {
       for (final theme in ThemePreference.values) {
-        final settings = (theme: theme, highlightLastMove: true);
+        final settings = (theme: theme, highlightLastMove: true, sound: true);
 
         expect(mapper.map(settings).theme.name, theme.name);
       }
@@ -26,14 +26,22 @@ void main() {
 
     test('reads every theme back as itself', () {
       for (final theme in ThemePreference.values) {
-        final shown = mapper.map((theme: theme, highlightLastMove: true)).theme;
+        final shown = mapper.map((
+          theme: theme,
+          highlightLastMove: true,
+          sound: true,
+        )).theme;
 
         expect(mapper.themePreferenceOf(shown), theme);
       }
     });
 
     test('shows the last-move highlight turned off', () {
-      const settings = (theme: ThemePreference.dark, highlightLastMove: false);
+      const settings = (
+        theme: ThemePreference.dark,
+        highlightLastMove: false,
+        sound: true,
+      );
 
       expect(mapper.map(settings).highlightLastMove, isFalse);
     });

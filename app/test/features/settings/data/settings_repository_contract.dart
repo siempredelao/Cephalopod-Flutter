@@ -18,7 +18,11 @@ void testSettingsRepositoryContract(
     });
 
     test('gives back the saved settings', () async {
-      const changed = (theme: ThemePreference.light, highlightLastMove: false);
+      const changed = (
+        theme: ThemePreference.light,
+        highlightLastMove: false,
+        sound: false,
+      );
 
       await repository.save(changed);
 
@@ -26,7 +30,11 @@ void testSettingsRepositoryContract(
     });
 
     test('keeps only the latest save', () async {
-      const dark = (theme: ThemePreference.dark, highlightLastMove: true);
+      const dark = (
+        theme: ThemePreference.dark,
+        highlightLastMove: true,
+        sound: true,
+      );
       await repository.save(defaultSettings);
 
       await repository.save(dark);
