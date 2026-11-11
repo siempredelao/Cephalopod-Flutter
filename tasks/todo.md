@@ -37,6 +37,9 @@ The numbers are the ones first planned, so they are not in order here.
 - ~~2. fix(game): make the game route always show the saved game (M)~~
 - ~~3. fix(game): show "thinking" before the computer searches on the web (XS)~~
 
+## To fix later
+- [ ] 27. fix(game): show the game screen's title in full on small phones (S), before M7's screenshots
+
 ## M7: Google Play
 - [ ] Crash reporting into Task 4's reporter
 - [ ] Play Store screenshots made by an integration test, in both languages
