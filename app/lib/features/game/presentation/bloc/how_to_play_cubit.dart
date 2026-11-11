@@ -17,6 +17,7 @@ class HowToPlayCubit extends Cubit<HowToPlayViewState> {
     return HowToPlayViewState(
       steps: steps,
       currentStep: step,
+      canGoBack: step > 0,
       rightButton: _rightButtonAt(step, steps.length),
     );
   }

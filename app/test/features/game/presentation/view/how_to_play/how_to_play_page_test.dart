@@ -2,6 +2,7 @@ import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/core/theme/board_colors.dart';
 import 'package:cephalopod/features/game/presentation/bloc/tutorial_steps.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
+import 'package:cephalopod/features/game/presentation/view/how_to_play/step_dots.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -44,6 +45,9 @@ void main() {
       expect(find.text('Se juega por turnos'), findsOne);
       expect(find.textContaining('coloca un dado'), findsOne);
       expect(find.widgetWithText(FilledButton, 'Siguiente'), findsOne);
+      await tester.tap(find.widgetWithText(FilledButton, 'Siguiente'));
+      await tester.pumpAndSettle();
+      expect(find.widgetWithText(OutlinedButton, 'Anterior'), findsOne);
     });
 
     testWidgets('turns the page on Next', (tester) async {
@@ -53,6 +57,33 @@ void main() {
 
       expect(find.text(english.howToPlayPlaceAOneTitle), findsOne);
       expect(find.text(english.howToPlayTakeTurnsTitle), findsNothing);
+    });
+
+    testWidgets('has no Previous on the first page', (tester) async {
+      await pumpTutorial(tester);
+
+      expect(find.widgetWithText(OutlinedButton, 'Previous'), findsNothing);
+    });
+
+    testWidgets('turns back on Previous', (tester) async {
+      await pumpTutorial(tester);
+      await tapNext(tester);
+
+      await tester.tap(find.widgetWithText(OutlinedButton, 'Previous'));
+      await tester.pumpAndSettle();
+
+      expect(find.text(english.howToPlayTakeTurnsTitle), findsOne);
+      expect(find.widgetWithText(OutlinedButton, 'Previous'), findsNothing);
+    });
+
+    testWidgets('centres the dots on a row of their own', (tester) async {
+      await pumpTutorial(tester);
+
+      final screen = tester.getRect(find.byType(Scaffold));
+      final dots = tester.getRect(find.byType(StepDots));
+      final next = tester.getRect(find.widgetWithText(FilledButton, 'Next'));
+      expect(dots.center.dx, moreOrLessEquals(screen.center.dx));
+      expect(dots.bottom, lessThanOrEqualTo(next.top));
     });
 
     testWidgets('keeps the board in the same place on every page', (

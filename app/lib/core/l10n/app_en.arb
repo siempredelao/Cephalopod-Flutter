@@ -356,6 +356,10 @@
   "@howToPlayTitle": {
     "description": "How to play: the page's title."
   },
+  "howToPlayPrevious": "Previous",
+  "@howToPlayPrevious": {
+    "description": "How to play: button that turns back to the page before. Not shown on the first page."
+  },
   "howToPlayNext": "Next",
   "@howToPlayNext": {
     "description": "How to play: button that turns to the next page."

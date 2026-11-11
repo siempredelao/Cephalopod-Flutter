@@ -9,8 +9,8 @@ import 'package:material_ui/material_ui.dart';
 
 const double _spacing = 16;
 
-/// How to play, one idea per page: swipe or tap Next through the tutorial's
-/// steps, each with a board that shows it. It draws the
+/// How to play, one idea per page: swipe, or tap Next and Previous, through
+/// the tutorial's steps, each with a board that shows it. It draws the
 /// [HowToPlayViewState] of the [HowToPlayCubit] it creates.
 class HowToPlayPage extends StatelessWidget {
   const HowToPlayPage({super.key});
@@ -42,6 +42,13 @@ class _TutorialPagesState extends State<_TutorialPages> {
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+
+  void _turnBack() {
+    _pageController.previousPage(
+      duration: _turnDuration,
+      curve: Curves.easeInOut,
+    );
   }
 
   /// Turns to the next page, or leaves the tutorial, as [rightButton] says.
@@ -87,20 +94,47 @@ class _TutorialPagesState extends State<_TutorialPages> {
                   ],
                 ),
               ),
+              // The dots on a row of their own, centred, and the buttons
+              // under them: Previous on the left, from the second page on,
+              // and Next or Done on the right, which stays put either way:
+              // on the first page an empty space holds Previous's place.
               Padding(
                 padding: const EdgeInsets.all(_spacing),
-                child: Row(
+                child: Column(
+                  spacing: _spacing,
                   children: [
                     StepDots(
                       count: state.steps.length,
                       current: state.currentStep,
                     ),
-                    const Spacer(),
-                    FilledButton(
-                      onPressed: () => _pressRightButton(state.rightButton),
-                      child: Text(
-                        _rightButtonLabelOf(state.rightButton, context.l10n),
-                      ),
+                    // Each button may take up to half the row, and its words
+                    // wrap rather than overflow when they need more, as in
+                    // Spanish with large text.
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      spacing: _spacing,
+                      children: [
+                        Flexible(
+                          child: state.canGoBack
+                              ? OutlinedButton(
+                                  onPressed: _turnBack,
+                                  child: Text(context.l10n.howToPlayPrevious),
+                                )
+                              : const SizedBox.shrink(),
+                        ),
+                        Flexible(
+                          child: FilledButton(
+                            onPressed: () =>
+                                _pressRightButton(state.rightButton),
+                            child: Text(
+                              _rightButtonLabelOf(
+                                state.rightButton,
+                                context.l10n,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
