@@ -47,7 +47,15 @@ class HomeView extends StatelessWidget {
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
-            child: BlocBuilder<HomeCubit, HomeViewState>(
+            child: BlocConsumer<HomeCubit, HomeViewState>(
+              // On the first launch, How to play opens over Home, so Back
+              // leads here.
+              listenWhen: (before, now) =>
+                  !before.showHowToPlay && now.showHowToPlay,
+              listener: (context, _) {
+                context.read<HomeCubit>().howToPlayOpened();
+                context.goNamed(AppRoute.howToPlay.name);
+              },
               builder: (context, state) => Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [

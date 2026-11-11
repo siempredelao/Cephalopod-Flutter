@@ -14,8 +14,10 @@ void main() {
       await tester.pumpWidget(
         localizedApp(
           HomePage(
-            createCubit: () =>
-                HomeCubit(hasGameToContinue: () async => hasGameToContinue),
+            createCubit: () => HomeCubit(
+              hasGameToContinue: () async => hasGameToContinue,
+              hasSeenHowToPlay: () async => true,
+            ),
           ),
         ),
       );

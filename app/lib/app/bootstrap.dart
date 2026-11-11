@@ -10,6 +10,7 @@ import 'package:cephalopod/features/about/data/package_info_app_version_source.d
 import 'package:cephalopod/features/about/data/url_launcher_link_opener.dart';
 import 'package:cephalopod/features/game/data/saved_game_json_codec.dart';
 import 'package:cephalopod/features/game/data/shared_preferences_game_repository.dart';
+import 'package:cephalopod/features/game/data/shared_preferences_how_to_play_repository.dart';
 import 'package:cephalopod/features/game/game_module.dart';
 import 'package:cephalopod/features/home/home_module.dart';
 import 'package:cephalopod/features/settings/data/shared_preferences_settings_repository.dart';
@@ -48,6 +49,10 @@ void bootstrap(Flavor flavor) {
       // (docs/adr/0016).
       errorReporter: logError,
     ),
+    howToPlayRepository: SharedPreferencesHowToPlayRepository(
+      sharedPreferencesAsync: preferences,
+      errorReporter: logError,
+    ),
     highlightLastMove: settings.highlightLastMove,
   );
   final about = AboutModule(
@@ -55,7 +60,10 @@ void bootstrap(Flavor flavor) {
     linkOpener: urlLauncherLinkOpener(errorReporter: logError),
   );
   final router = createRouter(
-    home: HomeModule(hasGameToContinue: game.hasGameToContinue),
+    home: HomeModule(
+      hasGameToContinue: game.hasGameToContinue,
+      hasSeenHowToPlay: game.hasSeenHowToPlay,
+    ),
     features: [game, settings, about],
   );
 

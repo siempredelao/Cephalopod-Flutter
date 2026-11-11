@@ -4,6 +4,7 @@ import 'package:cephalopod/core/navigation/app_route.dart';
 import 'package:cephalopod/core/navigation/dialog_page.dart';
 import 'package:cephalopod/core/navigation/feature_module.dart';
 import 'package:cephalopod/features/game/domain/game_repository.dart';
+import 'package:cephalopod/features/game/domain/how_to_play_repository.dart';
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/use_cases/choose_agent_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/has_game_to_continue.dart';
@@ -14,6 +15,7 @@ import 'package:cephalopod/features/game/domain/use_cases/undo_move.dart';
 import 'package:cephalopod/features/game/presentation/bloc/countdown_timer.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
+import 'package:cephalopod/features/game/presentation/bloc/how_to_play_cubit.dart';
 import 'package:cephalopod/features/game/presentation/bloc/opponent_query_codec.dart';
 import 'package:cephalopod/features/game/presentation/view/game_durations.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
@@ -33,11 +35,13 @@ final class GameModule implements FeatureModule {
   GameModule({
     required this._cephalopodRules,
     required this._gameRepository,
+    required this._howToPlayRepository,
     required this._highlightLastMove,
   });
 
   final CephalopodRules _cephalopodRules;
   final GameRepository _gameRepository;
+  final HowToPlayRepository _howToPlayRepository;
   final bool Function() _highlightLastMove;
 
   final PositionEvaluator _positionEvaluator = PositionEvaluator();
@@ -102,9 +106,18 @@ final class GameModule implements FeatureModule {
     GoRoute(
       path: 'how-to-play',
       name: AppRoute.howToPlay.name,
-      builder: (_, _) => const HowToPlayPage(),
+      builder: (_, _) => HowToPlayPage(createCubit: _createHowToPlayCubit),
     ),
   ];
+
+  /// Whether How to play has been shown on this device. A plain function,
+  /// so the composition root can hand it to Home, which opens How to play
+  /// by itself on the first launch only.
+  Future<bool> hasSeenHowToPlay() => _howToPlayRepository.hasSeenHowToPlay();
+
+  HowToPlayCubit _createHowToPlayCubit() {
+    return HowToPlayCubit(howToPlayRepository: _howToPlayRepository);
+  }
 
   /// The game route's first event, from its query parameters.
   GameEvent _openingOf(Map<String, String> parameters) {

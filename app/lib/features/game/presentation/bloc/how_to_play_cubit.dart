@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:cephalopod/features/game/domain/how_to_play_repository.dart';
 import 'package:cephalopod/features/game/presentation/bloc/tutorial_step_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/tutorial_steps.dart';
 import 'package:cephalopod/features/game/presentation/models/how_to_play_view_state.dart';
@@ -6,11 +7,20 @@ import 'package:cephalopod/features/game/presentation/models/tutorial_right_butt
 import 'package:cephalopod/features/game/presentation/models/tutorial_step_ui.dart';
 
 /// How to play's view model: maps the tutorial's steps to pages once, and
-/// follows which page is on screen. It starts on the first.
+/// follows which page is on screen. It starts on the first, and remembers
+/// that How to play was seen once it [opened].
 class HowToPlayCubit extends Cubit<HowToPlayViewState> {
   HowToPlayCubit({
+    required this._howToPlayRepository,
     TutorialStepUiMapper tutorialStepUiMapper = const TutorialStepUiMapper(),
   }) : super(_at(tutorialSteps.map(tutorialStepUiMapper.map).toList(), 0));
+
+  final HowToPlayRepository _howToPlayRepository;
+
+  /// How to play is on screen, however it was opened: it counts as seen
+  /// from now on, so the app does not open it by itself again. Leaving it
+  /// by Back, Skip or Done makes no difference.
+  Future<void> opened() => _howToPlayRepository.markHowToPlaySeen();
 
   /// The tutorial's [steps], with [step] on screen, counting from 0.
   static HowToPlayViewState _at(List<TutorialStepUi> steps, int step) {

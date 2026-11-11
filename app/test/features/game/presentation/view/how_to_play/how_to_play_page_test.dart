@@ -1,5 +1,7 @@
 import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/core/theme/board_colors.dart';
+import 'package:cephalopod/features/game/data/in_memory_how_to_play_repository.dart';
+import 'package:cephalopod/features/game/presentation/bloc/how_to_play_cubit.dart';
 import 'package:cephalopod/features/game/presentation/bloc/tutorial_steps.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/step_dots.dart';
@@ -10,6 +12,15 @@ import 'package:material_ui/material_ui.dart';
 import '../../../../../helpers/translations.dart';
 
 void main() {
+  late InMemoryHowToPlayRepository repository;
+
+  setUp(() => repository = InMemoryHowToPlayRepository());
+
+  /// How to play, remembering what it marks in [repository].
+  HowToPlayPage howToPlayPage() => HowToPlayPage(
+    createCubit: () => HowToPlayCubit(howToPlayRepository: repository),
+  );
+
   Future<void> pumpTutorial(
     WidgetTester tester, {
     Locale locale = const Locale('en'),
@@ -20,7 +31,7 @@ void main() {
         localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         theme: ThemeData(extensions: const [BoardColors.light]),
-        home: const HowToPlayPage(),
+        home: howToPlayPage(),
       ),
     );
   }
@@ -35,7 +46,7 @@ void main() {
         theme: ThemeData(extensions: const [BoardColors.light]),
         routes: {
           '/': (_) => const Text('Home'),
-          '/how-to-play': (_) => const HowToPlayPage(),
+          '/how-to-play': (_) => howToPlayPage(),
         },
         initialRoute: '/how-to-play',
       ),
@@ -53,6 +64,12 @@ void main() {
 
       expect(find.text(english.howToPlayTakeTurnsTitle), findsOne);
       expect(find.byType(GameBoard), findsOne);
+    });
+
+    testWidgets('counts as seen once it opens', (tester) async {
+      await pumpTutorial(tester);
+
+      expect(await repository.hasSeenHowToPlay(), isTrue);
     });
 
     testWidgets('speaks Spanish', (tester) async {
