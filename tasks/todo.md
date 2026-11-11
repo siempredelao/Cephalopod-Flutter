@@ -55,7 +55,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] 33c. feat(game): let the board draw a hint (S)
 - [x] 33d-1. feat(game): show a hint in the game's state (S)
 - [x] 33d-2. feat(game): say a hint aloud (S)
-- [ ] 33d-3. feat(game): give a hint (S)
+- [x] 33d-3. feat(game): give a hint (S)
 - [ ] 37a. feat(game): say what the move just played captured, and whether it won (S)
 - [ ] 34a. feat(game): draw particles (S)
 - [ ] 34b. feat(game): burst a captured die (S)

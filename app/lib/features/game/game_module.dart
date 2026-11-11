@@ -11,6 +11,7 @@ import 'package:cephalopod/features/game/domain/use_cases/has_game_to_continue.d
 import 'package:cephalopod/features/game/domain/use_cases/play_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/resume_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/start_new_game.dart';
+import 'package:cephalopod/features/game/domain/use_cases/suggest_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/undo_move.dart';
 import 'package:cephalopod/features/game/presentation/bloc/countdown_timer.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
@@ -74,6 +75,12 @@ final class GameModule implements FeatureModule {
     backgroundRunner: compute,
   );
 
+  /// Hints come from the same agents, in the background too.
+  late final SuggestMove _suggestMove = SuggestMove(
+    agentFactory: _agentFor,
+    backgroundRunner: compute,
+  );
+
   /// Whether there is a saved game worth continuing. A plain function, so
   /// the composition root can hand it to features that may not import this
   /// one.
@@ -133,6 +140,7 @@ final class GameModule implements FeatureModule {
       undoMove: _undoMove,
       resumeGame: _resumeGame,
       chooseAgentMove: _chooseAgentMove,
+      suggestMove: _suggestMove,
       highlightLastMove: _highlightLastMove(),
       moveCountdown: CountdownTimer(moveSettleDuration),
     );

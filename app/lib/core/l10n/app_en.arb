@@ -359,6 +359,10 @@
   "@gameMenuRedo": {
     "description": "Game: menu item that plays again a turn taken back."
   },
+  "gameMenuHint": "Hint",
+  "@gameMenuHint": {
+    "description": "Game: menu item that marks on the board where the player to move could place their die."
+  },
   "gameMenuRestart": "Restart game",
   "@gameMenuRestart": {
     "description": "Game: menu item that starts the game again, against the same opponent and under the same rules. It does not ask for a new opponent."

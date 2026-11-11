@@ -7,6 +7,7 @@ import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
+import 'package:cephalopod/features/game/presentation/models/square_mark.dart';
 import 'package:cephalopod/features/game/presentation/view/game_view.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/capture_controls.dart';
@@ -183,6 +184,69 @@ void main() {
       expect(menuItem(tester, 'Undo').onPressed, isNull);
       expect(menuItem(tester, 'Redo').onPressed, isNull);
       expect(menuItem(tester, 'Restart game').onPressed, isNotNull);
+    });
+
+    group('Hint', () {
+      /// The mark on the board's square at [square].
+      SquareMark markAt(WidgetTester tester, Position square) {
+        final squares = tester.widgetList<BoardSquare>(
+          find.byType(BoardSquare),
+        );
+        return squares
+            .firstWhere(
+              (widget) =>
+                  widget.square.row == square.row &&
+                  widget.square.col == square.col,
+            )
+            .square
+            .mark;
+      }
+
+      testWidgets('marks where to place a die, and says so', (tester) async {
+        final semantics = tester.ensureSemantics();
+        await pumpGame(tester);
+
+        await tapMenuItem(tester, 'Hint');
+
+        // The test agents suggest the first legal move: the top left corner.
+        expect(markAt(tester, const Position(0, 0)), SquareMark.hintTarget);
+        expect(
+          find.bySemanticsLabel(
+            'Hint: place your die at row 1, column 1. Player 1 to move',
+          ),
+          findsOne,
+        );
+        semantics.dispose();
+      });
+
+      testWidgets('clears the marks when the player places a die', (
+        tester,
+      ) async {
+        await pumpGame(tester);
+        await tapMenuItem(tester, 'Hint');
+
+        await tapSquare(tester, const Position(2, 2));
+
+        expect(markAt(tester, const Position(0, 0)), SquareMark.none);
+      });
+
+      testWidgets('offers no second hint while one shows', (tester) async {
+        await pumpGame(tester);
+        await tapMenuItem(tester, 'Hint');
+
+        await openMenu(tester);
+
+        expect(menuItem(tester, 'Hint').onPressed, isNull);
+      });
+
+      testWidgets('offers no hint once the game is over', (tester) async {
+        await pumpGame(tester, config: const GameConfig(boardSize: 1));
+        await tapSquare(tester, const Position(0, 0));
+
+        await openMenu(tester);
+
+        expect(menuItem(tester, 'Hint').onPressed, isNull);
+      });
     });
 
     testWidgets('keeps only How to play and the menu in the app bar', (
