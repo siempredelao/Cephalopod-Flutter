@@ -10,6 +10,7 @@ import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/models/square_mark.dart';
 import 'package:cephalopod/features/game/presentation/view/game_view.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
+import 'package:cephalopod/features/game/presentation/view/widgets/capture_burst.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/capture_controls.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -55,6 +56,12 @@ void main() {
     );
     return tester.widget<ScaleTransition>(transition).scale.value;
   }
+
+  /// The burst of captured dice, while one plays over the board.
+  final burst = find.descendant(
+    of: find.byType(CaptureBurst),
+    matching: find.byType(CustomPaint),
+  );
 
   /// Opens the app bar's "more" menu.
   Future<void> openMenu(WidgetTester tester) async {
@@ -350,6 +357,34 @@ void main() {
         expect(dieScale(tester, const Position(1, 1)), 1);
       });
 
+      testWidgets('bursts the captured dice while they shrink away', (
+        tester,
+      ) async {
+        await tapSurroundedCentre(tester);
+        await tapSquare(tester, const Position(0, 1));
+        await tapSquare(tester, const Position(1, 0));
+
+        await tester.tap(find.text('Capture'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+        expect(burst, findsOne);
+
+        await tester.pumpAndSettle();
+        expect(burst, findsNothing);
+      });
+
+      testWidgets('does not burst a die placed without a capture', (
+        tester,
+      ) async {
+        await pumpGame(tester);
+
+        await tester.tap(find.byKey(const ValueKey((2, 2))));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+
+        expect(burst, findsNothing);
+      });
+
       testWidgets('takes a capture back, and plays it again, at once', (
         tester,
       ) async {
@@ -363,6 +398,7 @@ void main() {
         // Back: the new die is gone and the captured dice are whole again.
         await tapMenuItemOnce(tester, 'Undo');
         expect(diceOnBoard, findsNWidgets(4));
+        expect(burst, findsNothing);
         for (final square in captured) {
           expect(dieScale(tester, square), 1);
         }
@@ -370,6 +406,7 @@ void main() {
         // Again: the captured dice are gone and the new die is whole.
         await tapMenuItemOnce(tester, 'Redo');
         expect(diceOnBoard, findsNWidgets(3));
+        expect(burst, findsNothing);
         expect(dieScale(tester, const Position(1, 1)), 1);
       });
 
