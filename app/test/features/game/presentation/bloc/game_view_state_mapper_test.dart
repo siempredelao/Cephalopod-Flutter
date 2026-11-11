@@ -3,12 +3,14 @@ import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/presentation/bloc/board_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/dice_tally_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_view_state_mapper.dart';
+import 'package:cephalopod/features/game/presentation/bloc/hint_state.dart';
 import 'package:cephalopod/features/game/presentation/bloc/played_move.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod/features/game/presentation/models/capture_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/computer_move_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/game_view_state.dart';
 import 'package:cephalopod/features/game/presentation/models/headline_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/hint_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/played_move_ui.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:cephalopod_engine/testing.dart';
@@ -48,6 +50,7 @@ void main() {
     bool canUndo = false,
     bool canRedo = false,
     PlayedMove? playedMove,
+    HintState hint = const HintState.none(),
   }) {
     return mapper.map(
       game: figure4,
@@ -58,6 +61,7 @@ void main() {
       canUndo: canUndo,
       canRedo: canRedo,
       playedMove: playedMove,
+      hint: hint,
     );
   }
 
@@ -124,6 +128,73 @@ void main() {
       );
 
       expect(map(phase: const TurnPhase.gameEnded(blackWins)).canTap, isFalse);
+    });
+
+    group('with a hint', () {
+      final hintMove = Move(top, captures: {left, right});
+
+      test('offers one only while a die can be placed', () {
+        expect(map().canHint, isTrue);
+        expect(
+          map(phase: const TurnPhase.computerThinking()).canHint,
+          isFalse,
+        );
+        expect(
+          map(
+            phase: const TurnPhase.gameEnded(
+              Finished(winner: Player.black, blackDice: 13, whiteDice: 12),
+            ),
+          ).canHint,
+          isFalse,
+        );
+        expect(
+          map(
+            phase: TurnPhase.choosingCapture(
+              target: top,
+              options: [
+                {left, right},
+              ],
+            ),
+          ).canHint,
+          isFalse,
+        );
+      });
+
+      test('says it is looking, and waits for it, while it searches', () {
+        final screen = map(
+          canUndo: true,
+          canRedo: true,
+          hint: const HintState.searching(),
+        );
+
+        expect(screen.headline, const HeadlineUi.lookingForHint());
+        expect(screen.canTap, isFalse);
+        expect(screen.canUndo, isFalse);
+        expect(screen.canRedo, isFalse);
+        expect(screen.canHint, isFalse);
+        expect(screen.hint, isNull);
+      });
+
+      test('marks the board and reports it once found', () {
+        final screen = map(canUndo: true, hint: HintState.found(hintMove));
+
+        expect(screen.hint, const HintUi(row: 0, col: 2, captures: 2));
+        expect(
+          screen.board,
+          const BoardUiMapper().map(
+            game: figure4,
+            phase: placing,
+            lastMove: Move(center),
+            opponent: const FriendOpponent(),
+            highlightLastMove: true,
+            hint: hintMove,
+          ),
+        );
+        expect(screen.headline, isNot(const HeadlineUi.lookingForHint()));
+        expect(screen.canTap, isTrue);
+        expect(screen.canUndo, isTrue);
+        expect(screen.canHint, isFalse);
+      });
     });
 
     test("counts each side's dice on the board", () {

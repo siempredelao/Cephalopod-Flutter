@@ -53,7 +53,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] 33a. feat(game): add a use case that suggests a move (S)
 - [x] 33b. refactor(game): draw a square's ring in its own widget (S)
 - [x] 33c. feat(game): let the board draw a hint (S)
-- [ ] 33d. feat(game): give a hint (S)
+- [x] 33d. feat(game): give a hint (S)
 - [ ] 37a. feat(game): say what the move just played captured, and whether it won (S)
 - [ ] 34a. feat(game): draw particles (S)
 - [ ] 34b. feat(game): burst a captured die (S)

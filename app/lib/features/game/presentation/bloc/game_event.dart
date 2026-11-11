@@ -61,3 +61,8 @@ final class UndoRequested extends GameEvent {
 final class RedoRequested extends GameEvent {
   const RedoRequested();
 }
+
+/// The player asked where to place their next die.
+final class HintRequested extends GameEvent {
+  const HintRequested();
+}

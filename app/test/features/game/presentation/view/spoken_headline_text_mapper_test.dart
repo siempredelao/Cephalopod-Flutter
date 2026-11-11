@@ -1,5 +1,6 @@
 import 'package:cephalopod/features/game/presentation/models/computer_move_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/headline_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/hint_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/spoken_headline_text_mapper.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -16,6 +17,31 @@ void main() {
       expect(
         mapper.map(const HeadlineUi.computerToMove(), null, english),
         'The computer is thinking…',
+      );
+    });
+
+    test('says the hint first, once found, counting from 1', () {
+      const placeOnly = HintUi(row: 0, col: 2, captures: 0);
+      const captureOne = HintUi(row: 0, col: 2, captures: 1);
+      const captureTwo = HintUi(row: 4, col: 0, captures: 2);
+
+      expect(
+        mapper.map(yourTurn, null, english, hint: placeOnly),
+        'Hint: place your die at row 1, column 3. Your turn',
+      );
+      expect(
+        mapper.map(yourTurn, null, english, hint: captureOne),
+        'Hint: place your die at row 1, column 3, capturing 1 die. Your turn',
+      );
+      expect(
+        mapper.map(yourTurn, null, english, hint: captureTwo),
+        'Hint: place your die at row 5, column 1, capturing 2 dice. '
+        'Your turn',
+      );
+      expect(
+        mapper.map(yourTurn, null, spanish, hint: captureTwo),
+        'Pista: coloca tu dado en la fila 5, columna 1, capturando 2 dados. '
+        'Tu turno',
       );
     });
 

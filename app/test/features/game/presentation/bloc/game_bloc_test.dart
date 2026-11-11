@@ -10,6 +10,7 @@ import 'package:cephalopod/features/game/presentation/bloc/countdown_timer.dart'
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_view_state_mapper.dart';
+import 'package:cephalopod/features/game/presentation/bloc/hint_state.dart';
 import 'package:cephalopod/features/game/presentation/bloc/played_move.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod/features/game/presentation/models/game_view_state.dart';
@@ -46,6 +47,7 @@ void main() {
     TurnPhase phase = const TurnPhase.awaitingPlacement(),
     Move? lastMove,
     PlayedMove? playedMove,
+    HintState hint = const HintState.none(),
     bool canUndo = false,
     bool canRedo = false,
     Opponent opponent = const FriendOpponent(),
@@ -59,6 +61,7 @@ void main() {
       canUndo: canUndo,
       canRedo: canRedo,
       playedMove: playedMove,
+      hint: hint,
     );
   }
 
@@ -764,6 +767,150 @@ void main() {
         expect(saved?.record.moves, isEmpty);
       },
     );
+  });
+
+  group('GameBloc hints', () {
+    final newGame = rules.newGame();
+    // The test agents play, and suggest, the first legal move.
+    final suggested = rules.legalMoves(newGame).first;
+    final searching = screenOf(newGame, hint: const HintState.searching());
+    final hinted = screenOf(newGame, hint: HintState.found(suggested));
+
+    blocTest<GameBloc, GameViewState>(
+      'says it is looking, then shows the suggested move',
+      build: build,
+      act: (bloc) => bloc.add(const HintRequested()),
+      expect: () => [searching, hinted],
+    );
+
+    test('the screen says so while it looks', () {
+      expect(searching.headline, const HeadlineUi.lookingForHint());
+      expect(searching.canTap, isFalse);
+      expect(hinted.hint, isNotNull);
+    });
+
+    blocTest<GameBloc, GameViewState>(
+      'clears the hint when the player taps a square',
+      build: build,
+      act: (bloc) => bloc
+        ..add(const HintRequested())
+        ..add(tap(center)),
+      expect: () => [
+        searching,
+        hinted,
+        placing(newGame),
+        screenOf(
+          after(newGame, Move(center)),
+          lastMove: Move(center),
+          playedMove: (move: Move(center), byComputer: false),
+          canUndo: true,
+        ),
+      ],
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      'clears the hint on a tap that places nothing',
+      build: () => buildAt(after(newGame, Move(center))),
+      act: (bloc) => bloc
+        ..add(const HintRequested())
+        // The centre is taken.
+        ..add(tap(center)),
+      skip: 2,
+      expect: () => [placing(after(newGame, Move(center)))],
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      'clears the hint on undo',
+      build: build,
+      act: (bloc) => bloc
+        ..add(tap(center))
+        ..add(const HintRequested())
+        ..add(const UndoRequested()),
+      skip: 3,
+      expect: () => [
+        // First the hint goes, then the move.
+        screenOf(
+          after(newGame, Move(center)),
+          lastMove: Move(center),
+          playedMove: (move: Move(center), byComputer: false),
+          canUndo: true,
+        ),
+        placing(newGame).copyWith(canRedo: true),
+      ],
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      'gives one hint at a time',
+      build: build,
+      act: (bloc) => bloc
+        ..add(const HintRequested())
+        ..add(const HintRequested()),
+      expect: () => [searching, hinted],
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      'gives no hint once the game is over',
+      build: () => createTestGameBloc(config: const GameConfig(boardSize: 1)),
+      act: (bloc) => bloc
+        ..add(tap(const Position(0, 0)))
+        ..add(const HintRequested()),
+      // The move that fills the board, and nothing after it.
+      expect: () => [isA<GameViewState>()],
+    );
+
+    test('gives no hint while the computer thinks', () async {
+      // The computer thinks for as long as the test runs.
+      final bloc =
+          createTestGameBloc(
+              backgroundRunner: <M, R>(_, _) => Completer<R>().future,
+            )
+            ..add(
+              const GameStarted(
+                opponent: ComputerOpponent(
+                  difficulty: Difficulty.easy,
+                  player: Player.black,
+                ),
+              ),
+            )
+            ..add(const HintRequested());
+      await pumpEventQueue();
+
+      expect(bloc.state.headline, const HeadlineUi.computerToMove());
+      expect(bloc.state.canHint, isFalse);
+      // Leaving the screen closes its bloc without waiting, as
+      // `BlocProvider` does.
+      unawaited(bloc.close());
+    });
+
+    test('drops the hint when the screen closes during the search', () async {
+      final search = Completer<Move>();
+      final bloc = createTestGameBloc(
+        backgroundRunner: <M, R>(_, _) => search.future as Future<R>,
+      )..add(const HintRequested());
+      await pumpEventQueue();
+      expect(bloc.state, searching);
+
+      final closing = bloc.close();
+      search.complete(suggested);
+      await closing;
+
+      expect(bloc.state, searching);
+    });
+
+    test('waits for the last move to be seen before it looks', () async {
+      final countdown = _ManualCountdown();
+      final bloc = createTestGameBloc(moveCountdown: countdown)
+        ..add(tap(center))
+        ..add(const HintRequested());
+      await Future<void>.delayed(Duration.zero);
+
+      expect(bloc.state.hint, isNull);
+      expect(bloc.state.headline, isNot(const HeadlineUi.lookingForHint()));
+
+      countdown.cancel();
+      await bloc.stream.firstWhere((state) => state.hint != null);
+      await bloc.close();
+    });
   });
 }
 

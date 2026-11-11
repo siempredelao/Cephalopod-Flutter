@@ -157,6 +157,10 @@
   "@gameHeadlineComputerToMove": {
     "description": "Game: above the board while the computer chooses its move."
   },
+  "gameHeadlineLookingForHint": "Looking for a hint…",
+  "@gameHeadlineLookingForHint": {
+    "description": "Game: above the board while the app looks for a move to suggest, after the player asked for a hint."
+  },
   "gameHeadlinePlayerWon": "{player} wins {winnerDice} to {loserDice}",
   "@gameHeadlinePlayerWon": {
     "description": "Game: above the board when a game between two people ends. The numbers are the dice each player has on the full board, the winner's first.",
@@ -197,6 +201,24 @@
     }
   },
 
+  "gameHeadlineWithHint": "Hint: place your die at row {row}, column {column}{captures, plural, =0{} =1{, capturing 1 die} other{, capturing {captures} dice}}. {headline}",
+  "@gameHeadlineWithHint": {
+    "description": "Game: what a screen reader says for the line above the board once a hint is found. Rows and columns count from 1 at the top left; {captures} is how many dice the move would capture, 0 for none; {headline} is the line above the board, such as gameHeadlinePersonToMove.",
+    "placeholders": {
+      "row": {
+        "type": "int"
+      },
+      "column": {
+        "type": "int"
+      },
+      "captures": {
+        "type": "int"
+      },
+      "headline": {
+        "type": "String"
+      }
+    }
+  },
   "gameHeadlineAfterComputerMove": "The computer placed a {pips} at row {row}, column {column}. {headline}",
   "@gameHeadlineAfterComputerMove": {
     "description": "Game: what a screen reader says for the line above the board right after the computer moved, so one announcement tells both what it did and whose turn it is. {pips} is the number on the die it placed, 1 to 6; rows and columns count from 1 at the top left; {headline} is the line above the board, such as gameHeadlinePersonToMove.",
@@ -336,6 +358,10 @@
   "gameMenuRedo": "Redo",
   "@gameMenuRedo": {
     "description": "Game: menu item that plays again a turn taken back."
+  },
+  "gameMenuHint": "Hint",
+  "@gameMenuHint": {
+    "description": "Game: menu item that marks on the board where the player to move could place their die."
   },
   "gameMenuRestart": "Restart game",
   "@gameMenuRestart": {
