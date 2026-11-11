@@ -39,6 +39,7 @@
   "gameHeadlinePersonWon": "Ganas por {winnerDice} a {loserDice}",
   "gameHeadlineComputerWon": "Gana el ordenador por {winnerDice} a {loserDice}",
 
+  "gameHeadlineWithHint": "Pista: coloca tu dado en la fila {row}, columna {column}{captures, plural, =0{} =1{, capturando 1 dado} other{, capturando {captures} dados}}. {headline}",
   "gameHeadlineAfterComputerMove": "El ordenador puso un {pips} en la fila {row}, columna {column}. {headline}",
 
   "gameCaptureSum": "Suma de la captura: {selectedSum} de {maxSum} como máximo",
