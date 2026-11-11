@@ -12,6 +12,7 @@ import 'package:cephalopod/features/game/presentation/view/game_view.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/capture_burst.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/capture_controls.dart';
+import 'package:cephalopod/features/game/presentation/view/widgets/confetti.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -60,6 +61,12 @@ void main() {
   /// The burst of captured dice, while one plays over the board.
   final burst = find.descendant(
     of: find.byType(CaptureBurst),
+    matching: find.byType(CustomPaint),
+  );
+
+  /// The confetti, while it falls over the screen.
+  final confetti = find.descendant(
+    of: find.byType(Confetti),
     matching: find.byType(CustomPaint),
   );
 
@@ -276,6 +283,62 @@ void main() {
       await tapSquare(tester, const Position(0, 0));
 
       expect(find.text('Player 1 wins 1 to 0'), findsOne);
+    });
+
+    group('at the end of a game between two people', () {
+      /// Player 1 fills a one-square board, and wins.
+      Future<void> win(WidgetTester tester) async {
+        await pumpGame(tester, config: const GameConfig(boardSize: 1));
+        await tester.tap(find.byKey(const ValueKey((0, 0))));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
+      }
+
+      testWidgets('throws confetti over the whole screen', (tester) async {
+        await win(tester);
+
+        expect(find.text('Player 1 wins 1 to 0'), findsOne);
+        expect(confetti, findsOne);
+        expect(
+          tester.getRect(confetti),
+          tester.getRect(find.byType(Scaffold)),
+        );
+      });
+
+      testWidgets('lets taps through to the menu while it falls', (
+        tester,
+      ) async {
+        await win(tester);
+
+        await tester.tap(find.byTooltip('More options'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        expect(find.widgetWithText(MenuItemButton, 'Restart game'), findsOne);
+        expect(confetti, findsOne);
+      });
+
+      testWidgets('stops the confetti when the game restarts', (tester) async {
+        await win(tester);
+
+        await tapMenuItemOnce(tester, 'Restart game');
+
+        expect(find.text('Player 1 to move'), findsOne);
+        expect(confetti, findsNothing);
+      });
+
+      testWidgets('throws no confetti under less motion', (tester) async {
+        tester.platformDispatcher.accessibilityFeaturesTestValue =
+            const FakeAccessibilityFeatures(disableAnimations: true);
+        addTearDown(
+          tester.platformDispatcher.clearAccessibilityFeaturesTestValue,
+        );
+
+        await win(tester);
+
+        expect(find.text('Player 1 wins 1 to 0'), findsOne);
+        expect(confetti, findsNothing);
+      });
     });
 
     testWidgets('restarts the game under the same rules', (tester) async {
@@ -514,18 +577,28 @@ void main() {
         semantics.dispose();
       });
 
-      testWidgets('R8: says when the person won', (tester) async {
+      testWidgets('R8: says when the person won, with confetti', (
+        tester,
+      ) async {
         await pumpAgainst(tester, Player.white, config: oneSquare);
 
-        await tapSquare(tester, const Position(0, 0));
+        await tester.tap(find.byKey(const ValueKey((0, 0))));
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
 
         expect(find.text('You win 1 to 0'), findsOne);
+        expect(confetti, findsOne);
+        await tester.pumpAndSettle();
+        expect(confetti, findsNothing);
       });
 
-      testWidgets('R8: says when the computer won', (tester) async {
+      testWidgets('R8: says when the computer won, without confetti', (
+        tester,
+      ) async {
         await pumpAgainst(tester, Player.black, config: oneSquare);
 
         expect(find.text('The computer wins 1 to 0'), findsOne);
+        expect(confetti, findsNothing);
       });
     });
   });

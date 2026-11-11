@@ -154,6 +154,43 @@ List<Particle> burstParticles({
   ];
 }
 
+/// [count] strips of confetti that start above an [area] of the screen,
+/// spread across its width, and fall into it, turning as they go.
+///
+/// Each strip starts somewhere above the top edge, up to half of [area]'s
+/// height above it, so they fall in for a while rather than all at once.
+/// Each one is thrown down at a fifth to three fifths of the height per
+/// run, drifts a little to the left or right, at up to a fifth of the width
+/// per run, and spins up to three turns either way. Each is a strip
+/// between [pieceSize] and half as big again, twice as wide as it is tall.
+/// The colours take turns from [colors]. [random] decides the rest, so the
+/// same seed gives the same confetti every time.
+List<Particle> confettiParticles({
+  required Size area,
+  required int count,
+  required double pieceSize,
+  required List<Color> colors,
+  required math.Random random,
+}) {
+  return [
+    for (var i = 0; i < count; i++)
+      Particle(
+        origin: Offset(
+          random.nextDouble() * area.width,
+          -random.nextDouble() * area.height / 2,
+        ),
+        velocity: Offset(
+          _between(-0.2, 0.2, random) * area.width,
+          _between(0.2, 0.6, random) * area.height,
+        ),
+        color: colors[i % colors.length],
+        size: const Size(2, 1) * (pieceSize * _between(1, 1.5, random)),
+        angle: random.nextDouble() * math.pi,
+        spin: _between(-6, 6, random) * math.pi,
+      ),
+  ];
+}
+
 /// A random number from [low] up to [high].
 double _between(double low, double high, math.Random random) {
   return low + (high - low) * random.nextDouble();

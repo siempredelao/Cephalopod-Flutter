@@ -6,6 +6,7 @@ import 'package:cephalopod/features/game/presentation/view/widgets/capture_contr
 import 'package:cephalopod/features/game/presentation/view/widgets/dice_tally.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_app_bar.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
+import 'package:cephalopod/features/game/presentation/view/widgets/game_effects.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_headline.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
@@ -16,7 +17,7 @@ import 'package:material_ui/material_ui.dart';
 /// decides what they do.
 ///
 /// It only lays the screen out. Each part is a widget of its own in
-/// `widgets/`.
+/// `widgets/`, and [GameEffects] puts the effects over the whole screen.
 class GameView extends StatelessWidget {
   const GameView({super.key});
 
@@ -28,38 +29,40 @@ class GameView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const GameAppBar(),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(_spacing),
-          child: BlocBuilder<GameBloc, GameViewState>(
-            builder: (context, state) => Column(
-              children: [
-                GameHeadline(
-                  headline: state.headline,
-                  computerMove: state.playedMove?.computer,
-                  hint: state.hint,
-                ),
-                const SizedBox(height: _spacing / 2),
-                DiceTally(tally: state.tally),
-                const SizedBox(height: _spacing),
-                Expanded(
-                  child: Center(
-                    child: GameBoard(
-                      board: state.board,
-                      animateDice: state.playedMove != null,
-                      captured: state.playedMove?.captured ?? const [],
-                      onSquareTapped: _tapHandlerOf(context, state),
+    return GameEffects(
+      child: Scaffold(
+        appBar: const GameAppBar(),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(_spacing),
+            child: BlocBuilder<GameBloc, GameViewState>(
+              builder: (context, state) => Column(
+                children: [
+                  GameHeadline(
+                    headline: state.headline,
+                    computerMove: state.playedMove?.computer,
+                    hint: state.hint,
+                  ),
+                  const SizedBox(height: _spacing / 2),
+                  DiceTally(tally: state.tally),
+                  const SizedBox(height: _spacing),
+                  Expanded(
+                    child: Center(
+                      child: GameBoard(
+                        board: state.board,
+                        animateDice: state.playedMove != null,
+                        captured: state.playedMove?.captured ?? const [],
+                        onSquareTapped: _tapHandlerOf(context, state),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: _spacing),
-                SizedBox(
-                  height: _controlsHeight,
-                  child: _controlsFor(context, state),
-                ),
-              ],
+                  const SizedBox(height: _spacing),
+                  SizedBox(
+                    height: _controlsHeight,
+                    child: _controlsFor(context, state),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
