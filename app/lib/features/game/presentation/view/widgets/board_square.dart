@@ -1,11 +1,11 @@
 import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/core/theme/board_colors.dart';
 import 'package:cephalopod/features/game/presentation/models/die_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/square_mark.dart';
 import 'package:cephalopod/features/game/presentation/models/square_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/game_durations.dart';
 import 'package:cephalopod/features/game/presentation/view/square_text_mapper.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
+import 'package:cephalopod/features/game/presentation/view/widgets/square_ring.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// One [square] of the board: a tile or the die on it, with a glowing ring
@@ -42,14 +42,6 @@ class BoardSquare extends StatefulWidget {
 
 class _BoardSquareState extends State<BoardSquare>
     with SingleTickerProviderStateMixin {
-  static const double _ringWidth = 3;
-  static const double _ringGlow = 8;
-  static const double _glowOpacity = 0.4;
-  static const double _cornerRadius = 10;
-
-  /// Room for the ring, so the tile is the same size whether marked or not.
-  static const double _ringInset = 6;
-
   /// The size a die grows from and shrinks to, as a fraction of its full
   /// size.
   static const double _smallestDie = 0.5;
@@ -119,13 +111,6 @@ class _BoardSquareState extends State<BoardSquare>
     final square = widget.square;
     final onTap = widget.onTap;
     final die = _drawnDie;
-    final markColor = switch (square.mark) {
-      SquareMark.none => null,
-      SquareMark.lastMove => colors.lastMove,
-      SquareMark.captureTarget => colors.captureTarget,
-      SquareMark.captureOption => colors.captureOption,
-      SquareMark.captureSelected => colors.captureSelected,
-    };
     return Semantics(
       label: widget._squareTextMapper.map(square, context.l10n),
       button: true,
@@ -135,32 +120,26 @@ class _BoardSquareState extends State<BoardSquare>
       child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
-        // The ring's box is there even without a ring. A box that came and
-        // went with the mark would make Flutter build everything inside it
-        // again, and the die would lose its place in the animation.
-        child: DecoratedBox(
-          decoration: _ringOf(markColor),
-          child: Padding(
-            padding: const EdgeInsets.all(_ringInset),
-            // The tile stays under the die, so the die grows out of the
-            // square it is placed on, and shrinks back into it.
-            child: DecoratedBox(
-              decoration: _tileOf(colors.square),
-              child: AnimatedBuilder(
-                animation: _presence,
-                // Built here, not on every frame of the animation.
-                child: die == null ? null : DieFace(die: die),
-                builder: (context, dieFace) {
-                  // No die, or one that has finished shrinking away.
-                  if (dieFace == null || _presence.isDismissed) {
-                    return const SizedBox.expand();
-                  }
-                  return FadeTransition(
-                    opacity: _opacity,
-                    child: ScaleTransition(scale: _scale, child: dieFace),
-                  );
-                },
-              ),
+        child: SquareRing(
+          mark: square.mark,
+          // The tile stays under the die, so the die grows out of the
+          // square it is placed on, and shrinks back into it.
+          child: DecoratedBox(
+            decoration: _tileOf(colors.square),
+            child: AnimatedBuilder(
+              animation: _presence,
+              // Built here, not on every frame of the animation.
+              child: die == null ? null : DieFace(die: die),
+              builder: (context, dieFace) {
+                // No die, or one that has finished shrinking away.
+                if (dieFace == null || _presence.isDismissed) {
+                  return const SizedBox.expand();
+                }
+                return FadeTransition(
+                  opacity: _opacity,
+                  child: ScaleTransition(scale: _scale, child: dieFace),
+                );
+              },
             ),
           ),
         ),
@@ -168,26 +147,10 @@ class _BoardSquareState extends State<BoardSquare>
     );
   }
 
-  /// A glowing ring in [color] around the tile, or nothing drawn without a
-  /// colour.
-  static BoxDecoration _ringOf(Color? color) {
-    if (color == null) return const BoxDecoration();
-    return BoxDecoration(
-      borderRadius: BorderRadius.circular(_cornerRadius + _ringInset),
-      border: Border.all(color: color, width: _ringWidth),
-      boxShadow: [
-        BoxShadow(
-          color: color.withValues(alpha: _glowOpacity),
-          blurRadius: _ringGlow,
-        ),
-      ],
-    );
-  }
-
   static BoxDecoration _tileOf(Color color) {
     return BoxDecoration(
       color: color,
-      borderRadius: BorderRadius.circular(_cornerRadius),
+      borderRadius: BorderRadius.circular(SquareRing.tileCornerRadius),
     );
   }
 }
