@@ -1,17 +1,23 @@
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
+import 'package:cephalopod/features/game/presentation/bloc/hint_state.dart';
 import 'package:cephalopod/features/game/presentation/bloc/side_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/models/headline_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/role_ui.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
 /// Turns how the game stands into the [HeadlineUi] above the board: whose
-/// turn it is, or who won and by how much, named for who the person faces.
+/// turn it is, or who won and by how much, named for who the person faces;
+/// or, while a hint is being looked for, that it is.
 final class HeadlineUiMapper {
   const HeadlineUiMapper({this._sideUiMapper = const SideUiMapper()});
 
   final SideUiMapper _sideUiMapper;
 
-  HeadlineUi map(GameStatus status, Opponent opponent) {
+  HeadlineUi map(GameStatus status, Opponent opponent, HintState hint) {
+    if (hint is HintSearching) {
+      return const HeadlineUi.lookingForHint();
+    }
+
     return switch (status) {
       InProgress(:final toMove) => _toMoveOf(toMove, opponent),
       Finished(:final winner, :final blackDice, :final whiteDice) => _wonOf(

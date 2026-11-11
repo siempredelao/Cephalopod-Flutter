@@ -22,6 +22,7 @@ final class HeadlineTextMapper {
     ),
     PersonToMoveHeadline() => l10n.gameHeadlinePersonToMove,
     ComputerToMoveHeadline() => l10n.gameHeadlineComputerToMove,
+    LookingForHintHeadline() => l10n.gameHeadlineLookingForHint,
     PlayerWonHeadline(:final player, :final winnerDice, :final loserDice) =>
       l10n.gameHeadlinePlayerWon(
         _playerTextMapper.map(player, l10n),

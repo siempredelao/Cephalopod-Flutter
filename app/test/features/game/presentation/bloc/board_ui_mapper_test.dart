@@ -1,6 +1,7 @@
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/presentation/bloc/board_ui_mapper.dart';
+import 'package:cephalopod/features/game/presentation/bloc/hint_state.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod/features/game/presentation/models/board_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/die_ui.dart';
@@ -52,6 +53,31 @@ void main() {
   }
 
   group('BoardUiMapper', () {
+    test("marks a hint's square and the dice it would capture", () {
+      final hint = Move(top, captures: {left, right});
+
+      final board = map(
+        phase: TurnPhase.awaitingPlacement(hint: HintState.found(hint)),
+      );
+
+      expect(squareAt(board, top).mark, SquareMark.hintTarget);
+      expect(squareAt(board, left).mark, SquareMark.hintCapture);
+      expect(squareAt(board, right).mark, SquareMark.hintCapture);
+      expect(squareAt(board, below).mark, SquareMark.none);
+    });
+
+    test('shows a hint over the last move', () {
+      // The last move placed the 5 below, which the hint would capture.
+      final hint = Move(top, captures: {left, below});
+
+      final board = map(
+        phase: TurnPhase.awaitingPlacement(hint: HintState.found(hint)),
+        lastMove: Move(below),
+      );
+
+      expect(squareAt(board, below).mark, SquareMark.hintCapture);
+    });
+
     test('lays the squares out row by row', () {
       final board = map();
 

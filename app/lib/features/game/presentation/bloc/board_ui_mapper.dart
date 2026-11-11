@@ -1,4 +1,5 @@
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
+import 'package:cephalopod/features/game/presentation/bloc/hint_state.dart';
 import 'package:cephalopod/features/game/presentation/bloc/side_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod/features/game/presentation/models/board_ui.dart';
@@ -15,8 +16,9 @@ final class BoardUiMapper {
   final SideUiMapper _sideUiMapper;
 
   /// The board of [game] against [opponent], with its squares marked for
-  /// [phase]. Outside a capture, [lastMove] stands out when
-  /// [highlightLastMove] is on.
+  /// [phase]: a capture's choices, or, while a die is to be placed, a hint
+  /// found in it. Otherwise [lastMove] stands out when [highlightLastMove]
+  /// is on.
   BoardUi map({
     required GameState game,
     required TurnPhase phase,
@@ -52,8 +54,14 @@ final class BoardUiMapper {
   }
 
   /// While a capture is being chosen, the target and the dice that can be
-  /// picked stand out; otherwise the [lastMove] does, if there is one.
-  SquareMark _markOf(Position square, TurnPhase phase, Move? lastMove) {
+  /// picked stand out. While a die is to be placed, a hint found in [phase]
+  /// does, over the last move, since the player asked for it; or else the
+  /// [lastMove], if there is one.
+  SquareMark _markOf(
+    Position square,
+    TurnPhase phase,
+    Move? lastMove,
+  ) {
     return switch (phase) {
       ChoosingCapture(:final selected) when selected.contains(square) =>
         SquareMark.captureSelected,
@@ -63,6 +71,12 @@ final class BoardUiMapper {
           when options.any((option) => option.contains(square)) =>
         SquareMark.captureOption,
       ChoosingCapture() => SquareMark.none,
+      AwaitingPlacement(hint: HintFound(:final move))
+          when move.position == square =>
+        SquareMark.hintTarget,
+      AwaitingPlacement(hint: HintFound(:final move))
+          when move.captures.contains(square) =>
+        SquareMark.hintCapture,
       _ when lastMove?.position == square => SquareMark.lastMove,
       _ => SquareMark.none,
     };

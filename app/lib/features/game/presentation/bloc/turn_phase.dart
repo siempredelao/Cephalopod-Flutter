@@ -1,3 +1,4 @@
+import 'package:cephalopod/features/game/presentation/bloc/hint_state.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -10,8 +11,13 @@ part 'turn_phase.freezed.dart';
 /// phases must handle all of them (docs/adr/0011).
 @freezed
 sealed class TurnPhase with _$TurnPhase {
-  /// The player to move picks a vacant square.
-  const factory TurnPhase.awaitingPlacement() = AwaitingPlacement;
+  /// The player to move picks a vacant square. Meanwhile, they may ask for
+  /// a [hint]: there is none at first, then it is searched for, then found.
+  /// No other phase has one, so a hint cannot outlive the placement it was
+  /// for.
+  const factory TurnPhase.awaitingPlacement({
+    @Default(HintState.none()) HintState hint,
+  }) = AwaitingPlacement;
 
   /// A die placed on [target] can capture in more than one way, so the player
   /// picks the dice to capture from [options].

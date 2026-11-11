@@ -1,6 +1,7 @@
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/presentation/bloc/headline_ui_mapper.dart';
+import 'package:cephalopod/features/game/presentation/bloc/hint_state.dart';
 import 'package:cephalopod/features/game/presentation/models/headline_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/player_ui.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   const mapper = HeadlineUiMapper();
+  const none = HintState.none();
   const friend = FriendOpponent();
   // The computer plays White, so the person plays Black.
   const computer = ComputerOpponent(
@@ -28,32 +30,32 @@ void main() {
   group('HeadlineUiMapper', () {
     test('names the player to move between two people', () {
       expect(
-        mapper.map(const InProgress(Player.black), friend),
+        mapper.map(const InProgress(Player.black), friend, none),
         const HeadlineUi.playerToMove(PlayerUi.one),
       );
       expect(
-        mapper.map(const InProgress(Player.white), friend),
+        mapper.map(const InProgress(Player.white), friend, none),
         const HeadlineUi.playerToMove(PlayerUi.two),
       );
     });
 
     test('the person is to move against the computer', () {
       expect(
-        mapper.map(const InProgress(Player.black), computer),
+        mapper.map(const InProgress(Player.black), computer, none),
         const HeadlineUi.personToMove(),
       );
     });
 
     test('the computer is to move on its turn', () {
       expect(
-        mapper.map(const InProgress(Player.white), computer),
+        mapper.map(const InProgress(Player.white), computer, none),
         const HeadlineUi.computerToMove(),
       );
     });
 
     test('R8: names the winner, with their dice first', () {
       expect(
-        mapper.map(blackWins, friend),
+        mapper.map(blackWins, friend, none),
         const HeadlineUi.playerWon(
           player: PlayerUi.one,
           winnerDice: 13,
@@ -61,7 +63,7 @@ void main() {
         ),
       );
       expect(
-        mapper.map(whiteWins, friend),
+        mapper.map(whiteWins, friend, none),
         const HeadlineUi.playerWon(
           player: PlayerUi.two,
           winnerDice: 14,
@@ -70,13 +72,35 @@ void main() {
       );
     });
 
+    test('says it is looking for a hint while one is searched for', () {
+      const searching = HintState.searching();
+
+      expect(
+        mapper.map(const InProgress(Player.black), friend, searching),
+        const HeadlineUi.lookingForHint(),
+      );
+      expect(
+        mapper.map(const InProgress(Player.black), computer, searching),
+        const HeadlineUi.lookingForHint(),
+      );
+    });
+
+    test('goes back to whose turn it is once the hint is found', () {
+      final found = HintState.found(Move(const Position(0, 0)));
+
+      expect(
+        mapper.map(const InProgress(Player.black), computer, found),
+        const HeadlineUi.personToMove(),
+      );
+    });
+
     test('R8: tells the person winning from the computer winning', () {
       expect(
-        mapper.map(blackWins, computer),
+        mapper.map(blackWins, computer, none),
         const HeadlineUi.personWon(winnerDice: 13, loserDice: 12),
       );
       expect(
-        mapper.map(whiteWins, computer),
+        mapper.map(whiteWins, computer, none),
         const HeadlineUi.computerWon(winnerDice: 14, loserDice: 11),
       );
     });
