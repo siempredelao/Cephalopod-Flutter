@@ -1,10 +1,12 @@
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/presentation/bloc/board_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/headline_ui_mapper.dart';
+import 'package:cephalopod/features/game/presentation/bloc/played_move.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod/features/game/presentation/models/capture_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/computer_move_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/game_view_state.dart';
+import 'package:cephalopod/features/game/presentation/models/played_move_ui.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
 /// Turns the game on screen into the [GameViewState] the game screen draws:
@@ -21,9 +23,7 @@ final class GameViewStateMapper {
   /// The screen for [game] against [opponent], waiting for [phase]. The
   /// board marks [lastMove] when [highlightLastMove] is on. Whether a turn
   /// can be taken back or played again is the bloc's to say. So is
-  /// [computerMove], the move the computer played to reach this screen, if
-  /// it did, and [movePlayed], whether a move just played by either side led
-  /// here.
+  /// [playedMove], the move just played that led here, if one did.
   GameViewState map({
     required GameState game,
     required Opponent opponent,
@@ -32,8 +32,7 @@ final class GameViewStateMapper {
     required bool highlightLastMove,
     required bool canUndo,
     required bool canRedo,
-    Move? computerMove,
-    bool movePlayed = false,
+    PlayedMove? playedMove,
   }) {
     final boardUi = _boardUiMapper.map(
       game: game,
@@ -49,18 +48,25 @@ final class GameViewStateMapper {
       board: boardUi,
       headline: headlineUi,
       capture: captureUi,
-      computerMove: _computerMoveUiOf(computerMove, game),
-      movePlayed: movePlayed,
+      playedMove: _playedMoveUiOf(playedMove, game),
       canTap: canTap,
       canUndo: canUndo,
       canRedo: canRedo,
     );
   }
 
+  /// The move just played, as the screen shows it, if one led to [game].
+  PlayedMoveUi? _playedMoveUiOf(PlayedMove? playedMove, GameState game) {
+    if (playedMove == null) return null;
+    final (:move, :byComputer) = playedMove;
+    return PlayedMoveUi(
+      computer: byComputer ? _computerMoveUiOf(move, game) : null,
+    );
+  }
+
   /// The computer's [move] as the screen reports it: where it placed its
   /// die, and what the die shows now that the move is played in [game].
-  ComputerMoveUi? _computerMoveUiOf(Move? move, GameState game) {
-    if (move == null) return null;
+  ComputerMoveUi _computerMoveUiOf(Move move, GameState game) {
     final position = move.position;
     return ComputerMoveUi(
       row: position.row,

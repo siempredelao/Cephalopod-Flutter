@@ -2,11 +2,13 @@ import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/presentation/bloc/board_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_view_state_mapper.dart';
+import 'package:cephalopod/features/game/presentation/bloc/played_move.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod/features/game/presentation/models/capture_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/computer_move_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/game_view_state.dart';
 import 'package:cephalopod/features/game/presentation/models/headline_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/played_move_ui.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:cephalopod_engine/testing.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -44,8 +46,7 @@ void main() {
     Opponent opponent = const FriendOpponent(),
     bool canUndo = false,
     bool canRedo = false,
-    Move? computerMove,
-    bool movePlayed = false,
+    PlayedMove? playedMove,
   }) {
     return mapper.map(
       game: figure4,
@@ -55,8 +56,7 @@ void main() {
       highlightLastMove: true,
       canUndo: canUndo,
       canRedo: canRedo,
-      computerMove: computerMove,
-      movePlayed: movePlayed,
+      playedMove: playedMove,
     );
   }
 
@@ -125,23 +125,27 @@ void main() {
       expect(map(phase: const TurnPhase.gameEnded(blackWins)).canTap, isFalse);
     });
 
-    test('reports no computer move unless the computer just played', () {
-      expect(map().computerMove, isNull);
+    test('reports no played move unless one led to the screen', () {
+      expect(map().playedMove, isNull);
+    });
+
+    test("reports no computer move after the person's move", () {
+      final screen = map(playedMove: (move: Move(below), byComputer: false));
+
+      expect(screen.playedMove, const PlayedMoveUi());
     });
 
     test('reports where the computer placed its die and what it shows', () {
       // The 5 on the square below the top centre is the die that moved.
-      final screen = map(opponent: computer, computerMove: Move(below));
+      final screen = map(
+        opponent: computer,
+        playedMove: (move: Move(below), byComputer: true),
+      );
 
       expect(
-        screen.computerMove,
+        screen.playedMove?.computer,
         const ComputerMoveUi(row: 1, col: 2, pips: 5),
       );
-    });
-
-    test('passes on whether a move was just played', () {
-      expect(map().movePlayed, isFalse);
-      expect(map(movePlayed: true).movePlayed, isTrue);
     });
 
     test('passes on whether a turn can be undone or redone', () {

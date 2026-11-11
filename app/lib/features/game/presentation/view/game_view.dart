@@ -36,14 +36,14 @@ class GameView extends StatelessWidget {
               children: [
                 GameHeadline(
                   headline: state.headline,
-                  computerMove: state.computerMove,
+                  computerMove: state.playedMove?.computer,
                 ),
                 const SizedBox(height: _spacing),
                 Expanded(
                   child: Center(
                     child: GameBoard(
                       board: state.board,
-                      animateDice: state.movePlayed,
+                      animateDice: state.playedMove != null,
                       onSquareTapped: _tapHandlerOf(context, state),
                     ),
                   ),

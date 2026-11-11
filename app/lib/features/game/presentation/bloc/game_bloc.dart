@@ -9,6 +9,7 @@ import 'package:cephalopod/features/game/domain/use_cases/undo_move.dart';
 import 'package:cephalopod/features/game/presentation/bloc/countdown_timer.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_view_state_mapper.dart';
+import 'package:cephalopod/features/game/presentation/bloc/played_move.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod/features/game/presentation/models/game_view_state.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
@@ -112,13 +113,9 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// it here; its state only describes the screen.
   CurrentGame _currentGame;
 
-  /// The move the computer played to reach the screen, while it is the last
-  /// one. Anything else that changes the game clears it.
-  Move? _computerMove;
-
-  /// Whether a move just played, by either side, led to the game on screen.
+  /// The move just played, by either side, that led to the game on screen.
   /// Anything else that changes the game clears it.
-  bool _movePlayed = false;
+  PlayedMove? _playedMove;
 
   /// What the screen is waiting for.
   TurnPhase _turnPhase = const TurnPhase.awaitingPlacement();
@@ -271,7 +268,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   Future<void> _play(Move move, Emitter<GameViewState> emit) async {
     if (await _playMove(_currentGame, move) case Ok(:final value)) {
       _undone.clear();
-      _show(value, emit, movePlayed: true);
+      _show(value, emit, playedMove: (move: move, byComputer: false));
     }
   }
 
@@ -315,27 +312,25 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     if (isClosed) return;
     switch (await _playMove(game, move)) {
       case Ok(:final value):
-        _show(value, emit, computerMove: move, movePlayed: true);
+        _show(value, emit, playedMove: (move: move, byComputer: true));
       case Err(:final error):
         throw StateError('The agent chose $move: $error');
     }
   }
 
   /// Keeps [game], the result of a use case, for the next move, and shows
-  /// it. [computerMove] is the computer's move that led to it, if one did.
-  /// [movePlayed] says a move just played led to it, the computer's or the
-  /// person's, and not a turn taken back or played again, or another game.
+  /// it. [playedMove] is the move just played that led to it, the
+  /// computer's or the person's; there is none after a turn taken back or
+  /// played again, or another game.
   void _show(
     CurrentGame game,
     Emitter<GameViewState> emit, {
-    Move? computerMove,
-    bool movePlayed = false,
+    PlayedMove? playedMove,
   }) {
     _currentGame = game;
-    _computerMove = computerMove;
-    _movePlayed = movePlayed;
+    _playedMove = playedMove;
     _turnPhase = _phaseOf(game);
-    if (movePlayed) {
+    if (playedMove != null) {
       _moveCountdown.start();
     } else {
       _moveCountdown.cancel();
@@ -360,8 +355,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
       highlightLastMove: _highlightLastMove,
       canUndo: _canUndo,
       canRedo: _undone.isNotEmpty,
-      computerMove: _computerMove,
-      movePlayed: _movePlayed,
+      playedMove: _playedMove,
     );
     emit(screen);
   }
