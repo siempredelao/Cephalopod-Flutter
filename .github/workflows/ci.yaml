@@ -39,6 +39,18 @@ jobs:
       - name: Verify
         run: dart run melos run verify
 
+      # When a golden image no longer matches, Flutter writes the expected
+      # image, the new one and their differences next to the test, in a
+      # failures/ folder. Keep them, so a reviewer can see what changed
+      # without running the tests.
+      - name: Keep the golden image differences
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: golden-failures
+          path: app/test/**/failures/
+          if-no-files-found: ignore
+
   build:
     name: Smoke build (${{ matrix.platform }})
     needs: verify

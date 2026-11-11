@@ -114,6 +114,26 @@ Every push and pull request runs, in order:
 Run the same checks locally with `dart run melos run verify`. Optional git
 hooks: install [lefthook](https://lefthook.dev) and run `lefthook install`.
 
+### Golden images
+
+Some screens are kept as images in `app/test/goldens/images/`, and the app
+tests compare each screen with its image, pixel by pixel. A change to how one
+of them looks fails the tests until the images are drawn again:
+
+```sh
+cd app && flutter test test/goldens --update-goldens
+```
+
+Look at the new images before committing them: the diff of the pull request
+shows the old and the new side by side. When a golden test fails, Flutter
+writes the expected image, the new one and their differences in
+`app/test/goldens/failures/`; on CI they are kept as the `golden-failures`
+download of the run.
+
+The images are drawn on Linux, as CI is, with the Flutter version above and
+its Roboto font. Another system or Flutter version can draw text a pixel
+differently, and fail every golden.
+
 ## Roadmap
 
 - [x] **M0 · Foundations**: workspace, lints, CI, ADRs, app shell
