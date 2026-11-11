@@ -13,7 +13,7 @@ in English or Spanish, with a system, light or dark theme. Dice animate as
 they are placed and captured, screen readers announce each move, and the
 About page links the rule sheet. Underneath is a rules engine tested with
 1,000 seeded random games checked move by move, and golden images lock in
-how the main screens look. Next is M7: Google Play.
+how the main screens look. Next is M6: UX, then M7: Google Play.
 
 ## The game
 
@@ -147,9 +147,12 @@ differently, and fail every golden.
 - [x] **M5 · Polish**: accessibility, English and Spanish, placement and capture
   animations, light and dark board palettes, rule-sheet link and app version on
   About, goldens
-- [ ] ~~**M6 · Release v1.0**~~ Dropped: the web build is not planned
-- [ ] **M7 · Google Play**: launcher icons and splash screen, crash reporting,
-  release signing, store listing and screenshots
+- [ ] **M6 · UX**: How to play on first launch, a simpler game app bar, a dice
+  count, a hint, effects and sounds for captures and wins. (The first M6, a web
+  release, was dropped with the web build.)
+- [ ] **M7 · Google Play**: twelve languages, launcher icons and splash screen,
+  crash reporting, a rating prompt, release signing, store listing and
+  screenshots
 
 ## Contributing
 

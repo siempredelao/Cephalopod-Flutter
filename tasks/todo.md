@@ -38,9 +38,38 @@ The numbers are the ones first planned, so they are not in order here.
 - ~~3. fix(game): show "thinking" before the computer searches on the web (XS)~~
 
 ## To fix later
-- [ ] 27. fix(game): show the game screen's title in full on small phones (S), before M7's screenshots
+- [ ] 27. fix(game): show the game screen's title in full on small phones (S), done by 28
+
+## M6: UX, in this order
+- [ ] 38. refactor(game): split the game screen into widgets (S)
+- [ ] 39. refactor(game): describe the move just played in one value (S)
+- [ ] 28. feat(game): move the game's actions into a menu (S), closes 27
+- [ ] 29. feat(game): centre How to play's dots and add Previous (S)
+- [ ] 30. feat(game): let the player skip How to play (XS)
+- [ ] 31a. feat(home): remember whether How to play was seen (S)
+- [ ] 31b. feat(app): show How to play the first time the app opens (S)
+- [ ] 32a. feat(game): count each player's dice in the game state (S)
+- [ ] 32b. feat(game): show how many dice each player has (S)
+- [ ] 33a. feat(game): add a use case that suggests a move (S)
+- [ ] 33b. refactor(game): draw a square's ring in its own widget (S)
+- [ ] 33c. feat(game): let the board draw a hint (S)
+- [ ] 33d. feat(game): give a hint (S)
+- [ ] 37a. feat(game): say what the move just played captured, and whether it won (S)
+- [ ] 34a. feat(game): draw particles (S)
+- [ ] 34b. feat(game): burst a captured die (S)
+- [ ] 37b. feat(game): throw confetti when the player wins (S)
+- [ ] 35. feat(settings): add a Sound switch (S)
+- [ ] 36a. feat(game): add audio playback (S)
+- [ ] 36b. feat(game): play a sound on a capture (S)
+- [ ] 36c. feat(game): play a sound when the player wins (XS)
+- [ ] Checkpoint: verify; by hand on Android: first launch, hint on Hard, capture and win effects, sound off
 
 ## M7: Google Play
+- [ ] L1. feat(app): get ready for more languages (S)
+- [ ] L2. feat(app): translate into French, Italian and Portuguese (M)
+- [ ] L3. feat(app): translate into German, Dutch, Danish, Norwegian and Swedish (M)
+- [ ] L4. feat(app): translate into Polish and Turkish (S)
+- [ ] Ask for a rating: the review feature, then the prompt after games, then the About link
 - [ ] Crash reporting into Task 4's reporter
 - [ ] Play Store screenshots made by an integration test, in both languages
 - [ ] The same test plays, saves and resumes a game on a device, as the release check
