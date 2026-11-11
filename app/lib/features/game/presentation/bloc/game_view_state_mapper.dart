@@ -1,5 +1,6 @@
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/presentation/bloc/board_ui_mapper.dart';
+import 'package:cephalopod/features/game/presentation/bloc/dice_tally_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/headline_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/played_move.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
@@ -10,15 +11,18 @@ import 'package:cephalopod/features/game/presentation/models/played_move_ui.dart
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
 /// Turns the game on screen into the [GameViewState] the game screen draws:
-/// the board, the headline, and the capture controls.
+/// the board, the headline, each side's dice count, and the capture
+/// controls.
 final class GameViewStateMapper {
   const GameViewStateMapper({
     this._boardUiMapper = const BoardUiMapper(),
     this._headlineUiMapper = const HeadlineUiMapper(),
+    this._diceTallyUiMapper = const DiceTallyUiMapper(),
   });
 
   final BoardUiMapper _boardUiMapper;
   final HeadlineUiMapper _headlineUiMapper;
+  final DiceTallyUiMapper _diceTallyUiMapper;
 
   /// The screen for [game] against [opponent], waiting for [phase]. The
   /// board marks [lastMove] when [highlightLastMove] is on. Whether a turn
@@ -47,6 +51,7 @@ final class GameViewStateMapper {
     return GameViewState(
       board: boardUi,
       headline: headlineUi,
+      tally: _diceTallyUiMapper.map(game, opponent),
       capture: captureUi,
       playedMove: _playedMoveUiOf(playedMove, game),
       canTap: canTap,

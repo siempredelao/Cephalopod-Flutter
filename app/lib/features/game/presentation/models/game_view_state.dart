@@ -1,5 +1,6 @@
 import 'package:cephalopod/features/game/presentation/models/board_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/capture_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/dice_tally_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/headline_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/played_move_ui.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -7,9 +8,10 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'game_view_state.freezed.dart';
 
 /// Everything the game screen shows: the [board], the [headline] above it,
-/// the [capture] controls while a capture is being chosen, whether the board
-/// takes taps ([canTap]), and whether a turn can be taken back ([canUndo]) or
-/// played again ([canRedo]).
+/// how many dice each side has on the board ([tally]), the [capture]
+/// controls while a capture is being chosen, whether the board takes taps
+/// ([canTap]), and whether a turn can be taken back ([canUndo]) or played
+/// again ([canRedo]).
 ///
 /// [playedMove] is the move just played, by either side, that led to this
 /// screen. It stays until the game changes in another way: a turn taken back
@@ -24,6 +26,7 @@ abstract class GameViewState with _$GameViewState {
   const factory GameViewState({
     required BoardUi board,
     required HeadlineUi headline,
+    required DiceTallyUi tally,
     CaptureUi? capture,
     PlayedMoveUi? playedMove,
     @Default(true) bool canTap,

@@ -1,6 +1,7 @@
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/presentation/bloc/board_ui_mapper.dart';
+import 'package:cephalopod/features/game/presentation/bloc/dice_tally_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_view_state_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/played_move.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
@@ -123,6 +124,15 @@ void main() {
       );
 
       expect(map(phase: const TurnPhase.gameEnded(blackWins)).canTap, isFalse);
+    });
+
+    test("counts each side's dice on the board", () {
+      expect(
+        map(opponent: computer).tally,
+        const DiceTallyUiMapper().map(figure4, computer),
+      );
+      expect(map().tally.playerOne.dice, 1);
+      expect(map().tally.playerTwo.dice, 2);
     });
 
     test('reports no played move unless one led to the screen', () {
