@@ -5,10 +5,12 @@ import 'package:cephalopod/features/game/domain/use_cases/choose_agent_move.dart
 import 'package:cephalopod/features/game/domain/use_cases/play_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/resume_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/start_new_game.dart';
+import 'package:cephalopod/features/game/domain/use_cases/suggest_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/undo_move.dart';
 import 'package:cephalopod/features/game/presentation/bloc/countdown_timer.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_view_state_mapper.dart';
+import 'package:cephalopod/features/game/presentation/bloc/hint_state.dart';
 import 'package:cephalopod/features/game/presentation/bloc/played_move.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod/features/game/presentation/models/game_view_state.dart';
@@ -19,7 +21,8 @@ import 'package:meta/meta.dart';
 /// The game screen's view model: turns taps into engine moves and works out
 /// what the screen shows. The rules stay in the engine; this class only asks
 /// it which moves are legal, and plays, undoes and saves them through the
-/// use cases. Against the computer, it lets the computer play its turns.
+/// use cases. Against the computer, it lets the computer play its turns. On
+/// request, it looks for a hint.
 ///
 /// It keeps the game to itself and emits a [GameViewState], which only
 /// describes the screen (docs/adr/0015).
@@ -42,6 +45,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     required UndoMove undoMove,
     required ResumeGame resumeGame,
     required ChooseAgentMove chooseAgentMove,
+    required SuggestMove suggestMove,
     GameViewStateMapper gameViewStateMapper = const GameViewStateMapper(),
     bool highlightLastMove = true,
     CountdownTimer? moveCountdown,
@@ -55,6 +59,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
       undoMove: undoMove,
       resumeGame: resumeGame,
       chooseAgentMove: chooseAgentMove,
+      suggestMove: suggestMove,
       gameViewStateMapper: gameViewStateMapper,
       highlightLastMove: highlightLastMove,
       moveCountdown: moveCountdown ?? CountdownTimer(Duration.zero),
@@ -75,6 +80,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     required this._undoMove,
     required this._resumeGame,
     required this._chooseAgentMove,
+    required this._suggestMove,
     required this._gameViewStateMapper,
     required this._highlightLastMove,
     required this._moveCountdown,
@@ -101,6 +107,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   final UndoMove _undoMove;
   final ResumeGame _resumeGame;
   final ChooseAgentMove _chooseAgentMove;
+  final SuggestMove _suggestMove;
   final GameViewStateMapper _gameViewStateMapper;
 
   /// Whether the board marks the last move, as the player's settings say.
@@ -117,7 +124,9 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// Anything else that changes the game clears it.
   PlayedMove? _playedMove;
 
-  /// What the screen is waiting for.
+  /// What the screen is waiting for. While a die is to be placed, it also
+  /// holds the hint, if one was asked for; any new phase starts without
+  /// one, so a hint never outlives the placement it was for.
   TurnPhase _turnPhase = const TurnPhase.awaitingPlacement();
 
   /// Moves taken back, most recent last, for redo. A new move clears them.
@@ -162,6 +171,8 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
         await _undo(emit);
       case RedoRequested():
         await _redo(emit);
+      case HintRequested():
+        await _lookForHint(emit);
     }
     // Whatever the event led to, the computer plays when it is its turn.
     await _letComputerPlay(emit);
@@ -293,6 +304,33 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
       if (await _playMove(game, move) case Ok(:final value)) game = value;
     }
     _show(game, emit);
+  }
+
+  /// Looks for a hint for the side to move while the screen says so, then
+  /// shows it. Only while a die can be placed and no hint is asked for yet:
+  /// there is nothing to suggest while the computer thinks, a capture is
+  /// being chosen, or after the game ends. Other events wait until it is
+  /// found.
+  Future<void> _lookForHint(Emitter<GameViewState> emit) async {
+    final canLook = switch (_turnPhase) {
+      AwaitingPlacement(hint: NoHint()) => true,
+      AwaitingPlacement() ||
+      ChoosingCapture() ||
+      ComputerThinking() ||
+      GameEnded() => false,
+    };
+    if (!canLook) return;
+    // The last move is still being watched; the hint comes after it.
+    await _moveCountdown.done;
+    _turnPhase = const TurnPhase.awaitingPlacement(
+      hint: HintState.searching(),
+    );
+    _emitScreen(emit);
+    final move = await _suggestMove(_currentGame);
+    // The screen may have closed while the agent looked.
+    if (isClosed) return;
+    _turnPhase = TurnPhase.awaitingPlacement(hint: HintState.found(move));
+    _emitScreen(emit);
   }
 
   /// Lets the computer play while the screen shows it thinking. Other

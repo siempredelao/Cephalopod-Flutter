@@ -32,8 +32,9 @@ class GameAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-/// The "more" button and its menu: undo, redo, and restarting the game.
-/// Undo and redo are enabled when there is a move to take back or to play
+/// The "more" button and its menu: a hint, undo, redo, and restarting the
+/// game. Each is enabled when it can do something: a hint while a die can
+/// be placed, undo and redo when there is a move to take back or to play
 /// again. The menu adds events to the `GameBloc` above it.
 class _GameMenu extends StatelessWidget {
   const _GameMenu();
@@ -42,12 +43,22 @@ class _GameMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     final bloc = context.read<GameBloc>();
     final l10n = context.l10n;
-    // Rebuilds only when undo or redo becomes available or not, not on every
-    // tap on the board, so an open menu follows the game too.
-    return BlocSelector<GameBloc, GameViewState, ({bool undo, bool redo})>(
-      selector: (state) => (undo: state.canUndo, redo: state.canRedo),
+    // Rebuilds only when an item becomes available or not, not on every tap
+    // on the board, so an open menu follows the game too.
+    return BlocSelector<
+      GameBloc,
+      GameViewState,
+      ({bool hint, bool undo, bool redo})
+    >(
+      selector: (state) =>
+          (hint: state.canHint, undo: state.canUndo, redo: state.canRedo),
       builder: (context, can) => MenuAnchor(
         menuChildren: [
+          MenuItemButton(
+            leadingIcon: const Icon(Icons.lightbulb_outline),
+            onPressed: can.hint ? () => bloc.add(const HintRequested()) : null,
+            child: Text(l10n.gameMenuHint),
+          ),
           MenuItemButton(
             leadingIcon: const Icon(Icons.undo),
             onPressed: can.undo ? () => bloc.add(const UndoRequested()) : null,

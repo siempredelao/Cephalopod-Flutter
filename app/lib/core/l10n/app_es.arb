@@ -57,6 +57,7 @@
   "gameMenuTooltip": "Más opciones",
   "gameMenuUndo": "Deshacer",
   "gameMenuRedo": "Rehacer",
+  "gameMenuHint": "Pista",
   "gameMenuRestart": "Reiniciar partida",
   "gameCaptureCancel": "Cancelar",
   "gameCaptureConfirm": "Capturar",
