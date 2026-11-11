@@ -30,12 +30,15 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] 22. feat(game): animate placing a die (S)
 - [x] 23. feat(game): animate a capture (M), after 22
 - [x] 24. feat(about): link the rule sheet and show the app's version (M)
-- [ ] 25. test(app): add golden images of the main screens (M), after 19–24
+- [x] 25. test(app): add golden images of the main screens (M), after 19–24
 - [ ] 26. docs: mark M5 done (XS)
 
 ## Dropped: the web build (2026-11-10)
 - ~~2. fix(game): make the game route always show the saved game (M)~~
 - ~~3. fix(game): show "thinking" before the computer searches on the web (XS)~~
+
+## To fix later
+- [ ] 27. fix(game): show the game screen's title in full on small phones (S), before M7's screenshots
 
 ## M7: Google Play
 - [ ] Crash reporting into Task 4's reporter

@@ -469,6 +469,10 @@ Acceptance:
 - `flutter test --update-goldens` is documented in the README's testing
   section, and CI fails on a change nobody updated.
 
+Built as two PRs: #85 set up the helper, the README section and one image;
+the next added the rest. Settings and About were left out (2026-11-11): a
+subset of the screens is enough.
+
 **Task 26. `docs: mark M5 done`** (XS)
 
 - README status and roadmap, `docs/architecture.md`'s testing table.
@@ -516,6 +520,24 @@ web`** (XS)
 Acceptance:
 - In Chrome, against Hard, "The computer is thinking…" is drawn before the
   computer's move appears.
+
+## To fix later
+
+**Task 27. `fix(game): show the game screen's title in full on small
+phones`** (S)
+
+Found by the goldens (Task 25, 2026-11-11): on a 360 dp phone, the game
+screen's title is cut to "Cepha…", because four icons share the app bar
+with it (undo, redo, How to play, new game).
+
+- Options: drop the title on the game screen, or move one or two icons
+  into an overflow menu. Decide before building.
+- Fix it before the Play Store screenshots (M7), which would show it.
+
+Acceptance:
+- The game screen's app bar shows nothing cut at 360 dp, in English and
+  Spanish.
+- The game goldens are drawn again, and the PR shows the old and new ones.
 
 ## M7: Google Play
 
