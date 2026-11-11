@@ -1,29 +1,22 @@
-import 'package:cephalopod/core/l10n/l10n.dart';
-import 'package:cephalopod/core/navigation/app_route.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/models/game_view_state.dart';
 import 'package:cephalopod/features/game/presentation/models/square_ui.dart';
-import 'package:cephalopod/features/game/presentation/view/headline_text_mapper.dart';
-import 'package:cephalopod/features/game/presentation/view/spoken_headline_text_mapper.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/capture_controls.dart';
+import 'package:cephalopod/features/game/presentation/view/widgets/game_app_bar.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
+import 'package:cephalopod/features/game/presentation/view/widgets/game_headline.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// The game screen: whose turn it is, the board, and the controls for
 /// choosing a capture. It draws the [GameViewState] of the `GameBloc` above
 /// it and adds events; the bloc decides what they do.
+///
+/// It only lays the screen out. Each part is a widget of its own in
+/// `widgets/`.
 class GameView extends StatelessWidget {
-  const GameView({
-    this._headlineTextMapper = const HeadlineTextMapper(),
-    this._spokenHeadlineTextMapper = const SpokenHeadlineTextMapper(),
-    super.key,
-  });
-
-  final HeadlineTextMapper _headlineTextMapper;
-  final SpokenHeadlineTextMapper _spokenHeadlineTextMapper;
+  const GameView({super.key});
 
   static const double _spacing = 16;
 
@@ -34,46 +27,16 @@ class GameView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.l10n.appTitle),
-        actions: [
-          const _HistoryButtons(),
-          // Pushed on top, so the game is still here on the way back.
-          IconButton(
-            tooltip: context.l10n.gameHowToPlayTooltip,
-            icon: const Icon(Icons.help_outline),
-            onPressed: () => context.pushNamed(AppRoute.howToPlay.name),
-          ),
-          IconButton(
-            tooltip: context.l10n.gameRestartTooltip,
-            icon: const Icon(Icons.refresh),
-            onPressed: () =>
-                context.read<GameBloc>().add(const GameRestarted()),
-          ),
-        ],
-      ),
+      appBar: const GameAppBar(),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(_spacing),
           child: BlocBuilder<GameBloc, GameViewState>(
             builder: (context, state) => Column(
               children: [
-                // A live region: a screen reader says the line again whenever
-                // it changes, so the player hears whose turn it is, and what
-                // the computer did, without searching the screen. What it
-                // says is a little more than what is written.
-                Semantics(
-                  liveRegion: true,
-                  label: _spokenHeadlineTextMapper.map(
-                    state.headline,
-                    state.computerMove,
-                    context.l10n,
-                  ),
-                  excludeSemantics: true,
-                  child: Text(
-                    _headlineTextMapper.map(state.headline, context.l10n),
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
+                GameHeadline(
+                  headline: state.headline,
+                  computerMove: state.computerMove,
                 ),
                 const SizedBox(height: _spacing),
                 Expanded(
@@ -118,37 +81,6 @@ class GameView extends StatelessWidget {
       capture: capture,
       onConfirm: () => bloc.add(const CaptureConfirmed()),
       onCancel: () => bloc.add(const CaptureCancelled()),
-    );
-  }
-}
-
-/// Undo and redo, each enabled when there is a move to take back or to play
-/// again.
-class _HistoryButtons extends StatelessWidget {
-  const _HistoryButtons();
-
-  @override
-  Widget build(BuildContext context) {
-    final bloc = context.read<GameBloc>();
-    // Rebuilds only when undo or redo becomes available or not, not on every
-    // tap on the board.
-    return BlocSelector<GameBloc, GameViewState, ({bool undo, bool redo})>(
-      selector: (state) => (undo: state.canUndo, redo: state.canRedo),
-      builder: (context, can) => Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            tooltip: context.l10n.gameUndoTooltip,
-            icon: const Icon(Icons.undo),
-            onPressed: can.undo ? () => bloc.add(const UndoRequested()) : null,
-          ),
-          IconButton(
-            tooltip: context.l10n.gameRedoTooltip,
-            icon: const Icon(Icons.redo),
-            onPressed: can.redo ? () => bloc.add(const RedoRequested()) : null,
-          ),
-        ],
-      ),
     );
   }
 }
