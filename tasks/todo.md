@@ -71,5 +71,6 @@ The numbers are the ones first planned, so they are not in order here.
 - [ ] L4. feat(app): translate into Polish and Turkish (S)
 - [ ] Ask for a rating: the review feature, then the prompt after games, then the About link
 - [ ] Crash reporting into Task 4's reporter
+- [ ] feat(about): show the open-source licenses (S)
 - [ ] Play Store screenshots made by an integration test, in both languages
 - [ ] The same test plays, saves and resumes a game on a device, as the release check

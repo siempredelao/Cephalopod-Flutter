@@ -847,6 +847,13 @@ Acceptance (36b, 36c):
   - Feature: the game reports a finished game through a plain callback that
     the composition root wires to the review feature.
   - Feature: About gets a "Rate the app" link to the store page.
+- **Open-source licenses** (noted 2026-11-11). About gets a "Licenses" link
+  to a screen listing the licenses of the packages the app uses, as stores
+  and many of those licenses ask. Flutter has one ready: `showLicensePage`
+  (or an `AboutListTile`) lists every license that `LicenseRegistry` holds,
+  and the packages register theirs on their own. Check that the generated
+  sounds and the fonts need no entry. One small PR; the words go into every
+  language's `.arb` file.
 
 ## Not planned, and why
 
