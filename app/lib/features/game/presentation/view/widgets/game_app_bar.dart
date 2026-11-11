@@ -32,9 +32,9 @@ class GameAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-/// The "more" button and its menu: undo, redo and a new game. Undo and redo
-/// are enabled when there is a move to take back or to play again. The menu
-/// adds events to the `GameBloc` above it.
+/// The "more" button and its menu: undo, redo, and restarting the game.
+/// Undo and redo are enabled when there is a move to take back or to play
+/// again. The menu adds events to the `GameBloc` above it.
 class _GameMenu extends StatelessWidget {
   const _GameMenu();
 
@@ -61,7 +61,7 @@ class _GameMenu extends StatelessWidget {
           MenuItemButton(
             leadingIcon: const Icon(Icons.refresh),
             onPressed: () => bloc.add(const GameRestarted()),
-            child: Text(l10n.gameMenuNewGame),
+            child: Text(l10n.gameMenuRestart),
           ),
         ],
         builder: (context, menu, _) => IconButton(

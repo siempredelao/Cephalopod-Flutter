@@ -48,7 +48,7 @@
   "gameMenuTooltip": "Más opciones",
   "gameMenuUndo": "Deshacer",
   "gameMenuRedo": "Rehacer",
-  "gameMenuNewGame": "Nueva partida",
+  "gameMenuRestart": "Reiniciar partida",
   "gameCaptureCancel": "Cancelar",
   "gameCaptureConfirm": "Capturar",
 

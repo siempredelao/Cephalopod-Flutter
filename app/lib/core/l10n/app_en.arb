@@ -286,9 +286,9 @@
   "@gameMenuRedo": {
     "description": "Game: menu item that plays again a turn taken back."
   },
-  "gameMenuNewGame": "New game",
-  "@gameMenuNewGame": {
-    "description": "Game: menu item that starts again, against the same opponent."
+  "gameMenuRestart": "Restart game",
+  "@gameMenuRestart": {
+    "description": "Game: menu item that starts the game again, against the same opponent and under the same rules. It does not ask for a new opponent."
   },
   "gameCaptureCancel": "Cancel",
   "@gameCaptureCancel": {

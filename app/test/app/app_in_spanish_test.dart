@@ -81,7 +81,7 @@ void main() {
       expect(find.byTooltip('Cómo se juega'), findsOne);
       await tester.tap(find.byTooltip('Más opciones'));
       await tester.pumpAndSettle();
-      for (final item in ['Deshacer', 'Rehacer', 'Nueva partida']) {
+      for (final item in ['Deshacer', 'Rehacer', 'Reiniciar partida']) {
         expect(find.widgetWithText(MenuItemButton, item), findsOne);
       }
     });

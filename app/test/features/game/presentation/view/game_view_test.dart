@@ -165,7 +165,7 @@ void main() {
 
       expect(menuItem(tester, 'Undo').onPressed, isNull);
       expect(menuItem(tester, 'Redo').onPressed, isNull);
-      expect(menuItem(tester, 'New game').onPressed, isNotNull);
+      expect(menuItem(tester, 'Restart game').onPressed, isNotNull);
     });
 
     testWidgets('keeps only How to play and the menu in the app bar', (
@@ -190,11 +190,11 @@ void main() {
       expect(find.text('Player 1 wins 1 to 0'), findsOne);
     });
 
-    testWidgets('starts a new game under the same rules', (tester) async {
+    testWidgets('restarts the game under the same rules', (tester) async {
       await pumpGame(tester, config: const GameConfig(boardSize: 3));
       await tapSquare(tester, const Position(0, 0));
 
-      await tapMenuItem(tester, 'New game');
+      await tapMenuItem(tester, 'Restart game');
 
       expect(find.byType(DieFace), findsNothing);
       expect(find.byType(BoardSquare), findsNWidgets(9));
