@@ -39,6 +39,7 @@ class GameView extends StatelessWidget {
                 GameHeadline(
                   headline: state.headline,
                   computerMove: state.playedMove?.computer,
+                  hint: state.hint,
                 ),
                 const SizedBox(height: _spacing / 2),
                 DiceTally(tally: state.tally),
