@@ -4,9 +4,10 @@ import 'package:cephalopod/features/about/presentation/models/about_view_state.d
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// Credits the game's inventor, as his rule sheet asks of anyone who
-/// programs the game, shows the app's version, and shows the address of the
-/// official rules.
+/// Shows the app's version, and credits the game's designer, as his rule
+/// sheet asks of anyone who programs the game, with links to his website and
+/// the official rules. The credits are laid out as in Dipole, the app of
+/// another of his games.
 ///
 /// It gets an `AboutCubit` from [createCubit] for as long as it is on
 /// screen, and draws its [AboutViewState].
@@ -29,15 +30,20 @@ class AboutPage extends StatelessWidget {
 class _AboutView extends StatelessWidget {
   const _AboutView();
 
+  static const double _gap = 4;
+
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
     final l10n = context.l10n;
+    final cubit = context.read<AboutCubit>();
     return Scaffold(
       appBar: AppBar(title: Text(l10n.aboutTitle)),
       body: BlocBuilder<AboutCubit, AboutViewState>(
         builder: (context, state) {
           final version = state.version;
+          final failedLinkAddress = state.failedLinkAddress;
           return ListView(
             padding: const EdgeInsets.all(24),
             children: [
@@ -47,16 +53,52 @@ class _AboutView extends StatelessWidget {
                   l10n.aboutVersion(version.version, version.build),
                   style: textTheme.bodyMedium,
                 ),
+              const SizedBox(height: 16),
+              Divider(color: theme.colorScheme.outline),
               const SizedBox(height: 8),
-              Text(l10n.aboutCredit),
-              const SizedBox(height: 24),
-              Text(l10n.aboutOfficialRules, style: textTheme.titleMedium),
-              const SizedBox(height: 4),
-              SelectableText(state.ruleSheetAddress),
+              Text(l10n.aboutDesignedBy, style: textTheme.bodyMedium),
+              const SizedBox(height: _gap),
+              Text(
+                state.copyright,
+                style: textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: _gap),
+              _Link(
+                label: l10n.aboutMoreGames(state.websiteName),
+                onPressed: cubit.openWebsite,
+              ),
+              _Link(
+                label: l10n.aboutOfficialRules,
+                onPressed: cubit.openRuleSheet,
+              ),
+              if (failedLinkAddress != null) ...[
+                const SizedBox(height: 8),
+                Text(l10n.aboutLinkFailed),
+                const SizedBox(height: _gap),
+                SelectableText(failedLinkAddress),
+              ],
             ],
           );
         },
       ),
+    );
+  }
+}
+
+/// A link that opens in the browser, drawn as a text button, as in Dipole.
+class _Link extends StatelessWidget {
+  const _Link({required this.label, required this.onPressed});
+
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: TextButton(onPressed: onPressed, child: Text(label)),
     );
   }
 }

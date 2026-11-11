@@ -236,7 +236,10 @@ void main() {
     testWidgets('credits Mark Steere on the about page', (tester) async {
       await pumpApp(tester, location: '/about');
 
-      expect(find.textContaining('Mark Steere'), findsOneWidget);
+      expect(
+        find.text('Cephalopod was designed by Mark Steere.'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('shows the debug banner in the dev flavor', (tester) async {

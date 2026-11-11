@@ -1,4 +1,4 @@
-import 'package:cephalopod/features/about/about_module.dart';
+import 'package:cephalopod/features/about/domain/models/credits.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -6,18 +6,29 @@ import '../../../../helpers/phone.dart';
 import '../../../../helpers/pump_app.dart';
 
 void main() {
-  final address = AboutModule.ruleSheet.toString();
+  const copyright = 'Copyright © February 2006 by Mark Steere';
+  const moreGames = 'More games by Mark Steere: marksteeregames.com';
+  const officialRules = 'Official rules (PDF)';
+  final opened = <Uri>[];
+
+  setUp(opened.clear);
+
+  /// The link whose label is [label].
+  Finder link(String label) => find.widgetWithText(TextButton, label);
 
   group('AboutPage', () {
-    testWidgets('credits the inventor and shows the rule sheet address', (
+    testWidgets('credits the designer, with his copyright and two links', (
       tester,
     ) async {
       await pumpApp(tester, location: '/about');
 
       expect(find.text('About'), findsOne);
-      expect(find.textContaining('Mark Steere'), findsOne);
-      expect(find.text('Official rules'), findsOne);
-      expect(find.widgetWithText(SelectableText, address), findsOne);
+      expect(find.text('Cephalopod was designed by Mark Steere.'), findsOne);
+      expect(find.text(copyright), findsOne);
+      expect(link(moreGames), findsOne);
+      expect(link(officialRules), findsOne);
+      // An address to copy shows only when a link does not open.
+      expect(find.byType(SelectableText), findsNothing);
     });
 
     testWidgets('shows the version and build number under the title', (
@@ -36,18 +47,72 @@ void main() {
       );
 
       expect(find.textContaining('Version'), findsNothing);
-      expect(find.textContaining('Mark Steere'), findsOne);
+      expect(find.text(copyright), findsOne);
     });
 
-    testWidgets('speaks Spanish', (tester) async {
+    testWidgets('opens the website and the rule sheet from their links', (
+      tester,
+    ) async {
+      await pumpApp(
+        tester,
+        location: '/about',
+        linkOpener: (address) async {
+          opened.add(address);
+          return true;
+        },
+      );
+
+      await tester.tap(link(moreGames));
+      await tester.pumpAndSettle();
+      await tester.tap(link(officialRules));
+      await tester.pumpAndSettle();
+
+      expect(opened, [cephalopodCredits.website, cephalopodCredits.ruleSheet]);
+      expect(find.textContaining('could not be opened'), findsNothing);
+    });
+
+    testWidgets('says so, and shows the address to copy, when it cannot', (
+      tester,
+    ) async {
+      await pumpApp(
+        tester,
+        location: '/about',
+        linkOpener: (_) async => false,
+      );
+
+      await tester.tap(link(officialRules));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('could not be opened'), findsOne);
+      expect(
+        find.widgetWithText(SelectableText, '${cephalopodCredits.ruleSheet}'),
+        findsOne,
+      );
+    });
+
+    testWidgets('speaks Spanish, and keeps the copyright in English', (
+      tester,
+    ) async {
       useSmallPhone(tester, const Locale('es', 'ES'));
+      await pumpApp(
+        tester,
+        location: '/about',
+        linkOpener: (_) async => false,
+      );
 
-      await pumpApp(tester, location: '/about');
-
-      expect(find.text('Versión 1.2.0 (compilación 14)'), findsOne);
       expect(find.text('Acerca de'), findsOne);
-      expect(find.text('Reglas oficiales'), findsOne);
-      expect(find.widgetWithText(SelectableText, address), findsOne);
+      expect(find.text('Versión 1.2.0 (compilación 14)'), findsOne);
+      expect(find.text('Cephalopod fue diseñado por Mark Steere.'), findsOne);
+      expect(find.text(copyright), findsOne);
+      expect(
+        link('Más juegos de Mark Steere: marksteeregames.com'),
+        findsOne,
+      );
+
+      await tester.tap(link('Reglas oficiales (PDF)'));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('No se pudo abrir el enlace'), findsOne);
     });
   });
 }
