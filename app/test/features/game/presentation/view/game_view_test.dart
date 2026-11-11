@@ -55,11 +55,32 @@ void main() {
     return tester.widget<ScaleTransition>(transition).scale.value;
   }
 
-  /// Taps the button with [tooltip] and draws one frame, and no more: what
-  /// is on screen then was drawn at once.
-  Future<void> tapButtonOnce(WidgetTester tester, String tooltip) async {
-    await tester.tap(find.byTooltip(tooltip));
+  /// Opens the app bar's "more" menu.
+  Future<void> openMenu(WidgetTester tester) async {
+    await tester.tap(find.byTooltip('More options'));
+    await tester.pumpAndSettle();
+  }
+
+  /// The [label]ed item of the open "more" menu.
+  MenuItemButton menuItem(WidgetTester tester, String label) =>
+      tester.widget<MenuItemButton>(find.widgetWithText(MenuItemButton, label));
+
+  /// Opens the "more" menu, taps its [label]ed item, and draws the frames
+  /// that take, and no more: what is on the board then was drawn at once.
+  /// The item acts once the frame that closes the menu is drawn, so the
+  /// board shows the change on the frame after it.
+  Future<void> tapMenuItemOnce(WidgetTester tester, String label) async {
+    await openMenu(tester);
+    await tester.tap(find.widgetWithText(MenuItemButton, label));
     await tester.pump();
+    await tester.pump();
+  }
+
+  /// Opens the "more" menu, taps its [label]ed item, and lets everything
+  /// settle.
+  Future<void> tapMenuItem(WidgetTester tester, String label) async {
+    await tapMenuItemOnce(tester, label);
+    await tester.pumpAndSettle();
   }
 
   FilledButton captureButton(WidgetTester tester) =>
@@ -117,10 +138,10 @@ void main() {
       await pumpGame(tester);
       await tapSquare(tester, const Position(2, 2));
 
-      await tapButtonOnce(tester, 'Undo');
+      await tapMenuItemOnce(tester, 'Undo');
       expect(find.byType(DieFace), findsNothing);
 
-      await tapButtonOnce(tester, 'Redo');
+      await tapMenuItemOnce(tester, 'Redo');
       expect(dieScale(tester, const Position(2, 2)), 1);
     });
 
@@ -128,13 +149,11 @@ void main() {
       await pumpGame(tester);
       await tapSquare(tester, const Position(2, 2));
 
-      await tester.tap(find.byTooltip('Undo'));
-      await tester.pumpAndSettle();
+      await tapMenuItem(tester, 'Undo');
       expect(find.byType(DieFace), findsNothing);
       expect(find.text('Player 1 to move'), findsOne);
 
-      await tester.tap(find.byTooltip('Redo'));
-      await tester.pumpAndSettle();
+      await tapMenuItem(tester, 'Redo');
       expect(find.byType(DieFace), findsOne);
       expect(find.text('Player 2 to move'), findsOne);
     });
@@ -142,10 +161,25 @@ void main() {
     testWidgets('has nothing to undo or redo in a new game', (tester) async {
       await pumpGame(tester);
 
-      final undo = find.widgetWithIcon(IconButton, Icons.undo);
-      final redo = find.widgetWithIcon(IconButton, Icons.redo);
-      expect(tester.widget<IconButton>(undo).onPressed, isNull);
-      expect(tester.widget<IconButton>(redo).onPressed, isNull);
+      await openMenu(tester);
+
+      expect(menuItem(tester, 'Undo').onPressed, isNull);
+      expect(menuItem(tester, 'Redo').onPressed, isNull);
+      expect(menuItem(tester, 'New game').onPressed, isNotNull);
+    });
+
+    testWidgets('keeps only How to play and the menu in the app bar', (
+      tester,
+    ) async {
+      await pumpGame(tester);
+
+      final actions = find.descendant(
+        of: find.byType(AppBar),
+        matching: find.byType(IconButton),
+      );
+      expect(actions, findsNWidgets(2));
+      expect(find.byTooltip('How to play'), findsOne);
+      expect(find.byTooltip('More options'), findsOne);
     });
 
     testWidgets('R8: names the winner of a full board', (tester) async {
@@ -160,8 +194,7 @@ void main() {
       await pumpGame(tester, config: const GameConfig(boardSize: 3));
       await tapSquare(tester, const Position(0, 0));
 
-      await tester.tap(find.byTooltip('New game'));
-      await tester.pumpAndSettle();
+      await tapMenuItem(tester, 'New game');
 
       expect(find.byType(DieFace), findsNothing);
       expect(find.byType(BoardSquare), findsNWidgets(9));
@@ -247,14 +280,14 @@ void main() {
         await tapText(tester, 'Capture');
 
         // Back: the new die is gone and the captured dice are whole again.
-        await tapButtonOnce(tester, 'Undo');
+        await tapMenuItemOnce(tester, 'Undo');
         expect(find.byType(DieFace), findsNWidgets(4));
         for (final square in captured) {
           expect(dieScale(tester, square), 1);
         }
 
         // Again: the captured dice are gone and the new die is whole.
-        await tapButtonOnce(tester, 'Redo');
+        await tapMenuItemOnce(tester, 'Redo');
         expect(find.byType(DieFace), findsNWidgets(3));
         expect(dieScale(tester, const Position(1, 1)), 1);
       });
