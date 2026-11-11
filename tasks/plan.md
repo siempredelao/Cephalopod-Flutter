@@ -569,7 +569,7 @@ in the order they were planned, not the order they are built.
 | `game_view.dart` | 154 lines: app bar, headline, board, controls | + menu, tally, hint, confetti, 2 sound listeners | Task 38 splits it |
 | "What just happened" | `_computerMove` and `_movePlayed` in the bloc, and `computerMove` and `movePlayed` in the state | + captured dice, captured squares, win | Task 39 makes it one value |
 | `board_square.dart` | 193 lines: ring plus die grow and shrink | + a pulsing hint ring, a 2nd controller | 33b moves the ring out |
-| "How to play was seen" | (new) | would put something that is not a choice into `AppSettings`, and need a `ready` future | Home's own store (31a) |
+| "How to play was seen" | (new) | would put something that is not a choice into `AppSettings`, and need a `ready` future | How to play's own store (31a) |
 | `GameViewStateMapper.map` | 9 named parameters | Task 39 takes 2 away; `HintState` adds 1 | Fine |
 | `GameBloc` | 378 lines, one event switch | the hint gets its own `HintState`, kept apart | Fine |
 | How to play cubit and state | small, an enum for the right button | + `canGoBack`, `canSkip` | Fine |
@@ -585,7 +585,7 @@ in the order they were planned, not the order they are built.
 | 3 | 28 · actions in a "more" menu | feature | S |
 | 4 | 29 · dots on their own row, Previous | feature | S |
 | 5 | 30 · Skip How to play | feature | XS |
-| 6 | 31a · Home remembers How to play was seen | foundation | S |
+| 6 | 31a · remember whether How to play was seen | foundation | S |
 | 7 | 31b · How to play on first launch | feature | S |
 | 8 | 32a · count each player's dice in the state | foundation | S |
 | 9 | 32b · the dice tally on screen | feature | S |
@@ -668,16 +668,22 @@ Acceptance:
 
 **Task 31. How to play the first time the app opens** (two PRs)
 
-- **31a. `feat(home): remember whether How to play was seen`** (foundation,
-  S). Home owns the first-launch decision, so the storage is Home's: a
-  `FirstLaunchRepository` in `home/domain/`, a shared_preferences
+- **31a. `feat(game): remember whether How to play was seen`** (foundation,
+  S). "Seen" describes How to play, so the store lives with it, in the game
+  feature: a `HowToPlayRepository` in `game/domain/`, a shared_preferences
   implementation and an in-memory one, and contract tests for both. A failed
   read counts as seen (docs/adr/0016), so a broken store never traps the
   player in the tutorial. `AppSettings` stays as it is.
 - **31b. `feat(app): show How to play the first time the app opens`**
-  (feature, S). `HomeCubit` asks the repository on its first `refresh`, and
-  `HomeView` opens How to play once. It is marked seen as it opens, so Back,
-  Skip and Done all count.
+  (feature, S). `HowToPlayCubit` marks it seen when the page opens, from
+  wherever it opens, so Back, Skip and Done all count. `GameModule` hands
+  Home a plain `hasSeenHowToPlay` function, as it does
+  `hasGameToContinue`, and the composition root wires it. `HomeCubit` asks
+  it on its first `refresh`, and `HomeView` opens How to play once.
+
+  Decided 2026-11-11, in #94: first planned as Home's store, marked by Home
+  as it opened How to play. Moved, so that the screen the flag describes is
+  the one that writes it, and Home only reads it.
 
 Acceptance:
 - A fresh install opens on How to play, and going back shows Home. It never
@@ -797,8 +803,9 @@ Acceptance (36b, 36c):
    plays nothing. The search is a `HintState` of its own, kept apart from
    `TurnPhase`.
 4. **The menu** uses the "more" icon (⋮), Android's usual icon for it.
-5. **The refactors** (38, 39, 33b) and Home's own first-launch store were
-   approved before any feature.
+5. **The refactors** (38, 39, 33b) and a store of its own for "How to play
+   was seen" were approved before any feature. The store is How to play's,
+   in the game feature (changed in #94 from Home's).
 
 ## M7: Google Play
 

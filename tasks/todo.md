@@ -46,7 +46,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] 28. feat(game): move the game's actions into a menu (S), closes 27
 - [x] 29. feat(game): centre How to play's dots and add Previous (S)
 - [x] 30. feat(game): let the player skip How to play (XS)
-- [ ] 31a. feat(home): remember whether How to play was seen (S)
+- [x] 31a. feat(game): remember whether How to play was seen (S)
 - [ ] 31b. feat(app): show How to play the first time the app opens (S)
 - [ ] 32a. feat(game): count each player's dice in the game state (S)
 - [ ] 32b. feat(game): show how many dice each player has (S)
