@@ -8,7 +8,6 @@ import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod/features/game/presentation/models/capture_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/computer_move_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/game_view_state.dart';
-import 'package:cephalopod/features/game/presentation/models/headline_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/hint_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/played_move_ui.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
@@ -47,7 +46,7 @@ final class GameViewStateMapper {
     required bool canRedo,
     PlayedMove? playedMove,
   }) {
-    final hint = getHint(phase);
+    final hint = _getHint(phase);
     final hintMove = switch (hint) {
       HintFound(:final move) => move,
       NoHint() || HintSearching() => null,
@@ -60,9 +59,7 @@ final class GameViewStateMapper {
       opponent: opponent,
       highlightLastMove: highlightLastMove,
     );
-    final headlineUi = searching
-        ? const HeadlineUi.lookingForHint()
-        : _headlineUiMapper.map(game.status, opponent);
+    final headlineUi = _headlineUiMapper.map(game.status, opponent, hint);
     final captureUi = _captureUiOf(phase, game.config);
     final canTap = _canTapIn(phase);
     return GameViewState(
@@ -80,7 +77,7 @@ final class GameViewStateMapper {
     );
   }
 
-  HintState getHint(TurnPhase phase) => switch (phase) {
+  HintState _getHint(TurnPhase phase) => switch (phase) {
     AwaitingPlacement(:final hint) => hint,
     ChoosingCapture() ||
     ComputerThinking() ||
