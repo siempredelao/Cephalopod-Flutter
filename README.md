@@ -7,11 +7,13 @@ A Flutter implementation of **Cephalopod**, the two-player dice game invented by
 reference for clean architecture, SOLID and testing in Flutter: the rules live in
 a pure-Dart package, the app sits on top, and CI enforces the boundaries.
 
-**Status:** M4, AI opponent. Play a friend on one device or the computer at
-three levels (Easy, Medium, Hard), undo and redo moves, leave and continue
-later, and choose a system, light or dark theme, on top of a rules engine
-tested with 1,000 seeded random games checked move by move. Next is M5:
-polish.
+**Status:** M5, polish. Play a friend on one device or the computer at three
+levels (Easy, Medium, Hard), undo and redo moves, leave and continue later,
+in English or Spanish, with a system, light or dark theme. Dice animate as
+they are placed and captured, screen readers announce each move, and the
+About page links the rule sheet. Underneath is a rules engine tested with
+1,000 seeded random games checked move by move, and golden images lock in
+how the main screens look. Next is M7: Google Play.
 
 ## The game
 
@@ -142,7 +144,7 @@ differently, and fail every golden.
 - [x] **M3 · Persistence and undo**: resume, undo/redo, settings with a theme
   choice (system, light or dark)
 - [x] **M4 · AI opponent**: three difficulty levels
-- [ ] **M5 · Polish**: accessibility, English and Spanish, placement and capture
+- [x] **M5 · Polish**: accessibility, English and Spanish, placement and capture
   animations, light and dark board palettes, rule-sheet link and app version on
   About, goldens
 - [ ] ~~**M6 · Release v1.0**~~ Dropped: the web build is not planned

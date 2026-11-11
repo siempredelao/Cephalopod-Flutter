@@ -134,7 +134,8 @@ Classes named above arrive in M1–M4; the table records how they will fit.
 | Agent contract | Every agent plays legal moves, repeats itself with the same seed, and runs on another isolate as the app runs it | `packages/cephalopod_engine/test/src/agents` |
 | Repository contract | Every implementation behaves the same | `app/test/features/*/data` |
 | Bloc | Event to state sequences | `app/test/features/*/presentation` |
-| Widget and golden | Rendering, taps, semantics, light and dark | `app/test` |
+| Widget | Rendering, taps, semantics, light and dark | `app/test` |
+| Golden | How the four main screens look, pixel by pixel, in both languages and both themes | `app/test/goldens` |
 | Accessibility | Tap targets, labels and contrast on every screen; twice the text size; one-line choices, in both languages | `app/test/app` |
 
 Coverage gates: engine 100% of lines, app 85% of lines, generated files excluded.
