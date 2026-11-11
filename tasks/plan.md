@@ -587,20 +587,22 @@ in the order they were planned, not the order they are built.
 | 5 | 30 · Skip How to play | feature | XS |
 | 6 | 31a · remember whether How to play was seen | foundation | S |
 | 7 | 31b · How to play on first launch | feature | S |
-| 8 | 32a · count each player's dice in the state | foundation | S |
-| 9 | 32b · the dice tally on screen | feature | S |
-| 10 | 33a · `SuggestMove` use case | foundation | S |
-| 11 | 33b · a square's ring in its own widget | refactor | S |
-| 12 | 33c · the board can draw a hint | foundation | S |
-| 13 | 33d · Hint in the menu | feature | S |
-| 14 | 37a · the played move says what it captured and whether it won | foundation | S |
-| 15 | 34a · particle drawing | foundation | S |
-| 16 | 34b · burst a captured die | feature | S |
-| 17 | 37b · confetti for a win | feature | S |
-| 18 | 35 · Sound switch in Settings | feature | S |
-| 19 | 36a · audio playback (ADR, package, sound files) | foundation | S |
-| 20 | 36b · sound on a capture | feature | S |
-| 21 | 36c · sound on a win | feature | XS |
+| 8 | 40a · the board's drawing moves to core | refactor | S |
+| 9 | 40b · How to play gets a feature of its own | refactor | S |
+| 10 | 32a · count each player's dice in the state | foundation | S |
+| 11 | 32b · the dice tally on screen | feature | S |
+| 12 | 33a · `SuggestMove` use case | foundation | S |
+| 13 | 33b · a square's ring in its own widget | refactor | S |
+| 14 | 33c · the board can draw a hint | foundation | S |
+| 15 | 33d · Hint in the menu | feature | S |
+| 16 | 37a · the played move says what it captured and whether it won | foundation | S |
+| 17 | 34a · particle drawing | foundation | S |
+| 18 | 34b · burst a captured die | feature | S |
+| 19 | 37b · confetti for a win | feature | S |
+| 20 | 35 · Sound switch in Settings | feature | S |
+| 21 | 36a · audio playback (ADR, package, sound files) | foundation | S |
+| 22 | 36b · sound on a capture | feature | S |
+| 23 | 36c · sound on a win | feature | XS |
 
 ### Refactors first
 
@@ -688,6 +690,42 @@ Acceptance:
 Acceptance:
 - A fresh install opens on How to play, and going back shows Home. It never
   opens by itself again.
+
+**Task 40. How to play gets a feature of its own** (two PRs, planned
+2026-11-11, after 31b)
+
+How to play lives inside the game feature because its pages draw example
+boards with the game's widgets, and features may not import each other.
+It is a feature of its own in every other way: its own route, cubit, steps,
+text, and (from 31a) its own store. This task moves it to
+`features/how_to_play/`, and the board pieces both use to `core/`.
+
+- **40a. `refactor(app): move the board's drawing to core`** (S). To
+  `core/board/` (or similar): what draws a board and is not about a
+  game in progress: `GameBoard`, `BoardSquare`, `DieFace`, the board UI
+  models (`BoardUi`, `SquareUi`, `DieUi`, `SquareMark`, `SideUi`) and
+  `SquareTextMapper`, with their tests and widget previews.
+- **40b. `refactor(app): give How to play a feature of its own`** (S). To
+  `features/how_to_play/`: the page, the step dots, the cubit, the
+  steps and their mapper, the text mappers, `HowToPlayRepository` and its
+  implementations, and the route, through a `HowToPlayModule`.
+  `hasSeenHowToPlay` comes from that module instead of `GameModule`.
+- **To decide when built:** the tutorial's example boards are made by the
+  game's `BoardUiMapper`, which takes the game's `TurnPhase` and `Opponent`,
+  and `TutorialStep` names a `TurnPhase` too. Either the marks a board shows
+  get a small input type of their own in `core/`, which the game's phases
+  map to, or the tutorial describes its examples with their marks directly.
+  Pick the one that leaves less code, and say why in the PR. Decided in
+  40a, since it decides what `core/` holds.
+- Done after 31b, so 31b's wiring moves with it, and before Task 33, whose
+  board changes (the ring widget, the hint marks) then land in `core/`.
+
+Acceptance:
+- No behaviour change: every test passes after moving with its code, and the
+  goldens do not change.
+- The architecture check passes with no new exception: `how_to_play` does
+  not import `game`, nor `game` `how_to_play`.
+- The game screen and Home still open How to play by its route name.
 
 **Task 32. Show how many dice each player has** (two PRs)
 
