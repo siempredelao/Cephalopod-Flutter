@@ -4,8 +4,10 @@ import 'package:cephalopod/features/game/presentation/bloc/dice_tally_ui_mapper.
 import 'package:cephalopod/features/game/presentation/bloc/headline_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/hint_state.dart';
 import 'package:cephalopod/features/game/presentation/bloc/played_move.dart';
+import 'package:cephalopod/features/game/presentation/bloc/side_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod/features/game/presentation/models/capture_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/captured_die_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/computer_move_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/game_view_state.dart';
 import 'package:cephalopod/features/game/presentation/models/hint_ui.dart';
@@ -20,11 +22,13 @@ final class GameViewStateMapper {
     this._boardUiMapper = const BoardUiMapper(),
     this._headlineUiMapper = const HeadlineUiMapper(),
     this._diceTallyUiMapper = const DiceTallyUiMapper(),
+    this._sideUiMapper = const SideUiMapper(),
   });
 
   final BoardUiMapper _boardUiMapper;
   final HeadlineUiMapper _headlineUiMapper;
   final DiceTallyUiMapper _diceTallyUiMapper;
+  final SideUiMapper _sideUiMapper;
 
   /// The screen for [game] against [opponent], waiting for [phase]. The
   /// board marks [lastMove] when [highlightLastMove] is on. Whether a turn
@@ -67,7 +71,7 @@ final class GameViewStateMapper {
       headline: headlineUi,
       tally: _diceTallyUiMapper.map(game, opponent),
       capture: captureUi,
-      playedMove: _playedMoveUiOf(playedMove, game),
+      playedMove: _playedMoveUiOf(playedMove, game, opponent),
       canTap: canTap,
       // Undo and redo would only wait for the search to end.
       canUndo: canUndo && !searching,
@@ -92,12 +96,37 @@ final class GameViewStateMapper {
   );
 
   /// The move just played, as the screen shows it, if one led to [game].
-  PlayedMoveUi? _playedMoveUiOf(PlayedMove? playedMove, GameState game) {
+  PlayedMoveUi? _playedMoveUiOf(
+    PlayedMove? playedMove,
+    GameState game,
+    Opponent opponent,
+  ) {
     if (playedMove == null) return null;
-    final (:move, :byComputer) = playedMove;
+    final (:move, :byComputer, :captured) = playedMove;
     return PlayedMoveUi(
       computer: byComputer ? _computerMoveUiOf(move, game) : null,
+      captured: [
+        for (final MapEntry(key: square, value: die) in captured.entries)
+          CapturedDieUi(
+            row: square.row,
+            col: square.col,
+            owner: _sideUiMapper.map(die.owner, opponent),
+          ),
+      ],
+      celebrate: _isWonByThePlayer(game.status, opponent),
     );
+  }
+
+  /// Whether [status] is a game the player won: against the computer, one
+  /// the person won; between two people, any finished game, since one of
+  /// them won it (the board has an odd number of squares, so no draws).
+  static bool _isWonByThePlayer(GameStatus status, Opponent opponent) {
+    return switch ((status, opponent)) {
+      (InProgress(), _) => false,
+      (Finished(), FriendOpponent()) => true,
+      (Finished(:final winner), ComputerOpponent(:final player)) =>
+        winner != player,
+    };
   }
 
   /// The computer's [move] as the screen reports it: where it placed its

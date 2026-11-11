@@ -277,9 +277,18 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// Plays [move], which comes from the engine's legal moves, and saves the
   /// game. A new move replaces any moves taken back.
   Future<void> _play(Move move, Emitter<GameViewState> emit) async {
-    if (await _playMove(_currentGame, move) case Ok(:final value)) {
+    final before = _currentGame;
+    if (await _playMove(before, move) case Ok(:final value)) {
       _undone.clear();
-      _show(value, emit, playedMove: (move: move, byComputer: false));
+      _show(
+        value,
+        emit,
+        playedMove: (
+          move: move,
+          byComputer: false,
+          captured: _capturedBy(move, before.state),
+        ),
+      );
     }
   }
 
@@ -333,6 +342,12 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     _emitScreen(emit);
   }
 
+  /// The dice [move] captures in [before], the game it is played in, and
+  /// where they were. They are gone from the board once it is played.
+  static Map<Position, Die> _capturedBy(Move move, GameState before) => {
+    for (final square in move.captures) square: before.board.dice[square]!,
+  };
+
   /// Lets the computer play while the screen shows it thinking. Other
   /// events wait until it has played.
   ///
@@ -350,7 +365,15 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     if (isClosed) return;
     switch (await _playMove(game, move)) {
       case Ok(:final value):
-        _show(value, emit, playedMove: (move: move, byComputer: true));
+        _show(
+          value,
+          emit,
+          playedMove: (
+            move: move,
+            byComputer: true,
+            captured: _capturedBy(move, game.state),
+          ),
+        );
       case Err(:final error):
         throw StateError('The agent chose $move: $error');
     }

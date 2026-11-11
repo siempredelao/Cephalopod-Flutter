@@ -7,11 +7,15 @@ import 'package:cephalopod/features/game/presentation/bloc/hint_state.dart';
 import 'package:cephalopod/features/game/presentation/bloc/played_move.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod/features/game/presentation/models/capture_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/captured_die_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/computer_move_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/game_view_state.dart';
 import 'package:cephalopod/features/game/presentation/models/headline_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/hint_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/played_move_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/player_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/role_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/side_ui.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:cephalopod_engine/testing.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -213,16 +217,101 @@ void main() {
     });
 
     test("reports no computer move after the person's move", () {
-      final screen = map(playedMove: (move: Move(below), byComputer: false));
+      final screen = map(
+        playedMove: (move: Move(below), byComputer: false, captured: const {}),
+      );
 
       expect(screen.playedMove, const PlayedMoveUi());
+    });
+
+    test('reports the dice a move captured, and whose they were', () {
+      final capture = Move(top, captures: {left, right});
+      final screen = map(
+        playedMove: (
+          move: capture,
+          byComputer: false,
+          captured: {
+            left: const Die(owner: Player.white, pips: 1),
+            right: const Die(owner: Player.white, pips: 1),
+          },
+        ),
+      );
+
+      const playerTwo = SideUi(player: PlayerUi.two, role: RoleUi.player);
+      expect(screen.playedMove?.captured, const [
+        CapturedDieUi(row: 0, col: 1, owner: playerTwo),
+        CapturedDieUi(row: 0, col: 3, owner: playerTwo),
+      ]);
+      expect(screen.playedMove?.celebrate, isFalse);
+    });
+
+    group('celebrates', () {
+      /// A full 3 × 3 board that Black wins, 5 dice to 4.
+      final blackWins = stateFromAscii('''
+        b1 w1 b1
+        w1 b1 w1
+        b1 w1 b1
+      ''', toMove: Player.black);
+      final lastMove = Move(const Position(2, 2));
+
+      /// Whether the screen celebrates the move that ended [blackWins]
+      /// against [opponent].
+      bool? celebratesAgainst(Opponent opponent) {
+        return mapper
+            .map(
+              game: blackWins,
+              opponent: opponent,
+              lastMove: lastMove,
+              phase: TurnPhase.gameEnded(blackWins.status as Finished),
+              highlightLastMove: true,
+              canUndo: false,
+              canRedo: false,
+              playedMove: (
+                move: lastMove,
+                byComputer: false,
+                captured: const {},
+              ),
+            )
+            .playedMove
+            ?.celebrate;
+      }
+
+      test('the end of a game between two people', () {
+        expect(celebratesAgainst(const FriendOpponent()), isTrue);
+      });
+
+      test('the person beating the computer', () {
+        // The computer plays White, so the person, Black, won.
+        expect(celebratesAgainst(computer), isTrue);
+      });
+
+      test('not the computer winning', () {
+        const computerPlaysBlack = ComputerOpponent(
+          difficulty: Difficulty.easy,
+          player: Player.black,
+        );
+
+        expect(celebratesAgainst(computerPlaysBlack), isFalse);
+      });
+
+      test('not a game that goes on', () {
+        final screen = map(
+          playedMove: (
+            move: Move(below),
+            byComputer: false,
+            captured: const {},
+          ),
+        );
+
+        expect(screen.playedMove?.celebrate, isFalse);
+      });
     });
 
     test('reports where the computer placed its die and what it shows', () {
       // The 5 on the square below the top centre is the die that moved.
       final screen = map(
         opponent: computer,
-        playedMove: (move: Move(below), byComputer: true),
+        playedMove: (move: Move(below), byComputer: true, captured: const {}),
       );
 
       expect(
