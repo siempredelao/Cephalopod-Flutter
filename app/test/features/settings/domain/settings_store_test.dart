@@ -13,8 +13,16 @@ import 'package:shared_preferences_platform_interface/shared_preferences_async_p
 import '../../../helpers/failing_shared_preferences.dart';
 
 void main() {
-  const dark = (theme: ThemePreference.dark, highlightLastMove: true);
-  const light = (theme: ThemePreference.light, highlightLastMove: false);
+  const dark = (
+    theme: ThemePreference.dark,
+    highlightLastMove: true,
+    sound: true,
+  );
+  const light = (
+    theme: ThemePreference.light,
+    highlightLastMove: false,
+    sound: false,
+  );
   late InMemorySettingsRepository repository;
   late SettingsStore store;
   late List<AppSettings> announced;

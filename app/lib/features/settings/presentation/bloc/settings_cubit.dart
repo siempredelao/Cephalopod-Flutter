@@ -31,6 +31,7 @@ class SettingsCubit extends Cubit<SettingsViewState> {
     return _settingsStore.update((
       theme: _settingsViewStateMapper.themePreferenceOf(theme),
       highlightLastMove: current.highlightLastMove,
+      sound: current.sound,
     ));
   }
 
@@ -39,6 +40,7 @@ class SettingsCubit extends Cubit<SettingsViewState> {
     return _settingsStore.update((
       theme: current.theme,
       highlightLastMove: !current.highlightLastMove,
+      sound: current.sound,
     ));
   }
 

@@ -12,8 +12,16 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   late InMemorySettingsRepository repository;
   late SettingsStore store;
-  const dark = (theme: ThemePreference.dark, highlightLastMove: true);
-  const noHighlight = (theme: ThemePreference.system, highlightLastMove: false);
+  const dark = (
+    theme: ThemePreference.dark,
+    highlightLastMove: true,
+    sound: true,
+  );
+  const noHighlight = (
+    theme: ThemePreference.system,
+    highlightLastMove: false,
+    sound: true,
+  );
 
   setUp(() {
     repository = InMemorySettingsRepository();
@@ -78,6 +86,25 @@ void main() {
       expect: () => [screenOf(noHighlight), screenOf(defaultSettings)],
       verify: (_) async => expect(await repository.load(), defaultSettings),
     );
+
+    test('keeps sounds off while the theme and the highlight change', () async {
+      await store.update((
+        theme: ThemePreference.system,
+        highlightLastMove: true,
+        sound: false,
+      ));
+      final cubit = build();
+      addTearDown(cubit.close);
+
+      await cubit.chooseTheme(ThemeUi.dark);
+      await cubit.toggleLastMoveHighlight();
+
+      expect(store.current, (
+        theme: ThemePreference.dark,
+        highlightLastMove: false,
+        sound: false,
+      ));
+    });
 
     test('stops following the store once closed', () async {
       final cubit = build();

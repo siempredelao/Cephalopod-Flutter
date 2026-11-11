@@ -597,10 +597,11 @@ in the order they were planned, not the order they are built.
 | 15 | 34a · particle drawing | foundation | S |
 | 16 | 34b · burst a captured die | feature | S |
 | 17 | 37b · confetti for a win | feature | S |
-| 18 | 35 · Sound switch in Settings | feature | S |
-| 19 | 36a · audio playback (ADR, package, sound files) | foundation | S |
-| 20 | 36b · sound on a capture | feature | S |
-| 21 | 36c · sound on a win | feature | XS |
+| 18 | 35a · the settings remember Sound | foundation | S |
+| 19 | 35b · Sound switch in Settings | feature | S |
+| 20 | 36a · audio playback (ADR, package, sound files) | foundation | S |
+| 21 | 36b · sound on a capture | feature | S |
+| 22 | 36c · sound on a win | feature | XS |
 
 ### Refactors first
 
@@ -775,11 +776,17 @@ Acceptance (34b):
 - No confetti under reduced motion, after a loss, or after undo or redo into
   a finished game.
 
-**Task 35. `feat(settings): add a Sound switch`** (S)
+**Task 35. Sound switch** (two PRs, split on 2026-11-11 to keep each one
+small)
 
-- `AppSettings.sound`, on by default, with a switch on the Settings page and
-  its words in both languages. `GameModule` reads it the way it reads
-  `highlightLastMove`. Nothing plays a sound yet.
+- **35a. `feat(settings): remember whether sounds are on`** (foundation, S).
+  `AppSettings.sound`, on by default, saved and loaded by the settings
+  repository under its own key, with the contract tests. Nothing shows it.
+- **35b. `feat(settings): add a Sound switch`** (feature, S). A switch on
+  the Settings page, with its words in both languages, through the
+  settings cubit and its view state.
+- `GameModule` reading the setting (`bool Function() soundOn`, the way it
+  reads `highlightLastMove`) moves to 36b, the first PR that plays a sound.
 
 **Task 36. Capture and win sounds** (three PRs)
 
@@ -790,6 +797,7 @@ Acceptance (34b):
   a fake for tests. Nothing calls it yet.
 - **36b. `feat(game): play a sound on a capture`** (feature, S). On every
   capture, by either side, when the switch is on. Undo and redo stay silent.
+  `GameModule` gets `soundOn` here.
 - **36c. `feat(game): play a sound when the player wins`** (feature, XS).
   The same moments as the confetti. A winning move that also captures plays
   only the win sound.
