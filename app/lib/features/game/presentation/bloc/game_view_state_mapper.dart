@@ -2,11 +2,14 @@ import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/presentation/bloc/board_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/dice_tally_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/headline_ui_mapper.dart';
+import 'package:cephalopod/features/game/presentation/bloc/hint_state.dart';
 import 'package:cephalopod/features/game/presentation/bloc/played_move.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod/features/game/presentation/models/capture_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/computer_move_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/game_view_state.dart';
+import 'package:cephalopod/features/game/presentation/models/headline_ui.dart';
+import 'package:cephalopod/features/game/presentation/models/hint_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/played_move_ui.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
@@ -28,6 +31,12 @@ final class GameViewStateMapper {
   /// board marks [lastMove] when [highlightLastMove] is on. Whether a turn
   /// can be taken back or played again is the bloc's to say. So is
   /// [playedMove], the move just played that led here, if one did.
+  ///
+  /// The [hint] and the [phase] are combined here, and only here: while a
+  /// hint is searched for, the board takes no taps and the headline says
+  /// so, and turns cannot be taken back or played again; once found, it
+  /// marks the board. A hint can be asked for only while
+  /// a die can be placed and none is shown or searched for.
   GameViewState map({
     required GameState game,
     required Opponent opponent,
@@ -37,17 +46,26 @@ final class GameViewStateMapper {
     required bool canUndo,
     required bool canRedo,
     PlayedMove? playedMove,
+    HintState hint = const HintState.none(),
   }) {
+    final hintMove = switch (hint) {
+      HintFound(:final move) => move,
+      NoHint() || HintSearching() => null,
+    };
+    final searching = hint is HintSearching;
     final boardUi = _boardUiMapper.map(
       game: game,
       phase: phase,
       lastMove: lastMove,
       opponent: opponent,
       highlightLastMove: highlightLastMove,
+      hint: hintMove,
     );
-    final headlineUi = _headlineUiMapper.map(game.status, opponent);
+    final headlineUi = searching
+        ? const HeadlineUi.lookingForHint()
+        : _headlineUiMapper.map(game.status, opponent);
     final captureUi = _captureUiOf(phase, game.config);
-    final canTap = _canTapIn(phase);
+    final canTap = _canTapIn(phase) && !searching;
     return GameViewState(
       board: boardUi,
       headline: headlineUi,
@@ -55,10 +73,20 @@ final class GameViewStateMapper {
       capture: captureUi,
       playedMove: _playedMoveUiOf(playedMove, game),
       canTap: canTap,
-      canUndo: canUndo,
-      canRedo: canRedo,
+      // Undo and redo would only wait for the search to end.
+      canUndo: canUndo && !searching,
+      canRedo: canRedo && !searching,
+      hint: hintMove == null ? null : _hintUiOf(hintMove),
+      canHint: phase is AwaitingPlacement && hint is NoHint,
     );
   }
+
+  /// The hinted [move] as a screen reader says it.
+  HintUi _hintUiOf(Move move) => HintUi(
+    row: move.position.row,
+    col: move.position.col,
+    captures: move.captures.length,
+  );
 
   /// The move just played, as the screen shows it, if one led to [game].
   PlayedMoveUi? _playedMoveUiOf(PlayedMove? playedMove, GameState game) {

@@ -157,6 +157,10 @@
   "@gameHeadlineComputerToMove": {
     "description": "Game: above the board while the computer chooses its move."
   },
+  "gameHeadlineLookingForHint": "Looking for a hint…",
+  "@gameHeadlineLookingForHint": {
+    "description": "Game: above the board while the app looks for a move to suggest, after the player asked for a hint."
+  },
   "gameHeadlinePlayerWon": "{player} wins {winnerDice} to {loserDice}",
   "@gameHeadlinePlayerWon": {
     "description": "Game: above the board when a game between two people ends. The numbers are the dice each player has on the full board, the winner's first.",

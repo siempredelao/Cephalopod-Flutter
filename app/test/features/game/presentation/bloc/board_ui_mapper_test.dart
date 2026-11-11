@@ -37,6 +37,7 @@ void main() {
     Move? lastMove,
     Opponent opponent = const FriendOpponent(),
     bool highlightLastMove = true,
+    Move? hint,
   }) {
     return mapper.map(
       game: figure4,
@@ -44,6 +45,7 @@ void main() {
       lastMove: lastMove,
       opponent: opponent,
       highlightLastMove: highlightLastMove,
+      hint: hint,
     );
   }
 
@@ -52,6 +54,26 @@ void main() {
   }
 
   group('BoardUiMapper', () {
+    test("marks a hint's square and the dice it would capture", () {
+      final hint = Move(top, captures: {left, right});
+
+      final board = map(hint: hint);
+
+      expect(squareAt(board, top).mark, SquareMark.hintTarget);
+      expect(squareAt(board, left).mark, SquareMark.hintCapture);
+      expect(squareAt(board, right).mark, SquareMark.hintCapture);
+      expect(squareAt(board, below).mark, SquareMark.none);
+    });
+
+    test('shows a hint over the last move', () {
+      // The last move placed the 5 below, which the hint would capture.
+      final hint = Move(top, captures: {left, below});
+
+      final board = map(lastMove: Move(below), hint: hint);
+
+      expect(squareAt(board, below).mark, SquareMark.hintCapture);
+    });
+
     test('lays the squares out row by row', () {
       final board = map();
 

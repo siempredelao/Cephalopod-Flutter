@@ -733,6 +733,11 @@ Acceptance:
   computer thinks and after the game ends, and is dropped if the screen
   closes during the search.
 
+Built as three PRs (split on review of #101, 2026-11-11): 33d-1 puts the
+hint into the game's state and the mappers, with the "Looking for a hint…"
+headline; 33d-2 the spoken hint; 33d-3 the bloc's search and the menu's
+Hint.
+
 **Task 37a. `feat(game): say what the move just played captured, and whether
 it won`** (foundation, S)
 

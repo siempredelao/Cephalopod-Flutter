@@ -27,6 +27,13 @@ void main() {
       );
     });
 
+    test('says it is looking for a hint', () {
+      expect(
+        mapper.map(const HeadlineUi.lookingForHint(), english),
+        'Looking for a hint…',
+      );
+    });
+
     test('R8: names the winner between two people, their dice first', () {
       const headline = HeadlineUi.playerWon(
         player: PlayerUi.one,
@@ -54,6 +61,7 @@ void main() {
         (HeadlineUi.playerToMove(PlayerUi.two), 'Turno del Jugador 2'),
         (HeadlineUi.personToMove(), 'Tu turno'),
         (HeadlineUi.computerToMove(), 'El ordenador está pensando…'),
+        (HeadlineUi.lookingForHint(), 'Buscando una pista…'),
         (
           HeadlineUi.playerWon(
             player: PlayerUi.one,

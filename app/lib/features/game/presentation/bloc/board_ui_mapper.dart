@@ -15,7 +15,8 @@ final class BoardUiMapper {
   final SideUiMapper _sideUiMapper;
 
   /// The board of [game] against [opponent], with its squares marked for
-  /// [phase]. Outside a capture, [lastMove] stands out when
+  /// [phase]. Outside a capture, a [hint] marks its square and the dice it
+  /// would capture; otherwise [lastMove] stands out when
   /// [highlightLastMove] is on.
   BoardUi map({
     required GameState game,
@@ -23,6 +24,7 @@ final class BoardUiMapper {
     required Move? lastMove,
     required Opponent opponent,
     required bool highlightLastMove,
+    Move? hint,
   }) {
     final board = game.board;
     final shownLastMove = highlightLastMove ? lastMove : null;
@@ -34,7 +36,7 @@ final class BoardUiMapper {
         row: row,
         col: col,
         die: die == null ? null : _dieUiOf(die, opponent),
-        mark: _markOf(position, phase, shownLastMove),
+        mark: _markOf(position, phase, shownLastMove, hint),
       );
     }
 
@@ -52,8 +54,14 @@ final class BoardUiMapper {
   }
 
   /// While a capture is being chosen, the target and the dice that can be
-  /// picked stand out; otherwise the [lastMove] does, if there is one.
-  SquareMark _markOf(Position square, TurnPhase phase, Move? lastMove) {
+  /// picked stand out. Otherwise a [hint] does, over the last move, since
+  /// the player asked for it; or else the [lastMove], if there is one.
+  SquareMark _markOf(
+    Position square,
+    TurnPhase phase,
+    Move? lastMove,
+    Move? hint,
+  ) {
     return switch (phase) {
       ChoosingCapture(:final selected) when selected.contains(square) =>
         SquareMark.captureSelected,
@@ -63,6 +71,8 @@ final class BoardUiMapper {
           when options.any((option) => option.contains(square)) =>
         SquareMark.captureOption,
       ChoosingCapture() => SquareMark.none,
+      _ when hint?.position == square => SquareMark.hintTarget,
+      _ when hint?.captures.contains(square) ?? false => SquareMark.hintCapture,
       _ when lastMove?.position == square => SquareMark.lastMove,
       _ => SquareMark.none,
     };

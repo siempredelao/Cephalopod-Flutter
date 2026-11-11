@@ -20,6 +20,9 @@ sealed class HeadlineUi with _$HeadlineUi {
   /// move.
   const factory HeadlineUi.computerToMove() = ComputerToMoveHeadline;
 
+  /// A hint is being looked for, for whoever is to move.
+  const factory HeadlineUi.lookingForHint() = LookingForHintHeadline;
+
   /// Between two people, [player] won with [winnerDice] to [loserDice].
   const factory HeadlineUi.playerWon({
     required PlayerUi player,
