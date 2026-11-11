@@ -14,7 +14,11 @@ roadmap:
 - **The web build is dropped** (2026-11-10), so the two problems that exist
   only on the web are not planned. They stay written down below in case that
   changes.
+- **M6 (UX, planned 2026-11-11):** How to play on first launch, a simpler
+  game app bar, a dice count, a hint, and effects and sounds for captures and
+  wins. Refactors and foundations come before the features they carry.
 - **M7:** crash reporting plugs into the error reporter added before M5.
+  Ten more languages and a rating prompt join it.
 
 Each task is one pull request, as usual here: a Conventional Commits title,
 squash-merged, `dart run melos run verify` green. Task numbers stay as first
@@ -32,8 +36,11 @@ planned, so they can be referred to. The checklist is in `tasks/todo.md`.
   too.
 - **Languages:**
   - English is the default. Spanish (Spain, `es`) comes second.
-  - The app follows the device: a Spanish device gets Spanish, and any other
-    device gets English. There is no language choice in Settings for now.
+  - M7 adds French, Italian, Portuguese (Brazil), German, Polish, Turkish,
+    Danish, Norwegian (Bokmål), Swedish and Dutch (planned 2026-11-11).
+  - The app follows the device: a device in one of its languages gets that
+    language, and any other device gets English. There is no language choice
+    in Settings for now.
   - English is listed first in `supportedLocales`, which is what makes
     Flutter fall back to it.
   - Adding a language later means adding one `.arb` file and one locale.
@@ -524,7 +531,8 @@ Acceptance:
 ## To fix later
 
 **Task 27. `fix(game): show the game screen's title in full on small
-phones`** (S)
+phones`** (S). Done by Task 28 (M6), which moves undo, redo and new game
+into a "more" menu.
 
 Found by the goldens (Task 25, 2026-11-11): on a 360 dp phone, the game
 screen's title is cut to "Cepha…", because four icons share the app bar
@@ -538,6 +546,259 @@ Acceptance:
 - The game screen's app bar shows nothing cut at 360 dp, in English and
   Spanish.
 - The game goldens are drawn again, and the PR shows the old and new ones.
+
+## M6: UX (planned 2026-11-11)
+
+Before M7, the game gets easier to learn and nicer to play: How to play on
+first launch, easier tutorial navigation, a less crowded game app bar, a dice
+count, a hint, a burst and a sound on captures, and confetti and a sound for
+a win.
+
+**How the work is split.** Refactors come first and change nothing the
+player sees, so the goldens stay the same. A feature with more than one layer
+becomes two or three PRs. First come the foundations, which add data, use
+cases or drawing code that nothing on screen uses yet, each tested on its
+own. Then a feature PR switches it on. A task keeps its number, and its PRs
+are lettered (33a, 33b, …), as Task 24 did. Refactors 38 and 39 are numbered
+in the order they were planned, not the order they are built.
+
+### Is the code scaling? What was checked (2026-11-11)
+
+| Area | Today | Under the new work | Verdict |
+| --- | --- | --- | --- |
+| `game_view.dart` | 154 lines: app bar, headline, board, controls | + menu, tally, hint, confetti, 2 sound listeners | Task 38 splits it |
+| "What just happened" | `_computerMove` and `_movePlayed` in the bloc, and `computerMove` and `movePlayed` in the state | + captured dice, captured squares, win | Task 39 makes it one value |
+| `board_square.dart` | 193 lines: ring plus die grow and shrink | + a pulsing hint ring, a 2nd controller | 33b moves the ring out |
+| "How to play was seen" | (new) | would put something that is not a choice into `AppSettings`, and need a `ready` future | Home's own store (31a) |
+| `GameViewStateMapper.map` | 9 named parameters | Task 39 takes 2 away; `HintState` adds 1 | Fine |
+| `GameBloc` | 378 lines, one event switch | the hint gets its own `HintState`, kept apart | Fine |
+| How to play cubit and state | small, an enum for the right button | + `canGoBack`, `canSkip` | Fine |
+| Settings, Home, `GameModule` wiring | plain-function wiring | + one switch, one callback | Fine |
+| Test helper `createTestGameBloc` | one place builds the bloc | + `SuggestMove` in one place | Fine |
+
+### Order
+
+| # | PR | Kind | Size |
+| --- | --- | --- | --- |
+| 1 | 38 · split the game screen into widgets | refactor | S |
+| 2 | 39 · one value for the move just played | refactor | S |
+| 3 | 28 · actions in a "more" menu | feature | S |
+| 4 | 29 · dots on their own row, Previous | feature | S |
+| 5 | 30 · Skip How to play | feature | XS |
+| 6 | 31a · Home remembers How to play was seen | foundation | S |
+| 7 | 31b · How to play on first launch | feature | S |
+| 8 | 32a · count each player's dice in the state | foundation | S |
+| 9 | 32b · the dice tally on screen | feature | S |
+| 10 | 33a · `SuggestMove` use case | foundation | S |
+| 11 | 33b · a square's ring in its own widget | refactor | S |
+| 12 | 33c · the board can draw a hint | foundation | S |
+| 13 | 33d · Hint in the menu | feature | S |
+| 14 | 37a · the played move says what it captured and whether it won | foundation | S |
+| 15 | 34a · particle drawing | foundation | S |
+| 16 | 34b · burst a captured die | feature | S |
+| 17 | 37b · confetti for a win | feature | S |
+| 18 | 35 · Sound switch in Settings | feature | S |
+| 19 | 36a · audio playback (ADR, package, sound files) | foundation | S |
+| 20 | 36b · sound on a capture | feature | S |
+| 21 | 36c · sound on a win | feature | XS |
+
+### Refactors first
+
+**Task 38. `refactor(game): split the game screen into widgets`** (S)
+
+- `widgets/game_app_bar.dart`: the app bar and its actions, a
+  `PreferredSizeWidget`. It takes over `_HistoryButtons` and its
+  `BlocSelector`.
+- `widgets/game_headline.dart`: the live-region headline, with both text
+  mappers.
+- `GameView` keeps only the layout. Later tasks add
+  `widgets/dice_tally.dart` (32b) and one wrapper,
+  `widgets/game_effects.dart`, holding the confetti layer (37b) and the sound
+  listener (36b, 36c).
+
+Acceptance:
+- No behaviour change: the widget tests pass unchanged, and the goldens do
+  not change.
+
+**Task 39. `refactor(game): describe the move just played in one value`** (S)
+
+- `GameViewState`'s `movePlayed` and `computerMove` become one field,
+  `playedMove: PlayedMoveUi?`. It is null when the board changed some other
+  way: undo, redo, a new game, a resumed game. When set, its `computer`
+  (a `ComputerMoveUi?`) is non-null if the computer played it.
+- In the bloc, `_computerMove` and `_movePlayed` become one `_playedMove`,
+  set and cleared in `_show`.
+- One place says "a move just happened". Task 37a adds what it captured and
+  whether it won, and the burst, the confetti and both sounds read it, so they
+  cannot disagree.
+
+Acceptance:
+- No behaviour change: the bloc tests are rewritten field for field, and the
+  goldens do not change.
+
+### Features
+
+**Task 28. `feat(game): move the game's actions into a menu`** (S)
+
+- The app bar keeps the How to play icon and gets a "more" icon
+  (`Icons.more_vert`). It opens a menu with Undo, Redo and New game, each
+  enabled under the same rule as today. New game still sends `GameRestarted`.
+- A new `gameMenuTooltip` in both `.arb` files; the items reuse the existing
+  words.
+- Fixes Task 27: two icons leave room for the title.
+
+Acceptance:
+- The title shows in full at 360 dp, in both languages.
+- The game goldens are drawn again, and the PR shows the old and new ones.
+
+**Task 29. `feat(game): centre How to play's dots and add Previous`** (S)
+
+- Under the pages, two rows: the `StepDots`, centred, on top; below, Previous
+  on the left (an empty space of the same width on the first page) and Next
+  or Done on the right.
+- `HowToPlayViewState` gets `canGoBack`, false on the first step. Previous
+  turns the page back.
+- New text: "Previous" / "Anterior".
+
+**Task 30. `feat(game): let the player skip How to play`** (XS)
+
+- "Skip" / "Omitir" in How to play's app bar. It leaves the tutorial, as
+  Done does. It is hidden on the last page, where Done does the same. The
+  state gets `canSkip`.
+
+**Task 31. How to play the first time the app opens** (two PRs)
+
+- **31a. `feat(home): remember whether How to play was seen`** (foundation,
+  S). Home owns the first-launch decision, so the storage is Home's: a
+  `FirstLaunchRepository` in `home/domain/`, a shared_preferences
+  implementation and an in-memory one, and contract tests for both. A failed
+  read counts as seen (docs/adr/0016), so a broken store never traps the
+  player in the tutorial. `AppSettings` stays as it is.
+- **31b. `feat(app): show How to play the first time the app opens`**
+  (feature, S). `HomeCubit` asks the repository on its first `refresh`, and
+  `HomeView` opens How to play once. It is marked seen as it opens, so Back,
+  Skip and Done all count.
+
+Acceptance:
+- A fresh install opens on How to play, and going back shows Home. It never
+  opens by itself again.
+
+**Task 32. Show how many dice each player has** (two PRs)
+
+- **32a. `feat(game): count each player's dice in the game state`**
+  (foundation, S). `GameViewState` gets `tally: DiceTallyUi`: each side's
+  player, colour and count, and who is to move.
+- **32b. `feat(game): show how many dice each player has`** (feature, S).
+  Two chips between the headline and the board, each with a small `DieFace`
+  in that player's colour, the player's name and the count. The player to
+  move is highlighted. Screen readers hear one label, such as "You 7 dice,
+  Computer 5 dice". Counts use an ICU `plural` from the start, so M7's
+  languages with more plural forms fit.
+
+Acceptance:
+- Both languages at 360 dp and at 200% text, and the game goldens drawn
+  again.
+
+**Task 33. A hint** (four PRs)
+
+- **33a. `feat(game): add a use case that suggests a move`** (foundation, S).
+  `SuggestMove`, shaped like `ChooseAgentMove`: the Hard agent chooses a move
+  on the background runner for the player to move. It refuses a finished
+  game.
+- **33b. `refactor(game): draw a square's ring in its own widget`**
+  (refactor, S). The ring leaves `BoardSquare` for `SquareRing`, which will
+  be stateful only to pulse. No behaviour change.
+- **33c. `feat(game): let the board draw a hint`** (foundation, S).
+  `SquareMark` gets `hintTarget` and `hintCapture`, with ring colours in both
+  palettes (at least 3:1, as in Task 21). The target pulses, except under
+  reduced motion. Screen readers hear "suggested" or "would be captured".
+  Nothing sets these marks yet.
+- **33d. `feat(game): give a hint`** (feature, S). A `HintState` (none,
+  searching, found), a freezed union kept next to `TurnPhase`. A
+  `HintRequested` event, allowed only when a die can be placed, works the
+  way the computer's turn does: the board takes no taps and the headline says
+  "Looking for a hint…". When the search ends, the marks show until the next
+  event. The "more" menu gets Hint, enabled only when a die can be placed:
+  not while the computer thinks, while a capture is chosen, or after the game
+  ends.
+
+Acceptance:
+- The hint clears on a tap, undo or a new game, is refused while the
+  computer thinks and after the game ends, and is dropped if the screen
+  closes during the search.
+
+**Task 37a. `feat(game): say what the move just played captured, and whether
+it won`** (foundation, S)
+
+- `PlayedMoveUi` gains `captured` (each square and the side its die belonged
+  to) and `celebrate`. `celebrate` is true when the move ends the game and
+  the person won; in a game between two people, every end is a win for one
+  of them (the board has an odd number of squares), so it is true there too.
+- Undo, redo and a resumed game have no `playedMove`, so they never
+  celebrate or report a capture.
+
+**Task 34. Burst a captured die** (two PRs)
+
+- **34a. `feat(game): draw particles`** (foundation, S). Plain Dart in
+  `view/effects/particles.dart`: particles with a start, a speed, a colour, a
+  size and a spin; where each one is, and how faded, at any moment, under
+  gravity and drag; and a painter. It takes a `Random`, so tests are the same
+  every run. One engine for the burst and the confetti, so no new package.
+- **34b. `feat(game): burst a captured die`** (feature, S). About 12 pieces
+  in the die's colour fly out of each captured square and fade, with a short
+  flash, inside `dieAnimationDuration`. They are drawn in one layer over the
+  board, so they cross neighbouring squares. The squares come from
+  `playedMove.captured`.
+
+Acceptance (34b):
+- No burst under reduced motion. Undo and redo stay instant. Tests pump
+  frames by hand, as in Task 23.
+
+**Task 37b. `feat(game): throw confetti when the player wins`** (feature, S)
+
+- When `playedMove.celebrate` is true, about 100 pieces in coral, cream and
+  the theme's colours fall over the whole screen, app bar included, for about
+  3 seconds. The layer ignores taps, so the menu still works.
+- No confetti under reduced motion, after a loss, or after undo or redo into
+  a finished game.
+
+**Task 35. `feat(settings): add a Sound switch`** (S)
+
+- `AppSettings.sound`, on by default, with a switch on the Settings page and
+  its words in both languages. `GameModule` reads it the way it reads
+  `highlightLastMove`. Nothing plays a sound yet.
+
+**Task 36. Capture and win sounds** (three PRs)
+
+- **36a. `feat(game): add audio playback`** (foundation, S). `audioplayers`,
+  with ADR 0021. Two sounds, a short pop and a short rising chime, made by a
+  script in `tool/`, so there is no licence question. A `SoundEffects`
+  interface (`playCapture`, `playWin`), its `audioplayers` implementation and
+  a fake for tests. Nothing calls it yet.
+- **36b. `feat(game): play a sound on a capture`** (feature, S). On every
+  capture, by either side, when the switch is on. Undo and redo stay silent.
+- **36c. `feat(game): play a sound when the player wins`** (feature, XS).
+  The same moments as the confetti. A winning move that also captures plays
+  only the win sound.
+
+Acceptance (36b, 36c):
+- With the fake: each sound plays when it should and not otherwise, and
+  never with the switch off. By hand on Android: it follows the media volume
+  and stays silent in silent mode.
+
+### Decisions for M6 (answered 2026-11-11)
+
+1. **The dice count** is a live count of each player's dice on the board,
+   drawn with a small die of each colour. Players do not start with a fixed
+   number of dice in Cephalopod.
+2. **The capture sound** plays on every capture, by either side. Settings
+   gets a Sound switch, on by default.
+3. **The hint** comes from the Hard search agent and only marks squares; it
+   plays nothing. The search is a `HintState` of its own, kept apart from
+   `TurnPhase`.
+4. **The menu** uses the "more" icon (⋮), Android's usual icon for it.
+5. **The refactors** (38, 39, 33b) and Home's own first-launch store were
+   approved before any feature.
 
 ## M7: Google Play
 
@@ -556,6 +817,36 @@ Acceptance:
   the screens have settled, once M5 is done.
 - The store needs a 1024 × 500 feature graphic as well; that one is made
   by hand from the art in `art/`.
+- **Ten more languages** (planned 2026-11-11), early in M7, before the
+  screenshots, which are made once per language. French, Italian, Portuguese
+  (Brazil), German, Polish, Turkish, Danish, Norwegian (Bokmål), Swedish and
+  Dutch join English and Spanish. The app still follows the device, and any
+  other language gets English.
+  - **L1. `feat(app): get ready for more languages`** (foundation, S). The
+    Spanish screen tests loop over every supported language, at 360 dp and at
+    200% text. The arb-files test also checks that every placeholder and
+    plural in English is in each other file. Every message with a count uses
+    ICU `plural` (Polish needs `one`, `few` and `many`). Phones that report
+    Norwegian as `no` or `nn` get `nb`. Nothing goes through `toUpperCase()`,
+    which breaks Turkish `i`. ADR 0017 is updated.
+  - **L2. `feat(app): translate into French, Italian and Portuguese`** (M)
+  - **L3. `feat(app): translate into German, Dutch, Danish, Norwegian and
+    Swedish`** (M)
+  - **L4. `feat(app): translate into Polish and Turkish`** (S)
+  - In each: one `.arb` file per language with every key, How to play
+    included. Claude drafts them, and they merge once read; mistakes are
+    fixed from user reports. Goldens of the game and How to play, light only,
+    for each new language. The store listing texts, drafted into
+    `art/play-store/<lang>/`.
+- **Ask for a rating** (planned 2026-11-11). Google's review sheet only shows
+  for apps installed from Play, so it comes in M7.
+  - Foundation: `in_app_review` with its own ADR, and a small `review`
+    feature that counts finished games in its own store (the pattern of
+    Task 31a) and asks after the 3rd game, and once more at most, after the
+    10th. Google limits it further.
+  - Feature: the game reports a finished game through a plain callback that
+    the composition root wires to the review feature.
+  - Feature: About gets a "Rate the app" link to the store page.
 
 ## Not planned, and why
 
