@@ -570,8 +570,8 @@ in the order they were planned, not the order they are built.
 | "What just happened" | `_computerMove` and `_movePlayed` in the bloc, and `computerMove` and `movePlayed` in the state | + captured dice, captured squares, win | Task 39 makes it one value |
 | `board_square.dart` | 193 lines: ring plus die grow and shrink | + a pulsing hint ring, a 2nd controller | 33b moves the ring out |
 | "How to play was seen" | (new) | would put something that is not a choice into `AppSettings`, and need a `ready` future | How to play's own store (31a) |
-| `GameViewStateMapper.map` | 9 named parameters | Task 39 takes 2 away; `HintState` adds 1 | Fine |
-| `GameBloc` | 378 lines, one event switch | the hint gets its own `HintState`, kept apart | Fine |
+| `GameViewStateMapper.map` | 9 named parameters | Task 39 takes 2 away; the hint rides in the phase | Fine |
+| `GameBloc` | 378 lines, one event switch | the hint is part of the phase that awaits a placement | Fine |
 | How to play cubit and state | small, an enum for the right button | + `canGoBack`, `canSkip` | Fine |
 | Settings, Home, `GameModule` wiring | plain-function wiring | + one switch, one callback | Fine |
 | Test helper `createTestGameBloc` | one place builds the bloc | + `SuggestMove` in one place | Fine |
@@ -720,7 +720,9 @@ Acceptance:
   reduced motion. Screen readers hear "suggested" or "would be captured".
   Nothing sets these marks yet.
 - **33d. `feat(game): give a hint`** (feature, S). A `HintState` (none,
-  searching, found), a freezed union kept next to `TurnPhase`. A
+  searching, found), a freezed union carried by
+  `TurnPhase.awaitingPlacement`, the only phase in which a hint makes sense
+  (changed in #102 from a state kept next to the phase). A
   `HintRequested` event, allowed only when a die can be placed, works the
   way the computer's turn does: the board takes no taps and the headline says
   "Looking for a hint…". When the search ends, the marks show until the next
@@ -805,8 +807,11 @@ Acceptance (36b, 36c):
 2. **The capture sound** plays on every capture, by either side. Settings
    gets a Sound switch, on by default.
 3. **The hint** comes from the Hard search agent and only marks squares; it
-   plays nothing. The search is a `HintState` of its own, kept apart from
-   `TurnPhase`.
+   plays nothing. Where the hint stands is a `HintState` (none, searching,
+   found), carried by `TurnPhase.awaitingPlacement`: a hint exists only
+   while a die is to be placed. First planned apart from `TurnPhase`;
+   changed on review of #102, so the types rule out a hint in any other
+   phase, and a new phase clears it.
 4. **The menu** uses the "more" icon (⋮), Android's usual icon for it.
 5. **The refactors** (38, 39, 33b) and a store of its own for "How to play
    was seen" were approved before any feature. The store is How to play's,

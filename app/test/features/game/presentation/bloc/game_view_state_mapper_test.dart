@@ -50,7 +50,6 @@ void main() {
     bool canUndo = false,
     bool canRedo = false,
     PlayedMove? playedMove,
-    HintState hint = const HintState.none(),
   }) {
     return mapper.map(
       game: figure4,
@@ -61,7 +60,6 @@ void main() {
       canUndo: canUndo,
       canRedo: canRedo,
       playedMove: playedMove,
-      hint: hint,
     );
   }
 
@@ -164,7 +162,9 @@ void main() {
         final screen = map(
           canUndo: true,
           canRedo: true,
-          hint: const HintState.searching(),
+          phase: const TurnPhase.awaitingPlacement(
+            hint: HintState.searching(),
+          ),
         );
 
         expect(screen.headline, const HeadlineUi.lookingForHint());
@@ -176,18 +176,20 @@ void main() {
       });
 
       test('marks the board and reports it once found', () {
-        final screen = map(canUndo: true, hint: HintState.found(hintMove));
+        final phase = TurnPhase.awaitingPlacement(
+          hint: HintState.found(hintMove),
+        );
+        final screen = map(canUndo: true, phase: phase);
 
         expect(screen.hint, const HintUi(row: 0, col: 2, captures: 2));
         expect(
           screen.board,
           const BoardUiMapper().map(
             game: figure4,
-            phase: placing,
+            phase: phase,
             lastMove: Move(center),
             opponent: const FriendOpponent(),
             highlightLastMove: true,
-            hint: hintMove,
           ),
         );
         expect(screen.headline, isNot(const HeadlineUi.lookingForHint()));

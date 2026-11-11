@@ -3,11 +3,9 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'hint_state.freezed.dart';
 
-/// Where the hint stands: none asked for, being searched for, or found.
-///
-/// Kept apart from `TurnPhase`: a hint does not change what the game waits
-/// for, only what the screen shows while the player decides. The bloc
-/// combines the two in one place, `GameViewStateMapper`.
+/// Where the hint stands while a die is to be placed: none asked for, being
+/// searched for, or found. It is part of `TurnPhase.awaitingPlacement`,
+/// the only phase in which a hint makes sense.
 ///
 /// A freezed union: each factory is a subclass, and a `switch` over the
 /// states must handle all of them (docs/adr/0011).

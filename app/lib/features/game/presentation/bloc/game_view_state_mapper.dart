@@ -32,11 +32,11 @@ final class GameViewStateMapper {
   /// can be taken back or played again is the bloc's to say. So is
   /// [playedMove], the move just played that led here, if one did.
   ///
-  /// The [hint] and the [phase] are combined here, and only here: while a
-  /// hint is searched for, the board takes no taps and the headline says
-  /// so, and turns cannot be taken back or played again; once found, it
-  /// marks the board. A hint can be asked for only while
-  /// a die can be placed and none is shown or searched for.
+  /// While a die is to be placed, the [phase] carries a hint. While it is
+  /// searched for, the board takes no taps and the headline says so, and
+  /// turns cannot be taken back or played again; once found, it marks the
+  /// board. A hint can be asked for only while a die can be placed and none
+  /// is shown or searched for.
   GameViewState map({
     required GameState game,
     required Opponent opponent,
@@ -46,8 +46,8 @@ final class GameViewStateMapper {
     required bool canUndo,
     required bool canRedo,
     PlayedMove? playedMove,
-    HintState hint = const HintState.none(),
   }) {
+    final hint = getHint(phase);
     final hintMove = switch (hint) {
       HintFound(:final move) => move,
       NoHint() || HintSearching() => null,
@@ -59,13 +59,12 @@ final class GameViewStateMapper {
       lastMove: lastMove,
       opponent: opponent,
       highlightLastMove: highlightLastMove,
-      hint: hintMove,
     );
     final headlineUi = searching
         ? const HeadlineUi.lookingForHint()
         : _headlineUiMapper.map(game.status, opponent);
     final captureUi = _captureUiOf(phase, game.config);
-    final canTap = _canTapIn(phase) && !searching;
+    final canTap = _canTapIn(phase);
     return GameViewState(
       board: boardUi,
       headline: headlineUi,
@@ -80,6 +79,13 @@ final class GameViewStateMapper {
       canHint: phase is AwaitingPlacement && hint is NoHint,
     );
   }
+
+  HintState getHint(TurnPhase phase) => switch (phase) {
+    AwaitingPlacement(:final hint) => hint,
+    ChoosingCapture() ||
+    ComputerThinking() ||
+    GameEnded() => const HintState.none(),
+  };
 
   /// The hinted [move] as a screen reader says it.
   HintUi _hintUiOf(Move move) => HintUi(
@@ -121,9 +127,10 @@ final class GameViewStateMapper {
   }
 
   /// Whether the board takes taps in [phase]: while a die can be placed or a
-  /// capture chosen, but not while the computer thinks, nor once the game is
-  /// over.
+  /// capture chosen, but not while a hint is searched for, the computer
+  /// thinks, nor once the game is over.
   bool _canTapIn(TurnPhase phase) => switch (phase) {
+    AwaitingPlacement(hint: HintSearching()) => false,
     AwaitingPlacement() || ChoosingCapture() => true,
     ComputerThinking() || GameEnded() => false,
   };

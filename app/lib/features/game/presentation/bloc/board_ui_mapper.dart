@@ -1,4 +1,5 @@
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
+import 'package:cephalopod/features/game/presentation/bloc/hint_state.dart';
 import 'package:cephalopod/features/game/presentation/bloc/side_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod/features/game/presentation/models/board_ui.dart';
@@ -15,16 +16,15 @@ final class BoardUiMapper {
   final SideUiMapper _sideUiMapper;
 
   /// The board of [game] against [opponent], with its squares marked for
-  /// [phase]. Outside a capture, a [hint] marks its square and the dice it
-  /// would capture; otherwise [lastMove] stands out when
-  /// [highlightLastMove] is on.
+  /// [phase]: a capture's choices, or, while a die is to be placed, a hint
+  /// found in it. Otherwise [lastMove] stands out when [highlightLastMove]
+  /// is on.
   BoardUi map({
     required GameState game,
     required TurnPhase phase,
     required Move? lastMove,
     required Opponent opponent,
     required bool highlightLastMove,
-    Move? hint,
   }) {
     final board = game.board;
     final shownLastMove = highlightLastMove ? lastMove : null;
@@ -36,7 +36,7 @@ final class BoardUiMapper {
         row: row,
         col: col,
         die: die == null ? null : _dieUiOf(die, opponent),
-        mark: _markOf(position, phase, shownLastMove, hint),
+        mark: _markOf(position, phase, shownLastMove),
       );
     }
 
@@ -54,13 +54,13 @@ final class BoardUiMapper {
   }
 
   /// While a capture is being chosen, the target and the dice that can be
-  /// picked stand out. Otherwise a [hint] does, over the last move, since
-  /// the player asked for it; or else the [lastMove], if there is one.
+  /// picked stand out. While a die is to be placed, a hint found in [phase]
+  /// does, over the last move, since the player asked for it; or else the
+  /// [lastMove], if there is one.
   SquareMark _markOf(
     Position square,
     TurnPhase phase,
     Move? lastMove,
-    Move? hint,
   ) {
     return switch (phase) {
       ChoosingCapture(:final selected) when selected.contains(square) =>
@@ -71,8 +71,12 @@ final class BoardUiMapper {
           when options.any((option) => option.contains(square)) =>
         SquareMark.captureOption,
       ChoosingCapture() => SquareMark.none,
-      _ when hint?.position == square => SquareMark.hintTarget,
-      _ when hint?.captures.contains(square) ?? false => SquareMark.hintCapture,
+      AwaitingPlacement(hint: HintFound(:final move))
+          when move.position == square =>
+        SquareMark.hintTarget,
+      AwaitingPlacement(hint: HintFound(:final move))
+          when move.captures.contains(square) =>
+        SquareMark.hintCapture,
       _ when lastMove?.position == square => SquareMark.lastMove,
       _ => SquareMark.none,
     };
