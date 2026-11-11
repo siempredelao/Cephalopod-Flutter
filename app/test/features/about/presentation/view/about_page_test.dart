@@ -1,4 +1,4 @@
-import 'package:cephalopod/features/about/about_module.dart';
+import 'package:cephalopod/features/about/domain/models/credits.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -67,7 +67,7 @@ void main() {
       await tester.tap(link(officialRules));
       await tester.pumpAndSettle();
 
-      expect(opened, [AboutModule.website, AboutModule.ruleSheet]);
+      expect(opened, [cephalopodCredits.website, cephalopodCredits.ruleSheet]);
       expect(find.textContaining('could not be opened'), findsNothing);
     });
 
@@ -85,7 +85,7 @@ void main() {
 
       expect(find.textContaining('could not be opened'), findsOne);
       expect(
-        find.widgetWithText(SelectableText, '${AboutModule.ruleSheet}'),
+        find.widgetWithText(SelectableText, '${cephalopodCredits.ruleSheet}'),
         findsOne,
       );
     });

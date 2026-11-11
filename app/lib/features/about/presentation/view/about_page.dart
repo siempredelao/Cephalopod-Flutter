@@ -26,13 +26,6 @@ class AboutPage extends StatelessWidget {
   }
 }
 
-/// The copyright line of Mark Steere's rule sheet. It stays in English, word
-/// for word, in every language.
-const String _copyright = 'Copyright © February 2006 by Mark Steere';
-
-/// The name of Mark Steere's website, as the link to it shows it.
-const String _websiteName = 'marksteeregames.com';
-
 /// The About page, drawn from the cubit above it.
 class _AboutView extends StatelessWidget {
   const _AboutView();
@@ -66,14 +59,14 @@ class _AboutView extends StatelessWidget {
               Text(l10n.aboutDesignedBy, style: textTheme.bodyMedium),
               const SizedBox(height: _gap),
               Text(
-                _copyright,
+                state.copyright,
                 style: textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(height: _gap),
               _Link(
-                label: l10n.aboutMoreGames(_websiteName),
+                label: l10n.aboutMoreGames(state.websiteName),
                 onPressed: cubit.openWebsite,
               ),
               _Link(

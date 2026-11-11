@@ -1,19 +1,24 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:cephalopod/features/about/domain/app_version_source.dart';
 import 'package:cephalopod/features/about/domain/link_opener.dart';
+import 'package:cephalopod/features/about/domain/models/credits.dart';
 import 'package:cephalopod/features/about/presentation/bloc/about_cubit.dart';
 import 'package:cephalopod/features/about/presentation/models/about_view_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  final website = Uri.parse('https://example.org');
-  final ruleSheet = Uri.parse('https://example.org/rules.pdf');
-  const start = AboutViewState();
+  final website = Uri.parse('https://www.example.org');
+  final ruleSheet = Uri.parse('https://www.example.org/rules.pdf');
+  const start = AboutViewState(
+    copyright: 'Copyright © 1999 by Someone',
+    websiteName: 'example.org',
+  );
   final opened = <Uri>[];
 
   AboutCubit build({
     AppVersionSource? appVersionSource,
     LinkOpener? linkOpener,
+    Uri? websiteAddress,
   }) {
     return AboutCubit(
       appVersionSource:
@@ -24,16 +29,41 @@ void main() {
             opened.add(address);
             return true;
           },
-      website: website,
-      ruleSheet: ruleSheet,
+      credits: (
+        copyright: 'Copyright © 1999 by Someone',
+        website: websiteAddress ?? website,
+        ruleSheet: ruleSheet,
+      ),
     );
   }
 
   setUp(opened.clear);
 
   group('AboutCubit', () {
-    test('starts with no version and no failed link', () {
+    test('starts with the credits, and no version or failed link', () {
       expect(build().state, start);
+    });
+
+    test('names a website without www as its address does', () {
+      final cubit = build(websiteAddress: Uri.parse('https://example.com'));
+
+      expect(cubit.state.websiteName, 'example.com');
+    });
+
+    test('gives Cephalopod the copyright and website of Mark Steere', () {
+      final cubit = AboutCubit(
+        appVersionSource: () async => null,
+        linkOpener: (_) async => true,
+        credits: cephalopodCredits,
+      );
+
+      expect(
+        cubit.state,
+        const AboutViewState(
+          copyright: 'Copyright © February 2006 by Mark Steere',
+          websiteName: 'marksteeregames.com',
+        ),
+      );
     });
 
     blocTest<AboutCubit, AboutViewState>(
@@ -90,8 +120,10 @@ void main() {
         await cubit.openWebsite();
       },
       expect: () => [
-        start.copyWith(failedLinkAddress: 'https://example.org/rules.pdf'),
-        start.copyWith(failedLinkAddress: 'https://example.org'),
+        start.copyWith(
+          failedLinkAddress: 'https://www.example.org/rules.pdf',
+        ),
+        start.copyWith(failedLinkAddress: 'https://www.example.org'),
         start,
       ],
     );
