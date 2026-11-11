@@ -227,7 +227,9 @@ void main() {
 
       await tester.tap(find.widgetWithText(OutlinedButton, 'Settings'));
       await tester.pumpAndSettle();
-      await tester.tap(find.byType(SwitchListTile));
+      await tester.tap(
+        find.widgetWithText(SwitchListTile, 'Highlight the last move'),
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();

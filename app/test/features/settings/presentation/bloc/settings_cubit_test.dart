@@ -17,6 +17,11 @@ void main() {
     highlightLastMove: true,
     sound: true,
   );
+  const silent = (
+    theme: ThemePreference.system,
+    highlightLastMove: true,
+    sound: false,
+  );
   const noHighlight = (
     theme: ThemePreference.system,
     highlightLastMove: false,
@@ -84,6 +89,18 @@ void main() {
         await cubit.toggleLastMoveHighlight();
       },
       expect: () => [screenOf(noHighlight), screenOf(defaultSettings)],
+      verify: (_) async => expect(await repository.load(), defaultSettings),
+    );
+
+    blocTest<SettingsCubit, SettingsViewState>(
+      'turns sounds off and on, saving each change',
+      build: build,
+      act: (cubit) async {
+        await cubit.toggleSound();
+        expect(await repository.load(), silent);
+        await cubit.toggleSound();
+      },
+      expect: () => [screenOf(silent), screenOf(defaultSettings)],
       verify: (_) async => expect(await repository.load(), defaultSettings),
     );
 

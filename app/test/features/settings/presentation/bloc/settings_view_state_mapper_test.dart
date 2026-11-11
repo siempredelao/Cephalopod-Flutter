@@ -12,7 +12,11 @@ void main() {
     test('shows the default settings', () {
       expect(
         mapper.map(defaultSettings),
-        const SettingsViewState(theme: ThemeUi.system, highlightLastMove: true),
+        const SettingsViewState(
+          theme: ThemeUi.system,
+          highlightLastMove: true,
+          sound: true,
+        ),
       );
     });
 
@@ -44,6 +48,16 @@ void main() {
       );
 
       expect(mapper.map(settings).highlightLastMove, isFalse);
+    });
+
+    test('shows sounds turned off', () {
+      const settings = (
+        theme: ThemePreference.system,
+        highlightLastMove: true,
+        sound: false,
+      );
+
+      expect(mapper.map(settings).sound, isFalse);
     });
   });
 }

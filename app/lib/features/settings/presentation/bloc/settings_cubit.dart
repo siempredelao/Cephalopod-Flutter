@@ -44,6 +44,15 @@ class SettingsCubit extends Cubit<SettingsViewState> {
     ));
   }
 
+  Future<void> toggleSound() {
+    final current = _settingsStore.current;
+    return _settingsStore.update((
+      theme: current.theme,
+      highlightLastMove: current.highlightLastMove,
+      sound: !current.sound,
+    ));
+  }
+
   /// Stops following the store and closes, both at once: a cancelled
   /// subscription gets no more changes, whenever its cleanup ends.
   @override
