@@ -59,7 +59,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] 37a. feat(game): say what the move just played captured, and whether it won (S)
 - [x] 34a. feat(game): draw particles (S)
 - [x] 34b. feat(game): burst a captured die (S)
-- [ ] 37b. feat(game): throw confetti when the player wins (S)
+- [x] 37b. feat(game): throw confetti when the player wins (S)
 - [ ] 35. feat(settings): add a Sound switch (S)
 - [ ] 36a. feat(game): add audio playback (S)
 - [ ] 36b. feat(game): play a sound on a capture (S)

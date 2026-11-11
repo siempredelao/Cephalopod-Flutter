@@ -186,6 +186,66 @@ void main() {
     });
   });
 
+  group('confettiParticles', () {
+    const area = Size(300, 600);
+    const blue = Color(0xFF1E88E5);
+
+    List<Particle> confetti(int seed) {
+      return confettiParticles(
+        area: area,
+        count: 30,
+        pieceSize: 4,
+        colors: const [red, blue],
+        random: math.Random(seed),
+      );
+    }
+
+    test('makes the pieces asked for, taking turns with the colours', () {
+      final pieces = confetti(1);
+
+      expect(pieces, hasLength(30));
+      expect(pieces.take(4).map((piece) => piece.color), [
+        red,
+        blue,
+        red,
+        blue,
+      ]);
+    });
+
+    test('starts the pieces above the area, up to half its height, across '
+        'its width', () {
+      for (final piece in confetti(2)) {
+        expect(piece.origin.dx, inInclusiveRange(0, 300));
+        expect(piece.origin.dy, inInclusiveRange(-300, 0));
+      }
+    });
+
+    test('throws the pieces down, drifting a little to either side', () {
+      for (final piece in confetti(3)) {
+        expect(piece.velocity.dy, inInclusiveRange(120, 360));
+        expect(piece.velocity.dx, inInclusiveRange(-60, 60));
+      }
+    });
+
+    test('makes strips twice as wide as tall, up to half as big again', () {
+      for (final piece in confetti(4)) {
+        expect(piece.size.width, closeTo(2 * piece.size.height, 1e-9));
+        expect(piece.size.height, inInclusiveRange(4, 6));
+      }
+    });
+
+    test('gives the same confetti for the same seed', () {
+      expect(
+        ParticleField(particles: confetti(5)).at(0.5),
+        ParticleField(particles: confetti(5)).at(0.5),
+      );
+      expect(
+        ParticleField(particles: confetti(5)).at(0.5),
+        isNot(ParticleField(particles: confetti(6)).at(0.5)),
+      );
+    });
+  });
+
   group('ParticlePainter', () {
     const field = ParticleField(particles: [piece], fadeFrom: 0.5);
 
