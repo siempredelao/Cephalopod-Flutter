@@ -469,6 +469,10 @@ Acceptance:
 - `flutter test --update-goldens` is documented in the README's testing
   section, and CI fails on a change nobody updated.
 
+Built as two PRs: #85 set up the helper, the README section and one image;
+the next added the rest. Settings and About were left out (2026-11-11): a
+subset of the screens is enough.
+
 **Task 26. `docs: mark M5 done`** (XS)
 
 - README status and roadmap, `docs/architecture.md`'s testing table.

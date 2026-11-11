@@ -11,36 +11,56 @@ typedef Screen = ({
   Future<void> Function(WidgetTester tester, AppLocalizations words) open,
 });
 
-/// The screens a player sees, each opened from a fresh app. A game is played
-/// one move in, so the board holds a die and not only empty squares.
+/// The home screen.
+final Screen homeScreen = (name: 'Home', open: (tester, _) => pumpApp(tester));
+
+/// The new-game dialog, against the computer, where it shows the most
+/// controls.
+final Screen newGameDialogScreen = (
+  name: 'the new-game dialog',
+  open: (tester, words) async {
+    await pumpApp(tester);
+    await tester.tap(find.byType(FilledButton));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(words.newGameComputer));
+    await tester.pumpAndSettle();
+  },
+);
+
+/// A game one move in, so the board holds a die and not only empty squares.
+final Screen gameScreen = (
+  name: 'a game',
+  open: (tester, _) async {
+    await pumpApp(tester, location: '/game');
+    await tester.tap(find.byKey(const ValueKey((2, 2))));
+    await tester.pumpAndSettle();
+  },
+);
+
+/// How to play.
+final Screen howToPlayScreen = (
+  name: 'How to play',
+  open: (tester, _) => pumpApp(tester, location: '/how-to-play'),
+);
+
+/// The settings.
+final Screen settingsScreen = (
+  name: 'Settings',
+  open: (tester, _) => pumpApp(tester, location: '/settings'),
+);
+
+/// About.
+final Screen aboutScreen = (
+  name: 'About',
+  open: (tester, _) => pumpApp(tester, location: '/about'),
+);
+
+/// The screens a player sees, each opened from a fresh app.
 final List<Screen> screens = [
-  (name: 'Home', open: (tester, _) => pumpApp(tester)),
-  (
-    name: 'the new-game dialog',
-    open: (tester, words) async {
-      await pumpApp(tester);
-      await tester.tap(find.byType(FilledButton));
-      await tester.pumpAndSettle();
-      // Against the computer, the dialog shows the most controls.
-      await tester.tap(find.text(words.newGameComputer));
-      await tester.pumpAndSettle();
-    },
-  ),
-  (
-    name: 'a game',
-    open: (tester, _) async {
-      await pumpApp(tester, location: '/game');
-      await tester.tap(find.byKey(const ValueKey((2, 2))));
-      await tester.pumpAndSettle();
-    },
-  ),
-  (
-    name: 'How to play',
-    open: (tester, _) => pumpApp(tester, location: '/how-to-play'),
-  ),
-  (
-    name: 'Settings',
-    open: (tester, _) => pumpApp(tester, location: '/settings'),
-  ),
-  (name: 'About', open: (tester, _) => pumpApp(tester, location: '/about')),
+  homeScreen,
+  newGameDialogScreen,
+  gameScreen,
+  howToPlayScreen,
+  settingsScreen,
+  aboutScreen,
 ];
