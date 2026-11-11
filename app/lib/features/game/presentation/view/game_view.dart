@@ -49,6 +49,7 @@ class GameView extends StatelessWidget {
                     child: GameBoard(
                       board: state.board,
                       animateDice: state.playedMove != null,
+                      captured: state.playedMove?.captured ?? const [],
                       onSquareTapped: _tapHandlerOf(context, state),
                     ),
                   ),
