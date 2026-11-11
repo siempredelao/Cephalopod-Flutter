@@ -127,7 +127,11 @@ void main() {
         screenOf(
           after(rules.newGame(), Move(center)),
           lastMove: Move(center),
-          playedMove: (move: Move(center), byComputer: false),
+          playedMove: (
+            move: Move(center),
+            byComputer: false,
+            captured: const {},
+          ),
           canUndo: true,
         ),
       ],
@@ -160,7 +164,14 @@ void main() {
         screenOf(
           after(oneCapture, captureBoth),
           lastMove: captureBoth,
-          playedMove: (move: captureBoth, byComputer: false),
+          playedMove: (
+            move: captureBoth,
+            byComputer: false,
+            captured: {
+              for (final square in captureBoth.captures)
+                square: oneCapture.board.dice[square]!,
+            },
+          ),
           canUndo: true,
         ),
       ],
@@ -226,6 +237,10 @@ void main() {
           playedMove: (
             move: Move(top, captures: {left, right}),
             byComputer: false,
+            captured: {
+              left: figure4.board.dice[left]!,
+              right: figure4.board.dice[right]!,
+            },
           ),
           canUndo: true,
         ),
@@ -283,7 +298,11 @@ void main() {
           after(lastSquare, Move(const Position(1, 1))),
           phase: const TurnPhase.gameEnded(blackWins),
           lastMove: Move(const Position(1, 1)),
-          playedMove: (move: Move(const Position(1, 1)), byComputer: false),
+          playedMove: (
+            move: Move(const Position(1, 1)),
+            byComputer: false,
+            captured: const {},
+          ),
         ),
       ],
     );
@@ -332,7 +351,7 @@ void main() {
     final played = screenOf(
       after(rules.newGame(), Move(center)),
       lastMove: Move(center),
-      playedMove: (move: Move(center), byComputer: false),
+      playedMove: (move: Move(center), byComputer: false, captured: const {}),
       canUndo: true,
     );
     final undone = placing(rules.newGame()).copyWith(canRedo: true);
@@ -403,7 +422,7 @@ void main() {
         screenOf(
           after(rules.newGame(), Move(top)),
           lastMove: Move(top),
-          playedMove: (move: Move(top), byComputer: false),
+          playedMove: (move: Move(top), byComputer: false, captured: const {}),
           canUndo: true,
         ),
       ],
@@ -483,7 +502,7 @@ void main() {
     final centerPlayed = screenOf(
       afterCenter,
       lastMove: Move(center),
-      playedMove: (move: Move(center), byComputer: false),
+      playedMove: (move: Move(center), byComputer: false, captured: const {}),
       canUndo: true,
     );
     late _ManualCountdown countdown;
@@ -520,7 +539,7 @@ void main() {
         screenOf(
           afterTop,
           lastMove: Move(top),
-          playedMove: (move: Move(top), byComputer: false),
+          playedMove: (move: Move(top), byComputer: false, captured: const {}),
           canUndo: true,
         ),
       );
@@ -597,13 +616,13 @@ void main() {
       afterCenter,
       phase: const TurnPhase.computerThinking(),
       lastMove: Move(center),
-      playedMove: (move: Move(center), byComputer: false),
+      playedMove: (move: Move(center), byComputer: false, captured: const {}),
       opponent: whiteComputer,
     );
     final replied = screenOf(
       after(afterCenter, reply),
       lastMove: reply,
-      playedMove: (move: reply, byComputer: true),
+      playedMove: (move: reply, byComputer: true, captured: const {}),
       canUndo: true,
       opponent: whiteComputer,
     );
@@ -634,7 +653,7 @@ void main() {
           screenOf(
             after(start, opening),
             lastMove: opening,
-            playedMove: (move: opening, byComputer: true),
+            playedMove: (move: opening, byComputer: true, captured: const {}),
             opponent: blackComputer,
           ),
         ];
@@ -767,6 +786,17 @@ void main() {
     );
   });
 
+  group('GameBloc after a game-ending move', () {
+    test('celebrates the move that fills the board', () async {
+      final bloc = createTestGameBloc(config: const GameConfig(boardSize: 1))
+        ..add(tap(const Position(0, 0)));
+      await pumpEventQueue();
+
+      expect(bloc.state.playedMove?.celebrate, isTrue);
+      await bloc.close();
+    });
+  });
+
   group('GameBloc hints', () {
     final newGame = rules.newGame();
     // The test agents play, and suggest, the first legal move.
@@ -800,7 +830,11 @@ void main() {
         screenOf(
           after(newGame, Move(center)),
           lastMove: Move(center),
-          playedMove: (move: Move(center), byComputer: false),
+          playedMove: (
+            move: Move(center),
+            byComputer: false,
+            captured: const {},
+          ),
           canUndo: true,
         ),
       ],
