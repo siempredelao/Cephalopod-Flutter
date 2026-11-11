@@ -39,6 +39,12 @@ melos:
       description: Regenerate code in the app whenever a source file changes.
       run: cd app && dart run build_runner watch
 
+    sounds:
+      description: >-
+        Make the game's sounds again (app/assets/sounds) from
+        tool/make_sounds.dart, after changing how they sound.
+      run: dart run tool/make_sounds.dart
+
     analyze:
       description: Static analysis of the whole workspace; infos fail too.
       run: flutter analyze --fatal-infos

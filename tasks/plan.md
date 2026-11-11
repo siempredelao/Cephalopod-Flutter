@@ -599,9 +599,10 @@ in the order they were planned, not the order they are built.
 | 17 | 37b · confetti for a win | feature | S |
 | 18 | 35a · the settings remember Sound | foundation | S |
 | 19 | 35b · Sound switch in Settings | feature | S |
-| 20 | 36a · audio playback (ADR, package, sound files) | foundation | S |
-| 21 | 36b · sound on a capture | feature | S |
-| 22 | 36c · sound on a win | feature | XS |
+| 20 | 36a-1 · the sound files and the script that makes them | foundation | S |
+| 21 | 36a-2 · audio playback (ADR, package, `SoundEffects`) | foundation | S |
+| 22 | 36b · sound on a capture | feature | S |
+| 23 | 36c · sound on a win | feature | XS |
 
 ### Refactors first
 
@@ -788,13 +789,17 @@ small)
 - `GameModule` reading the setting (`bool Function() soundOn`, the way it
   reads `highlightLastMove`) moves to 36b, the first PR that plays a sound.
 
-**Task 36. Capture and win sounds** (three PRs)
+**Task 36. Capture and win sounds** (four PRs; 36a split in two on
+2026-11-11 to keep each one small)
 
-- **36a. `feat(game): add audio playback`** (foundation, S). `audioplayers`,
-  with ADR 0021. Two sounds, a short pop and a short rising chime, made by a
-  script in `tool/`, so there is no licence question. A `SoundEffects`
-  interface (`playCapture`, `playWin`), its `audioplayers` implementation and
-  a fake for tests. Nothing calls it yet.
+- **36a-1. `feat(game): add the capture and win sounds`** (foundation, S).
+  Two sounds, a short pop and a short rising chime, made from sine waves by
+  `tool/make_sounds.dart` (`melos run sounds`), so there is no licence
+  question. Declared as app assets. Nothing plays them.
+- **36a-2. `feat(game): add audio playback`** (foundation, S).
+  `audioplayers`, with ADR 0021. A `SoundEffects` interface (`playCapture`,
+  `playWin`), its `audioplayers` implementation built in `GameModule`, and a
+  fake for tests. Nothing calls it yet.
 - **36b. `feat(game): play a sound on a capture`** (feature, S). On every
   capture, by either side, when the switch is on. Undo and redo stay silent.
   `GameModule` gets `soundOn` here.
