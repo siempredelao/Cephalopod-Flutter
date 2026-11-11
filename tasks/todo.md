@@ -50,7 +50,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] 31b. feat(app): show How to play the first time the app opens (S)
 - [x] 32a. feat(game): count each player's dice in the game state (S)
 - [x] 32b. feat(game): show how many dice each player has (S)
-- [ ] 33a. feat(game): add a use case that suggests a move (S)
+- [x] 33a. feat(game): add a use case that suggests a move (S)
 - [ ] 33b. refactor(game): draw a square's ring in its own widget (S)
 - [ ] 33c. feat(game): let the board draw a hint (S)
 - [ ] 33d. feat(game): give a hint (S)
