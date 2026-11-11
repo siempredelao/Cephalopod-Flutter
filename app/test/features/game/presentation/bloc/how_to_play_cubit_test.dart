@@ -17,19 +17,21 @@ void main() {
         HowToPlayViewState(
           steps: steps,
           currentStep: 0,
+          canGoBack: false,
           rightButton: TutorialRightButtonUi.next,
         ),
       );
     });
 
     blocTest<HowToPlayCubit, HowToPlayViewState>(
-      'follows the step on screen',
+      'follows the step on screen, which can turn back to the first',
       build: HowToPlayCubit.new,
       act: (cubit) => cubit.showStep(1),
       expect: () => [
         HowToPlayViewState(
           steps: steps,
           currentStep: 1,
+          canGoBack: true,
           rightButton: TutorialRightButtonUi.next,
         ),
       ],
@@ -43,6 +45,7 @@ void main() {
         HowToPlayViewState(
           steps: steps,
           currentStep: lastStep,
+          canGoBack: true,
           rightButton: TutorialRightButtonUi.finish,
         ),
       ],

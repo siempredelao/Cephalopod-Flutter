@@ -44,7 +44,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] 38. refactor(game): split the game screen into widgets (S)
 - [x] 39. refactor(game): describe the move just played in one value (S)
 - [x] 28. feat(game): move the game's actions into a menu (S), closes 27
-- [ ] 29. feat(game): centre How to play's dots and add Previous (S)
+- [x] 29. feat(game): centre How to play's dots and add Previous (S)
 - [ ] 30. feat(game): let the player skip How to play (XS)
 - [ ] 31a. feat(home): remember whether How to play was seen (S)
 - [ ] 31b. feat(app): show How to play the first time the app opens (S)
@@ -71,5 +71,6 @@ The numbers are the ones first planned, so they are not in order here.
 - [ ] L4. feat(app): translate into Polish and Turkish (S)
 - [ ] Ask for a rating: the review feature, then the prompt after games, then the About link
 - [ ] Crash reporting into Task 4's reporter
+- [ ] feat(about): show the open-source licenses (S)
 - [ ] Play Store screenshots made by an integration test, in both languages
 - [ ] The same test plays, saves and resumes a game on a device, as the release check
