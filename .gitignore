@@ -2,6 +2,8 @@
 .dart_tool/
 build/
 coverage/
+# What a failed golden test draws; see the README's "Golden images"
+**/test/**/failures/
 .flutter-plugins
 .flutter-plugins-dependencies
 
