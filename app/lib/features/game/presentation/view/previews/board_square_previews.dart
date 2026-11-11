@@ -15,7 +15,7 @@ const double _spacing = 4;
 @Preview(
   group: 'BoardSquare',
   name: 'Empty, every mark',
-  size: Size(480, 100),
+  size: Size(660, 100),
   wrapper: boardPreviewWrapper,
 )
 Widget emptySquaresPreview() => _everyMarkOf(null);
@@ -23,7 +23,7 @@ Widget emptySquaresPreview() => _everyMarkOf(null);
 @Preview(
   group: 'BoardSquare',
   name: 'With a die, every mark',
-  size: Size(480, 100),
+  size: Size(660, 100),
   wrapper: boardPreviewWrapper,
 )
 Widget occupiedSquaresPreview() {
@@ -34,7 +34,7 @@ Widget occupiedSquaresPreview() {
   return _everyMarkOf(die);
 }
 
-/// One square per [SquareMark], from none to picked for a capture.
+/// One square per [SquareMark], from none to a hint's capture.
 Widget _everyMarkOf(DieUi? die) {
   return Row(
     mainAxisSize: MainAxisSize.min,

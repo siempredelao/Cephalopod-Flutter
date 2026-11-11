@@ -20,6 +20,8 @@ class BoardColors extends ThemeExtension<BoardColors> {
     required this.captureTarget,
     required this.captureOption,
     required this.captureSelected,
+    required this.hintTarget,
+    required this.hintCapture,
   });
 
   /// The board colours of the theme around [context].
@@ -53,6 +55,8 @@ class BoardColors extends ThemeExtension<BoardColors> {
     captureTarget: Color(0xFFC2410C),
     captureOption: Color(0xFF0B7A6B),
     captureSelected: Color(0xFFB42318),
+    hintTarget: Color(0xFFA16207),
+    hintCapture: Color(0xFF9C6F00),
   );
 
   /// The dark theme's board, the palette of the repository's social preview
@@ -72,6 +76,8 @@ class BoardColors extends ThemeExtension<BoardColors> {
     captureTarget: Color(0xFFFFB199),
     captureOption: Color(0xFF5EEAD4),
     captureSelected: Color(0xFFFF7A5C),
+    hintTarget: Color(0xFFFACC15),
+    hintCapture: Color(0xFFFDE68A),
   );
 
   /// The panel the squares sit on, showing in the gaps between them.
@@ -106,6 +112,14 @@ class BoardColors extends ThemeExtension<BoardColors> {
   /// The ring around a die the player has picked for the capture.
   final Color captureSelected;
 
+  /// The ring around the square a hint suggests: gold, a colour no other
+  /// mark uses.
+  final Color hintTarget;
+
+  /// The ring around a die the hinted move would capture: the hint's gold,
+  /// in another shade.
+  final Color hintCapture;
+
   @override
   BoardColors copyWith({
     Color? board,
@@ -121,6 +135,8 @@ class BoardColors extends ThemeExtension<BoardColors> {
     Color? captureTarget,
     Color? captureOption,
     Color? captureSelected,
+    Color? hintTarget,
+    Color? hintCapture,
   }) {
     return BoardColors(
       board: board ?? this.board,
@@ -136,6 +152,8 @@ class BoardColors extends ThemeExtension<BoardColors> {
       captureTarget: captureTarget ?? this.captureTarget,
       captureOption: captureOption ?? this.captureOption,
       captureSelected: captureSelected ?? this.captureSelected,
+      hintTarget: hintTarget ?? this.hintTarget,
+      hintCapture: hintCapture ?? this.hintCapture,
     );
   }
 
@@ -157,6 +175,8 @@ class BoardColors extends ThemeExtension<BoardColors> {
       captureTarget: Color.lerp(captureTarget, other.captureTarget, t)!,
       captureOption: Color.lerp(captureOption, other.captureOption, t)!,
       captureSelected: Color.lerp(captureSelected, other.captureSelected, t)!,
+      hintTarget: Color.lerp(hintTarget, other.hintTarget, t)!,
+      hintCapture: Color.lerp(hintCapture, other.hintCapture, t)!,
     );
   }
 }

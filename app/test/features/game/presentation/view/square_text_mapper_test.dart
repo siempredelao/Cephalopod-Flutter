@@ -33,6 +33,33 @@ void main() {
       expect(mapper.map(square, english), 'Row 1, column 3, empty');
     });
 
+    test('adds what a hint says about the square', () {
+      const suggested = SquareUi(
+        row: 0,
+        col: 2,
+        die: null,
+        mark: SquareMark.hintTarget,
+      );
+      final captured = fiveOf(
+        PlayerUi.two,
+        RoleUi.player,
+      ).copyWith(mark: SquareMark.hintCapture);
+
+      expect(
+        mapper.map(suggested, english),
+        'Row 1, column 3, empty. Hint: place your die here',
+      );
+      expect(
+        mapper.map(captured, english),
+        'Row 2, column 3, Player 2 die showing 5. '
+        'Hint: this die would be captured',
+      );
+      expect(
+        mapper.map(suggested, spanish),
+        'Fila 1, columna 3, vacía. Pista: coloca tu dado aquí',
+      );
+    });
+
     test("names a player's die between two people", () {
       final square = fiveOf(PlayerUi.one, RoleUi.player);
 

@@ -289,6 +289,24 @@
       }
     }
   },
+  "gameSquareHintTarget": "{square}. Hint: place your die here",
+  "@gameSquareHintTarget": {
+    "description": "Game: what a screen reader says for the square a hint suggests. {square} is what it says for the square otherwise, such as gameSquareEmpty.",
+    "placeholders": {
+      "square": {
+        "type": "String"
+      }
+    }
+  },
+  "gameSquareHintCapture": "{square}. Hint: this die would be captured",
+  "@gameSquareHintCapture": {
+    "description": "Game: what a screen reader says for a die the hinted move would capture. {square} is what it says for the square otherwise, such as gameSquarePlayerDie.",
+    "placeholders": {
+      "square": {
+        "type": "String"
+      }
+    }
+  },
 
   "howToPlayProgress": "Step {step} of {stepCount}",
   "@howToPlayProgress": {

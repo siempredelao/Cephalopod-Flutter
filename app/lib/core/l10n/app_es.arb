@@ -46,6 +46,8 @@
   "gameSquarePlayerDie": "Fila {row}, columna {column}, dado del {player} con {pips, plural, =1{1 punto} other{{pips} puntos}}",
   "gameSquareYourDie": "Fila {row}, columna {column}, tu dado con {pips, plural, =1{1 punto} other{{pips} puntos}}",
   "gameSquareComputerDie": "Fila {row}, columna {column}, dado del ordenador con {pips, plural, =1{1 punto} other{{pips} puntos}}",
+  "gameSquareHintTarget": "{square}. Pista: coloca tu dado aquí",
+  "gameSquareHintCapture": "{square}. Pista: este dado se capturaría",
 
   "howToPlayProgress": "Paso {step} de {stepCount}",
 

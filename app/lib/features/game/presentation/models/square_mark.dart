@@ -14,4 +14,10 @@ enum SquareMark {
 
   /// A die the player has picked for the capture.
   captureSelected,
+
+  /// A hint's square: where the hint suggests placing the next die.
+  hintTarget,
+
+  /// A die the hinted move would capture.
+  hintCapture,
 }
