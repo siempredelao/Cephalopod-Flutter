@@ -107,6 +107,39 @@
     }
   },
 
+  "gameTallyYou": "You",
+  "@gameTallyYou": {
+    "description": "Game: the person's name in the dice count above the board, against the computer."
+  },
+  "gameTallyComputer": "Computer",
+  "@gameTallyComputer": {
+    "description": "Game: the computer's name in the dice count above the board."
+  },
+  "gameTallySide": "{side}: {count, plural, =1{1 die} other{{count} dice}}",
+  "@gameTallySide": {
+    "description": "Game: what a screen reader says for one side of the dice count above the board. {side} is gamePlayerName, gameTallyYou or gameTallyComputer; {count} is how many dice that side has on the board.",
+    "placeholders": {
+      "side": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "gameTallySpoken": "{playerOne}. {playerTwo}.",
+  "@gameTallySpoken": {
+    "description": "Game: what a screen reader says for the dice count above the board. {playerOne} and {playerTwo} are gameTallySide, for Player 1's side and then Player 2's.",
+    "placeholders": {
+      "playerOne": {
+        "type": "String"
+      },
+      "playerTwo": {
+        "type": "String"
+      }
+    }
+  },
+
   "gameHeadlinePlayerToMove": "{player} to move",
   "@gameHeadlinePlayerToMove": {
     "description": "Game: above the board, between two people. {player} is gamePlayerName.",

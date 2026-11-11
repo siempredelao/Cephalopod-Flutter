@@ -26,6 +26,11 @@
 
   "gamePlayerName": "Jugador {number}",
 
+  "gameTallyYou": "Tú",
+  "gameTallyComputer": "Ordenador",
+  "gameTallySide": "{side}: {count, plural, =1{1 dado} other{{count} dados}}",
+  "gameTallySpoken": "{playerOne}. {playerTwo}.",
+
   "gameHeadlinePlayerToMove": "Turno del {player}",
   "gameHeadlinePersonToMove": "Tu turno",
   "gameHeadlineComputerToMove": "El ordenador está pensando…",

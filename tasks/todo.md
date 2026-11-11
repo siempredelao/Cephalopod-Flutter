@@ -49,7 +49,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] 31a. feat(game): remember whether How to play was seen (S)
 - [x] 31b. feat(app): show How to play the first time the app opens (S)
 - [x] 32a. feat(game): count each player's dice in the game state (S)
-- [ ] 32b. feat(game): show how many dice each player has (S)
+- [x] 32b. feat(game): show how many dice each player has (S)
 - [ ] 33a. feat(game): add a use case that suggests a move (S)
 - [ ] 33b. refactor(game): draw a square's ring in its own widget (S)
 - [ ] 33c. feat(game): let the board draw a hint (S)

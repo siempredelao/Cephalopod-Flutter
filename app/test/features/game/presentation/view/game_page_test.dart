@@ -7,11 +7,11 @@ import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/game_view.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
-import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../../helpers/board.dart';
 import '../../../../helpers/game_bloc_factory.dart';
 
 void main() {
@@ -56,7 +56,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // The computer plays Black, which moves first.
-      expect(find.byType(DieFace), findsOne);
+      expect(diceOnBoard, findsOne);
       expect(find.text('Your turn'), findsOne);
     });
 
@@ -78,7 +78,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byType(DieFace), findsOne);
+      expect(diceOnBoard, findsOne);
       expect(find.text('Player 2 to move'), findsOne);
     });
   });
