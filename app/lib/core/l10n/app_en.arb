@@ -356,6 +356,10 @@
   "@howToPlayTitle": {
     "description": "How to play: the page's title."
   },
+  "howToPlaySkip": "Skip",
+  "@howToPlaySkip": {
+    "description": "How to play: app bar button that leaves the tutorial before its last page."
+  },
   "howToPlayPrevious": "Previous",
   "@howToPlayPrevious": {
     "description": "How to play: button that turns back to the page before. Not shown on the first page."

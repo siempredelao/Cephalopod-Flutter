@@ -18,6 +18,8 @@ class HowToPlayCubit extends Cubit<HowToPlayViewState> {
       steps: steps,
       currentStep: step,
       canGoBack: step > 0,
+      // On the last page, the right button already leaves.
+      canSkip: step < steps.length - 1,
       rightButton: _rightButtonAt(step, steps.length),
     );
   }

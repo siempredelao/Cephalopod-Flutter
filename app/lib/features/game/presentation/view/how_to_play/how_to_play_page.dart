@@ -60,9 +60,12 @@ class _TutorialPagesState extends State<_TutorialPages> {
           curve: Curves.easeInOut,
         );
       case TutorialRightButtonUi.finish:
-        Navigator.of(context).maybePop();
+        _leave();
     }
   }
+
+  /// Leaves the tutorial, from its last page or by skipping the rest.
+  void _leave() => Navigator.of(context).maybePop();
 
   /// The words on [rightButton], in the language on screen.
   static String _rightButtonLabelOf(
@@ -79,7 +82,21 @@ class _TutorialPagesState extends State<_TutorialPages> {
   Widget build(BuildContext context) {
     final cubit = context.read<HowToPlayCubit>();
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.howToPlayTitle)),
+      appBar: AppBar(
+        title: Text(context.l10n.howToPlayTitle),
+        actions: [
+          // Skip, on every page but the last, where Done leaves too.
+          BlocSelector<HowToPlayCubit, HowToPlayViewState, bool>(
+            selector: (state) => state.canSkip,
+            builder: (context, canSkip) => canSkip
+                ? TextButton(
+                    onPressed: _leave,
+                    child: Text(context.l10n.howToPlaySkip),
+                  )
+                : const SizedBox.shrink(),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: BlocBuilder<HowToPlayCubit, HowToPlayViewState>(
           builder: (context, state) => Column(
