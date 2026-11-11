@@ -16,6 +16,7 @@ final class SettingsViewStateMapper {
     return SettingsViewState(
       theme: themeUi,
       highlightLastMove: settings.highlightLastMove,
+      sound: settings.sound,
     );
   }
 

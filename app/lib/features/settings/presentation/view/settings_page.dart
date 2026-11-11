@@ -74,6 +74,11 @@ class _SettingsView extends StatelessWidget {
               value: state.highlightLastMove,
               onChanged: (_) => cubit.toggleLastMoveHighlight(),
             ),
+            SwitchListTile(
+              title: Text(l10n.settingsSound),
+              value: state.sound,
+              onChanged: (_) => cubit.toggleSound(),
+            ),
           ],
         ),
       ),

@@ -23,6 +23,12 @@ void main() {
     );
   }
 
+  final highlightSwitch = find.widgetWithText(
+    SwitchListTile,
+    'Highlight the last move',
+  );
+  final soundSwitch = find.widgetWithText(SwitchListTile, 'Sound');
+
   group('SettingsPage', () {
     testWidgets('chooses the theme', (tester) async {
       await pumpSettings(tester);
@@ -37,12 +43,24 @@ void main() {
       await pumpSettings(tester);
       expect(cubit.state.highlightLastMove, isTrue);
 
-      await tester.tap(find.byType(SwitchListTile));
+      await tester.tap(highlightSwitch);
       await tester.pumpAndSettle();
 
       expect(cubit.state.highlightLastMove, isFalse);
-      final tile = tester.widget<SwitchListTile>(find.byType(SwitchListTile));
-      expect(tile.value, isFalse);
+      expect(tester.widget<SwitchListTile>(highlightSwitch).value, isFalse);
+      expect(tester.widget<SwitchListTile>(soundSwitch).value, isTrue);
+    });
+
+    testWidgets('turns sounds off', (tester) async {
+      await pumpSettings(tester);
+      expect(cubit.state.sound, isTrue);
+
+      await tester.tap(soundSwitch);
+      await tester.pumpAndSettle();
+
+      expect(cubit.state.sound, isFalse);
+      expect(tester.widget<SwitchListTile>(soundSwitch).value, isFalse);
+      expect(tester.widget<SwitchListTile>(highlightSwitch).value, isTrue);
     });
 
     testWidgets('closes its cubit when it leaves the screen', (tester) async {

@@ -55,6 +55,10 @@
   "@settingsHighlightLastMove": {
     "description": "Settings: switch that marks the square of the last die placed."
   },
+  "settingsSound": "Sound",
+  "@settingsSound": {
+    "description": "Settings: switch that turns the game's sounds, on a capture and on a win, on or off."
+  },
 
   "aboutTitle": "About",
   "@aboutTitle": {

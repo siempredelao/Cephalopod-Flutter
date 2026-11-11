@@ -61,7 +61,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] 34b. feat(game): burst a captured die (S)
 - [x] 37b. feat(game): throw confetti when the player wins (S)
 - [x] 35a. feat(settings): remember whether sounds are on (S)
-- [ ] 35b. feat(settings): add a Sound switch (S)
+- [x] 35b. feat(settings): add a Sound switch (S)
 - [ ] 36a. feat(game): add audio playback (S)
 - [ ] 36b. feat(game): play a sound on a capture (S)
 - [ ] 36c. feat(game): play a sound when the player wins (XS)
