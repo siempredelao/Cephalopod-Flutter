@@ -10,12 +10,12 @@ import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/view/game_view.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/capture_controls.dart';
-import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../../helpers/board.dart';
 import '../../../../helpers/game_bloc_factory.dart';
 
 void main() {
@@ -108,12 +108,29 @@ void main() {
       semantics.dispose();
     });
 
+    testWidgets("counts each side's dice above the board", (tester) async {
+      final semantics = tester.ensureSemantics();
+      await pumpGame(tester);
+      expect(
+        find.bySemanticsLabel('Player 1: 0 dice. Player 2: 0 dice.'),
+        findsOne,
+      );
+
+      await tapSquare(tester, const Position(2, 2));
+
+      expect(
+        find.bySemanticsLabel('Player 1: 1 die. Player 2: 0 dice.'),
+        findsOne,
+      );
+      semantics.dispose();
+    });
+
     testWidgets('places a die on the tapped square', (tester) async {
       await pumpGame(tester);
 
       await tapSquare(tester, const Position(2, 2));
 
-      expect(find.byType(DieFace), findsOne);
+      expect(diceOnBoard, findsOne);
       expect(find.text('Player 2 to move'), findsOne);
     });
 
@@ -139,7 +156,7 @@ void main() {
       await tapSquare(tester, const Position(2, 2));
 
       await tapMenuItemOnce(tester, 'Undo');
-      expect(find.byType(DieFace), findsNothing);
+      expect(diceOnBoard, findsNothing);
 
       await tapMenuItemOnce(tester, 'Redo');
       expect(dieScale(tester, const Position(2, 2)), 1);
@@ -150,11 +167,11 @@ void main() {
       await tapSquare(tester, const Position(2, 2));
 
       await tapMenuItem(tester, 'Undo');
-      expect(find.byType(DieFace), findsNothing);
+      expect(diceOnBoard, findsNothing);
       expect(find.text('Player 1 to move'), findsOne);
 
       await tapMenuItem(tester, 'Redo');
-      expect(find.byType(DieFace), findsOne);
+      expect(diceOnBoard, findsOne);
       expect(find.text('Player 2 to move'), findsOne);
     });
 
@@ -196,7 +213,7 @@ void main() {
 
       await tapMenuItem(tester, 'Restart game');
 
-      expect(find.byType(DieFace), findsNothing);
+      expect(diceOnBoard, findsNothing);
       expect(find.byType(BoardSquare), findsNWidgets(9));
       expect(find.text('Player 1 to move'), findsOne);
     });
@@ -233,7 +250,7 @@ void main() {
         expect(find.text('Capture sum: 2 of up to 6'), findsOne);
         await tapText(tester, 'Capture');
 
-        expect(find.byType(DieFace), findsNWidgets(3));
+        expect(diceOnBoard, findsNWidgets(3));
         expect(find.byType(CaptureControls), findsNothing);
         expect(find.text('Player 2 to move'), findsOne);
       });
@@ -250,7 +267,7 @@ void main() {
         await tester.tap(find.text('Capture'));
         await tester.pump();
         // The new die and the two it captured are all still drawn.
-        expect(find.byType(DieFace), findsNWidgets(5));
+        expect(diceOnBoard, findsNWidgets(5));
         expect(dieScale(tester, const Position(1, 1)), 0.5);
         expect(dieScale(tester, captured.first), 1);
 
@@ -265,7 +282,7 @@ void main() {
         expect(dieScale(tester, const Position(1, 2)), 1);
 
         await tester.pumpAndSettle();
-        expect(find.byType(DieFace), findsNWidgets(3));
+        expect(diceOnBoard, findsNWidgets(3));
         expect(dieScale(tester, const Position(1, 1)), 1);
       });
 
@@ -281,14 +298,14 @@ void main() {
 
         // Back: the new die is gone and the captured dice are whole again.
         await tapMenuItemOnce(tester, 'Undo');
-        expect(find.byType(DieFace), findsNWidgets(4));
+        expect(diceOnBoard, findsNWidgets(4));
         for (final square in captured) {
           expect(dieScale(tester, square), 1);
         }
 
         // Again: the captured dice are gone and the new die is whole.
         await tapMenuItemOnce(tester, 'Redo');
-        expect(find.byType(DieFace), findsNWidgets(3));
+        expect(diceOnBoard, findsNWidgets(3));
         expect(dieScale(tester, const Position(1, 1)), 1);
       });
 
@@ -297,7 +314,7 @@ void main() {
 
         await tapText(tester, 'Cancel');
 
-        expect(find.byType(DieFace), findsNWidgets(4));
+        expect(diceOnBoard, findsNWidgets(4));
         expect(find.byType(CaptureControls), findsNothing);
         expect(find.text('Player 1 to move'), findsOne);
       });
@@ -336,7 +353,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Your turn'), findsOne);
-      expect(find.byType(DieFace), findsOne);
+      expect(diceOnBoard, findsOne);
     });
 
     group('against the computer', () {

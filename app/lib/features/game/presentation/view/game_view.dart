@@ -3,15 +3,17 @@ import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/models/game_view_state.dart';
 import 'package:cephalopod/features/game/presentation/models/square_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/capture_controls.dart';
+import 'package:cephalopod/features/game/presentation/view/widgets/dice_tally.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_app_bar.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_headline.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// The game screen: whose turn it is, the board, and the controls for
-/// choosing a capture. It draws the [GameViewState] of the `GameBloc` above
-/// it and adds events; the bloc decides what they do.
+/// The game screen: whose turn it is, how many dice each side has, the
+/// board, and the controls for choosing a capture. It draws the
+/// [GameViewState] of the `GameBloc` above it and adds events; the bloc
+/// decides what they do.
 ///
 /// It only lays the screen out. Each part is a widget of its own in
 /// `widgets/`.
@@ -38,6 +40,8 @@ class GameView extends StatelessWidget {
                   headline: state.headline,
                   computerMove: state.playedMove?.computer,
                 ),
+                const SizedBox(height: _spacing / 2),
+                DiceTally(tally: state.tally),
                 const SizedBox(height: _spacing),
                 Expanded(
                   child: Center(

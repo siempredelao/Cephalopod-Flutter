@@ -8,13 +8,13 @@ import 'package:cephalopod/features/game/presentation/view/game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
 import 'package:cephalopod/features/game/presentation/view/new_game_dialog.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
-import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
 import 'package:cephalopod/features/home/presentation/view/home_page.dart';
 import 'package:cephalopod/features/settings/presentation/view/settings_page.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../helpers/board.dart';
 import '../helpers/pump_app.dart';
 
 void main() {
@@ -147,7 +147,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(GamePage), findsOneWidget);
-      expect(find.byType(DieFace), findsOneWidget);
+      expect(diceOnBoard, findsOneWidget);
     });
 
     testWidgets('opens a game against the opponent a link names', (
@@ -196,7 +196,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(HowToPlayPage), findsNothing);
-      expect(find.byType(DieFace), findsOneWidget);
+      expect(diceOnBoard, findsOneWidget);
     });
 
     testWidgets('switches to the dark theme from the settings', (tester) async {
@@ -236,7 +236,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final squares = tester.widgetList<BoardSquare>(find.byType(BoardSquare));
-      expect(find.byType(DieFace), findsOne);
+      expect(diceOnBoard, findsOne);
       expect(
         squares.map((square) => square.square.mark),
         everyElement(SquareMark.none),
