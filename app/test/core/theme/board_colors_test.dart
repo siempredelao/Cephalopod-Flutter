@@ -77,6 +77,8 @@ void main() {
           expectContrast('Capture target', colors.captureTarget, colors.board);
           expectContrast('Capture option', colors.captureOption, colors.board);
           expectContrast('Picked die', colors.captureSelected, colors.board);
+          expectContrast('Hint target', colors.hintTarget, colors.board);
+          expectContrast('Hint capture', colors.hintCapture, colors.board);
         });
       });
     }
