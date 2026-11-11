@@ -45,9 +45,10 @@
   "howToPlayProgress": "Paso {step} de {stepCount}",
 
   "gameHowToPlayTooltip": "Cómo se juega",
-  "gameRestartTooltip": "Nueva partida",
-  "gameUndoTooltip": "Deshacer",
-  "gameRedoTooltip": "Rehacer",
+  "gameMenuTooltip": "Más opciones",
+  "gameMenuUndo": "Deshacer",
+  "gameMenuRedo": "Rehacer",
+  "gameMenuRestart": "Reiniciar partida",
   "gameCaptureCancel": "Cancelar",
   "gameCaptureConfirm": "Capturar",
 

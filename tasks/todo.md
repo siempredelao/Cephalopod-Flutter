@@ -38,12 +38,12 @@ The numbers are the ones first planned, so they are not in order here.
 - ~~3. fix(game): show "thinking" before the computer searches on the web (XS)~~
 
 ## To fix later
-- [ ] 27. fix(game): show the game screen's title in full on small phones (S), done by 28
+- [x] 27. fix(game): show the game screen's title in full on small phones (S), done by 28
 
 ## M6: UX, in this order
-- [ ] 38. refactor(game): split the game screen into widgets (S)
-- [ ] 39. refactor(game): describe the move just played in one value (S)
-- [ ] 28. feat(game): move the game's actions into a menu (S), closes 27
+- [x] 38. refactor(game): split the game screen into widgets (S)
+- [x] 39. refactor(game): describe the move just played in one value (S)
+- [x] 28. feat(game): move the game's actions into a menu (S), closes 27
 - [ ] 29. feat(game): centre How to play's dots and add Previous (S)
 - [ ] 30. feat(game): let the player skip How to play (XS)
 - [ ] 31a. feat(home): remember whether How to play was seen (S)

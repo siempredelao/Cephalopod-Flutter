@@ -274,17 +274,21 @@
   "@gameHowToPlayTooltip": {
     "description": "Game: tooltip of the app bar button that opens the rules tutorial."
   },
-  "gameRestartTooltip": "New game",
-  "@gameRestartTooltip": {
-    "description": "Game: tooltip of the app bar button that starts again, against the same opponent."
+  "gameMenuTooltip": "More options",
+  "@gameMenuTooltip": {
+    "description": "Game: tooltip of the app bar button that opens the menu of the game's actions."
   },
-  "gameUndoTooltip": "Undo",
-  "@gameUndoTooltip": {
-    "description": "Game: tooltip of the button that takes back the last turn."
+  "gameMenuUndo": "Undo",
+  "@gameMenuUndo": {
+    "description": "Game: menu item that takes back the last turn."
   },
-  "gameRedoTooltip": "Redo",
-  "@gameRedoTooltip": {
-    "description": "Game: tooltip of the button that plays again a turn taken back."
+  "gameMenuRedo": "Redo",
+  "@gameMenuRedo": {
+    "description": "Game: menu item that plays again a turn taken back."
+  },
+  "gameMenuRestart": "Restart game",
+  "@gameMenuRestart": {
+    "description": "Game: menu item that starts the game again, against the same opponent and under the same rules. It does not ask for a new opponent."
   },
   "gameCaptureCancel": "Cancel",
   "@gameCaptureCancel": {

@@ -78,13 +78,11 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Turno del Jugador 2'), findsOne);
-      for (final tooltip in [
-        'Cómo se juega',
-        'Nueva partida',
-        'Deshacer',
-        'Rehacer',
-      ]) {
-        expect(find.byTooltip(tooltip), findsOne);
+      expect(find.byTooltip('Cómo se juega'), findsOne);
+      await tester.tap(find.byTooltip('Más opciones'));
+      await tester.pumpAndSettle();
+      for (final item in ['Deshacer', 'Rehacer', 'Reiniciar partida']) {
+        expect(find.widgetWithText(MenuItemButton, item), findsOne);
       }
     });
 
