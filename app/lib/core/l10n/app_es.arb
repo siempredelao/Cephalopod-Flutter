@@ -67,6 +67,7 @@
   "newGameStart": "Empezar",
 
   "howToPlayTitle": "Cómo se juega",
+  "howToPlaySkip": "Omitir",
   "howToPlayPrevious": "Anterior",
   "howToPlayNext": "Siguiente",
   "howToPlayDone": "Entendido",

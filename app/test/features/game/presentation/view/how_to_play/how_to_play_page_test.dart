@@ -25,6 +25,23 @@ void main() {
     );
   }
 
+  /// How to play over a page that says Home, so leaving it shows where it
+  /// went.
+  Future<void> pumpTutorialOverHome(WidgetTester tester) {
+    return tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: appLocalizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        theme: ThemeData(extensions: const [BoardColors.light]),
+        routes: {
+          '/': (_) => const Text('Home'),
+          '/how-to-play': (_) => const HowToPlayPage(),
+        },
+        initialRoute: '/how-to-play',
+      ),
+    );
+  }
+
   Future<void> tapNext(WidgetTester tester) async {
     await tester.tap(find.widgetWithText(FilledButton, 'Next'));
     await tester.pumpAndSettle();
@@ -42,6 +59,7 @@ void main() {
       await pumpTutorial(tester, locale: const Locale('es'));
 
       expect(find.widgetWithText(AppBar, 'Cómo se juega'), findsOne);
+      expect(find.widgetWithText(TextButton, 'Omitir'), findsOne);
       expect(find.text('Se juega por turnos'), findsOne);
       expect(find.textContaining('coloca un dado'), findsOne);
       expect(find.widgetWithText(FilledButton, 'Siguiente'), findsOne);
@@ -119,18 +137,7 @@ void main() {
     });
 
     testWidgets('closes with Got it on the last step', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: appLocalizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          theme: ThemeData(extensions: const [BoardColors.light]),
-          routes: {
-            '/': (_) => const Text('Home'),
-            '/how-to-play': (_) => const HowToPlayPage(),
-          },
-          initialRoute: '/how-to-play',
-        ),
-      );
+      await pumpTutorialOverHome(tester);
 
       for (var step = 1; step < tutorialSteps.length; step++) {
         await tapNext(tester);
@@ -141,6 +148,27 @@ void main() {
 
       expect(find.byType(HowToPlayPage), findsNothing);
       expect(find.text('Home'), findsOne);
+    });
+
+    testWidgets('closes with Skip from the first step', (tester) async {
+      await pumpTutorialOverHome(tester);
+
+      await tester.tap(find.widgetWithText(TextButton, 'Skip'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(HowToPlayPage), findsNothing);
+      expect(find.text('Home'), findsOne);
+    });
+
+    testWidgets('has no Skip on the last step', (tester) async {
+      await pumpTutorial(tester);
+
+      for (var step = 1; step < tutorialSteps.length; step++) {
+        expect(find.widgetWithText(TextButton, 'Skip'), findsOne);
+        await tapNext(tester);
+      }
+
+      expect(find.widgetWithText(TextButton, 'Skip'), findsNothing);
     });
   });
 }

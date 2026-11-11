@@ -18,6 +18,7 @@ void main() {
           steps: steps,
           currentStep: 0,
           canGoBack: false,
+          canSkip: true,
           rightButton: TutorialRightButtonUi.next,
         ),
       );
@@ -32,13 +33,14 @@ void main() {
           steps: steps,
           currentStep: 1,
           canGoBack: true,
+          canSkip: true,
           rightButton: TutorialRightButtonUi.next,
         ),
       ],
     );
 
     blocTest<HowToPlayCubit, HowToPlayViewState>(
-      'finishes the tutorial from the last step',
+      'finishes the tutorial from the last step, with nothing left to skip',
       build: HowToPlayCubit.new,
       act: (cubit) => cubit.showStep(lastStep),
       expect: () => [
@@ -46,6 +48,7 @@ void main() {
           steps: steps,
           currentStep: lastStep,
           canGoBack: true,
+          canSkip: false,
           rightButton: TutorialRightButtonUi.finish,
         ),
       ],
