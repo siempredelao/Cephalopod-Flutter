@@ -10,6 +10,7 @@ import 'package:cephalopod/features/game/presentation/bloc/countdown_timer.dart'
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_view_state_mapper.dart';
+import 'package:cephalopod/features/game/presentation/bloc/played_move.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod/features/game/presentation/models/game_view_state.dart';
 import 'package:cephalopod/features/game/presentation/models/headline_ui.dart';
@@ -44,8 +45,7 @@ void main() {
     GameState game, {
     TurnPhase phase = const TurnPhase.awaitingPlacement(),
     Move? lastMove,
-    Move? computerMove,
-    bool movePlayed = false,
+    PlayedMove? playedMove,
     bool canUndo = false,
     bool canRedo = false,
     Opponent opponent = const FriendOpponent(),
@@ -58,8 +58,7 @@ void main() {
       highlightLastMove: true,
       canUndo: canUndo,
       canRedo: canRedo,
-      computerMove: computerMove,
-      movePlayed: movePlayed,
+      playedMove: playedMove,
     );
   }
 
@@ -127,7 +126,7 @@ void main() {
         screenOf(
           after(rules.newGame(), Move(center)),
           lastMove: Move(center),
-          movePlayed: true,
+          playedMove: (move: Move(center), byComputer: false),
           canUndo: true,
         ),
       ],
@@ -160,7 +159,7 @@ void main() {
         screenOf(
           after(oneCapture, captureBoth),
           lastMove: captureBoth,
-          movePlayed: true,
+          playedMove: (move: captureBoth, byComputer: false),
           canUndo: true,
         ),
       ],
@@ -223,7 +222,10 @@ void main() {
         screenOf(
           after(figure4, Move(top, captures: {left, right})),
           lastMove: Move(top, captures: {left, right}),
-          movePlayed: true,
+          playedMove: (
+            move: Move(top, captures: {left, right}),
+            byComputer: false,
+          ),
           canUndo: true,
         ),
       ],
@@ -280,7 +282,7 @@ void main() {
           after(lastSquare, Move(const Position(1, 1))),
           phase: const TurnPhase.gameEnded(blackWins),
           lastMove: Move(const Position(1, 1)),
-          movePlayed: true,
+          playedMove: (move: Move(const Position(1, 1)), byComputer: false),
         ),
       ],
     );
@@ -329,7 +331,7 @@ void main() {
     final played = screenOf(
       after(rules.newGame(), Move(center)),
       lastMove: Move(center),
-      movePlayed: true,
+      playedMove: (move: Move(center), byComputer: false),
       canUndo: true,
     );
     final undone = placing(rules.newGame()).copyWith(canRedo: true);
@@ -383,7 +385,7 @@ void main() {
         played,
         undone,
         // The move is back, but it was not just played.
-        played.copyWith(movePlayed: false),
+        played.copyWith(playedMove: null),
       ],
     );
 
@@ -400,7 +402,7 @@ void main() {
         screenOf(
           after(rules.newGame(), Move(top)),
           lastMove: Move(top),
-          movePlayed: true,
+          playedMove: (move: Move(top), byComputer: false),
           canUndo: true,
         ),
       ],
@@ -480,7 +482,7 @@ void main() {
     final centerPlayed = screenOf(
       afterCenter,
       lastMove: Move(center),
-      movePlayed: true,
+      playedMove: (move: Move(center), byComputer: false),
       canUndo: true,
     );
     late _ManualCountdown countdown;
@@ -517,7 +519,7 @@ void main() {
         screenOf(
           afterTop,
           lastMove: Move(top),
-          movePlayed: true,
+          playedMove: (move: Move(top), byComputer: false),
           canUndo: true,
         ),
       );
@@ -531,12 +533,12 @@ void main() {
       await settle();
 
       expect(bloc.state.canTap, isFalse);
-      expect(bloc.state.computerMove, isNull);
+      expect(bloc.state.playedMove?.computer, isNull);
 
       countdown.cancel();
-      await bloc.stream.firstWhere((state) => state.computerMove != null);
-
-      expect(bloc.state.movePlayed, isTrue);
+      await bloc.stream.firstWhere(
+        (state) => state.playedMove?.computer != null,
+      );
       await bloc.close();
     });
 
@@ -594,14 +596,13 @@ void main() {
       afterCenter,
       phase: const TurnPhase.computerThinking(),
       lastMove: Move(center),
-      movePlayed: true,
+      playedMove: (move: Move(center), byComputer: false),
       opponent: whiteComputer,
     );
     final replied = screenOf(
       after(afterCenter, reply),
       lastMove: reply,
-      movePlayed: true,
-      computerMove: reply,
+      playedMove: (move: reply, byComputer: true),
       canUndo: true,
       opponent: whiteComputer,
     );
@@ -632,8 +633,7 @@ void main() {
           screenOf(
             after(start, opening),
             lastMove: opening,
-            movePlayed: true,
-            computerMove: opening,
+            playedMove: (move: opening, byComputer: true),
             opponent: blackComputer,
           ),
         ];
@@ -671,7 +671,7 @@ void main() {
         replied,
         waiting.copyWith(canRedo: true),
         // Both moves are back, but they were not just played.
-        replied.copyWith(computerMove: null, movePlayed: false),
+        replied.copyWith(playedMove: null),
       ],
     );
 
