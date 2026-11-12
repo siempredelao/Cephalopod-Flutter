@@ -1,4 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:cephalopod/features/home/presentation/bloc/demo_script.dart';
+import 'package:cephalopod/features/home/presentation/bloc/demo_ui_mapper.dart';
 import 'package:cephalopod/features/home/presentation/bloc/home_cubit.dart';
 import 'package:cephalopod/features/home/presentation/models/home_view_state.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,6 +18,16 @@ void main() {
       addTearDown(cubit.close);
 
       expect(cubit.state, noSavedGame);
+    });
+
+    test('has the demo Home plays', () {
+      final cubit = HomeCubit(
+        hasGameToContinue: () async => true,
+        hasSeenHowToPlay: () async => true,
+      );
+      addTearDown(cubit.close);
+
+      expect(cubit.demo, const DemoUiMapper().map(homeDemoScript));
     });
 
     blocTest<HomeCubit, HomeViewState>(

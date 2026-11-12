@@ -2,6 +2,7 @@ import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/core/navigation/app_route.dart';
 import 'package:cephalopod/features/home/presentation/bloc/home_cubit.dart';
 import 'package:cephalopod/features/home/presentation/models/home_view_state.dart';
+import 'package:cephalopod/features/home/presentation/view/widgets/demo_board.dart';
 import 'package:cephalopod/features/home/presentation/view/widgets/home_link_button.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -11,7 +12,8 @@ import 'package:material_ui/material_ui.dart';
 /// play, change the settings, or read about the game. It renders the
 /// `HomeCubit` above it.
 ///
-/// One big button starts the game. The other screens are a row of small
+/// A small board above the title plays a capture on a loop. One big button
+/// starts the game. The other screens are a row of small
 /// buttons at the bottom, over a teal background that fades downwards.
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -94,6 +96,10 @@ class HomeView extends StatelessWidget {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
+                                DemoBoard(
+                                  demo: context.read<HomeCubit>().demo,
+                                ),
+                                const SizedBox(height: 24),
                                 Text(
                                   l10n.appTitle,
                                   style: textTheme.displaySmall,

@@ -1,6 +1,8 @@
+import 'package:cephalopod/core/theme/board_colors.dart';
 import 'package:cephalopod/features/home/presentation/bloc/home_cubit.dart';
 import 'package:cephalopod/features/home/presentation/view/home_page.dart';
 import 'package:cephalopod/features/home/presentation/view/home_view.dart';
+import 'package:cephalopod/features/home/presentation/view/widgets/demo_board.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -14,10 +16,14 @@ void main() {
     }) async {
       await tester.pumpWidget(
         localizedApp(
-          HomePage(
-            createCubit: () => HomeCubit(
-              hasGameToContinue: () async => hasGameToContinue,
-              hasSeenHowToPlay: () async => true,
+          // The demo board reads the board's colours from the theme.
+          Theme(
+            data: ThemeData(extensions: const [BoardColors.light]),
+            child: HomePage(
+              createCubit: () => HomeCubit(
+                hasGameToContinue: () async => hasGameToContinue,
+                hasSeenHowToPlay: () async => true,
+              ),
             ),
           ),
         ),
@@ -43,6 +49,16 @@ void main() {
       await pumpHome(tester, hasGameToContinue: false);
 
       expect(find.text('Place dice. Add them up. Capture.'), findsOne);
+    });
+
+    testWidgets('plays a demo board above the title', (tester) async {
+      await pumpHome(tester, hasGameToContinue: false);
+
+      final demo = tester.getRect(find.byType(DemoBoard));
+      final title = tester.getRect(find.text('Cephalopod'));
+
+      expect(demo.bottom, lessThanOrEqualTo(title.top));
+      expect(demo.center.dx, moreOrLessEquals(title.center.dx, epsilon: 0.5));
     });
 
     testWidgets('gives the main button the width of the screen', (
