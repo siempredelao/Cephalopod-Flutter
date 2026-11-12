@@ -77,7 +77,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] HM1. feat(home): make Home clearer (S)
 - [x] HM2. feat(home): show a board that plays a capture (S)
 - [x] HM3. feat(game): describe the saved game for Home (S)
-- [ ] HM4. feat(home): continue from a card that shows the saved game (S)
+- [x] HM4. feat(home): continue from a card that shows the saved game (S)
 - [ ] S1. feat(game): wait longer after a bigger capture (S)
 - [ ] S2. feat(game): shrink and burst captured dice one at a time (S)
 - [ ] S3. feat(game): pop once per captured die (S)

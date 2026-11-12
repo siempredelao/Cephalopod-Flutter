@@ -2,6 +2,7 @@ import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/core/navigation/app_route.dart';
 import 'package:cephalopod/features/home/presentation/bloc/home_cubit.dart';
 import 'package:cephalopod/features/home/presentation/models/home_view_state.dart';
+import 'package:cephalopod/features/home/presentation/view/widgets/continue_card.dart';
 import 'package:cephalopod/features/home/presentation/view/widgets/demo_board.dart';
 import 'package:cephalopod/features/home/presentation/view/widgets/home_link_button.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,8 +14,10 @@ import 'package:material_ui/material_ui.dart';
 /// `HomeCubit` above it.
 ///
 /// A small board above the title plays a capture on a loop. One big button
-/// starts the game. The other screens are a row of small
-/// buttons at the bottom, over a teal background that fades downwards.
+/// starts a game, or, when one is saved, a card shows the saved game and
+/// picks it up, with the new-game button below it. The other screens are a
+/// row of small buttons at the bottom, over a teal background that fades
+/// downwards.
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
@@ -114,11 +117,10 @@ class HomeView extends StatelessWidget {
                             ),
                           ),
                         ),
-                        if (state.canContinue) ...[
-                          FilledButton(
-                            style: mainButtonStyle,
+                        if (state.savedGame case final savedGame?) ...[
+                          ContinueCard(
+                            game: savedGame,
                             onPressed: () => _continue(context),
-                            child: Text(l10n.homeContinue),
                           ),
                           const SizedBox(height: 12),
                           FilledButton.tonal(

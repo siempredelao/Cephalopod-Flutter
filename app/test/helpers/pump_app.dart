@@ -5,6 +5,7 @@ import 'package:cephalopod/features/about/about_module.dart';
 import 'package:cephalopod/features/about/domain/app_version_source.dart';
 import 'package:cephalopod/features/about/domain/link_opener.dart';
 import 'package:cephalopod/features/game/data/in_memory_game_repository.dart';
+import 'package:cephalopod/features/game/domain/models/saved_game.dart';
 import 'package:cephalopod/features/game/domain/sound_effects.dart';
 import 'package:cephalopod/features/game/game_module.dart';
 import 'package:cephalopod/features/home/home_module.dart';
@@ -28,6 +29,8 @@ import 'fake_sound_effects.dart';
 /// How to play counts as already seen, so the app starts on [location]
 /// rather than on How to play, as it would on a first launch. Pass
 /// [firstLaunch] to start as a fresh install does.
+///
+/// Pass [savedGame] to start with that game saved, as after leaving a game.
 Future<void> pumpApp(
   WidgetTester tester, {
   Flavor flavor = Flavor.prod,
@@ -36,13 +39,16 @@ Future<void> pumpApp(
   LinkOpener? linkOpener,
   SoundEffects? soundEffects,
   bool firstLaunch = false,
+  SavedGame? savedGame,
 }) async {
   final settings = SettingsModule(
     settingsRepository: InMemorySettingsRepository(),
   );
+  final games = InMemoryGameRepository();
+  if (savedGame != null) await games.save(savedGame);
   final game = GameModule(
     cephalopodRules: CephalopodRules(),
-    gameRepository: InMemoryGameRepository(),
+    gameRepository: games,
     soundEffects: soundEffects ?? FakeSoundEffects(),
     highlightLastMove: settings.highlightLastMove,
     soundOn: settings.soundOn,
