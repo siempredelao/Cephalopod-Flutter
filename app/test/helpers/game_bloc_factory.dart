@@ -22,7 +22,8 @@ import 'fake_sound_effects.dart';
 /// The computer plays its first legal move, and hints suggest it too,
 /// unless [agentFactory] gives another agent, on the test's isolate unless
 /// [backgroundRunner] says otherwise. After a move, the bloc runs
-/// [moveCountdown], which has no length by default. The bloc starts from a
+/// [moveCountdown] for [settleDurationFor] the dice the move captured, which
+/// is no wait by default. The bloc starts from a
 /// new game under [config], or from [position] when given. It plays its
 /// sounds on [soundEffects], or on a fake that only records them.
 GameBloc createTestGameBloc({
@@ -32,6 +33,7 @@ GameBloc createTestGameBloc({
   BackgroundRunner backgroundRunner = runHere,
   AgentFactory? agentFactory,
   CountdownTimer? moveCountdown,
+  Duration Function(int captures)? settleDurationFor,
   SoundEffects? soundEffects,
 }) {
   final rules = CephalopodRules();
@@ -61,6 +63,7 @@ GameBloc createTestGameBloc({
     chooseAgentMove: chooseAgentMove,
     suggestMove: suggestMove,
     moveCountdown: moveCountdown,
+    settleDurationFor: settleDurationFor ?? (_) => Duration.zero,
     soundEffects: soundEffects ?? FakeSoundEffects(),
     config: config,
     position: position,

@@ -106,7 +106,9 @@ final class GameViewStateMapper {
     return PlayedMoveUi(
       computer: byComputer ? _computerMoveUiOf(move, game) : null,
       captured: [
-        for (final MapEntry(key: square, value: die) in captured.entries)
+        for (final MapEntry(key: square, value: die) in _inReadingOrder(
+          captured,
+        ))
           CapturedDieUi(
             row: square.row,
             col: square.col,
@@ -115,6 +117,18 @@ final class GameViewStateMapper {
       ],
       celebrate: _isWonByThePlayer(game.status, opponent),
     );
+  }
+
+  /// The captured dice in reading order: top row first, each row from left
+  /// to right, so the screen can take them one at a time in the order a
+  /// person reads the board.
+  static List<MapEntry<Position, Die>> _inReadingOrder(
+    Map<Position, Die> captured,
+  ) {
+    return captured.entries.toList()..sort((a, b) {
+      final byRow = a.key.row.compareTo(b.key.row);
+      return byRow != 0 ? byRow : a.key.col.compareTo(b.key.col);
+    });
   }
 
   /// Whether [status] is a game the player won: against the computer, one

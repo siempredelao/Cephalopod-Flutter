@@ -37,9 +37,10 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// captures, by either side, plays a pop on [soundEffects], and one that
   /// wins the game for the player a chime; the [soundEffects] decide whether
   /// they are heard, as the Sound switch in Settings says. After every
-  /// move, the game runs [moveCountdown], so the player sees what changed
-  /// before anything else moves: taps are ignored, and the computer does
-  /// not reply, until it ends. By default it has no length.
+  /// move, the game runs [moveCountdown] for [settleDurationFor] the number
+  /// of dice the move captured, so the player sees what changed before
+  /// anything else moves: taps are ignored, and the computer does not reply,
+  /// until it ends. By default [settleDurationFor] gives no wait.
   ///
   /// A factory, so that it builds the starting game once and hands it to
   /// `GameBloc._`, which both keeps it and maps the first screen from it.
@@ -57,6 +58,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     GameViewStateMapper gameViewStateMapper = const GameViewStateMapper(),
     bool highlightLastMove = true,
     CountdownTimer? moveCountdown,
+    Duration Function(int captures) settleDurationFor = _noWait,
     GameConfig config = GameConfig.standard,
     @visibleForTesting GameState? position,
   }) {
@@ -71,7 +73,8 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
       gameViewStateMapper: gameViewStateMapper,
       highlightLastMove: highlightLastMove,
       soundEffects: soundEffects,
-      moveCountdown: moveCountdown ?? CountdownTimer(Duration.zero),
+      moveCountdown: moveCountdown ?? CountdownTimer(),
+      settleDurationFor: settleDurationFor,
       currentGame: (
         record: GameRecord(config: config),
         opponent: const FriendOpponent(),
@@ -94,6 +97,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     required this._highlightLastMove,
     required this._soundEffects,
     required this._moveCountdown,
+    required this._settleDurationFor,
     required this._currentGame,
   }) : super(
          _gameViewStateMapper.map(
@@ -128,6 +132,10 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
 
   /// Runs after every move, so the player sees it before the next one.
   final CountdownTimer _moveCountdown;
+
+  /// How long [_moveCountdown] runs after a move that captured the given
+  /// number of dice.
+  final Duration Function(int captures) _settleDurationFor;
 
   /// The game on screen, as the use cases take and give it. The bloc keeps
   /// it here; its state only describes the screen.
@@ -355,6 +363,8 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     _emitScreen(emit);
   }
 
+  static Duration _noWait(int captures) => Duration.zero;
+
   /// The dice [move] captures in [before], the game it is played in, and
   /// where they were. They are gone from the board once it is played.
   static Map<Position, Die> _capturedBy(Move move, GameState before) => {
@@ -405,7 +415,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     _playedMove = playedMove;
     _turnPhase = _phaseOf(game);
     if (playedMove != null) {
-      _moveCountdown.start();
+      _moveCountdown.start(_settleDurationFor(playedMove.captured.length));
     } else {
       _moveCountdown.cancel();
     }

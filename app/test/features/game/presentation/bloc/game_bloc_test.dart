@@ -523,6 +523,34 @@ void main() {
       await bloc.close();
     });
 
+    test('starts it for as long as the move captured dice ask', () async {
+      final bloc =
+          createTestGameBloc(
+              position: figure4,
+              moveCountdown: countdown,
+              settleDurationFor: (captures) => Duration(seconds: captures),
+            )
+            ..add(tap(top))
+            ..add(tap(left))
+            ..add(tap(right))
+            ..add(const CaptureConfirmed());
+      await settle();
+
+      expect(countdown.started, [const Duration(seconds: 2)]);
+      await bloc.close();
+    });
+
+    test('starts it with no wait for a move that captures nothing', () async {
+      final bloc = createTestGameBloc(
+        moveCountdown: countdown,
+        settleDurationFor: (captures) => Duration(seconds: captures),
+      )..add(tap(center));
+      await settle();
+
+      expect(countdown.started, [Duration.zero]);
+      await bloc.close();
+    });
+
     test('ignores taps until the countdown ends', () async {
       final bloc = buildCounting()
         ..add(tap(center))
@@ -1102,8 +1130,8 @@ final class _OffBoardAgent implements GameAgent {
 final class _ManualCountdown implements CountdownTimer {
   Completer<void>? _running;
 
-  @override
-  Duration get duration => Duration.zero;
+  /// The length of each wait it was started with, in order.
+  final List<Duration> started = [];
 
   @override
   bool get isActive => _running != null;
@@ -1112,7 +1140,8 @@ final class _ManualCountdown implements CountdownTimer {
   Future<void> get done => _running?.future ?? Future<void>.value();
 
   @override
-  void start() {
+  void start(Duration duration) {
+    started.add(duration);
     cancel();
     _running = Completer<void>();
   }
