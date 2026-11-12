@@ -84,7 +84,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] S1. feat(game): wait longer after a bigger capture (S)
 - [x] S2a. feat(core): let a square wait before its die shrinks (S)
 - [x] S2b. feat(game): shrink captured dice one at a time (S)
-- [ ] S2c. feat(game): burst captured dice one at a time (S)
+- [x] S2c. feat(game): burst captured dice one at a time (S)
 - [ ] S3. feat(game): pop once per captured die (S)
 - [ ] Checkpoint: verify; by hand on Android: How to play on first launch and from the game, the new Home (demo board, Continue card), a 3- or 4-die capture one die at a time with a pop each
 

@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:cephalopod/core/board/board_durations.dart';
 import 'package:cephalopod/core/board/models/player_ui.dart';
 import 'package:cephalopod/core/theme/board_colors.dart';
+import 'package:cephalopod/features/game/presentation/bloc/move_timing.dart';
 import 'package:cephalopod/features/game/presentation/models/captured_die_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/effects/particles.dart';
 import 'package:flutter/foundation.dart' show listEquals;
@@ -14,8 +15,13 @@ import 'package:material_ui/material_ui.dart';
 /// From each captured square, a ring flashes outward and pieces in the
 /// die's colours fly out, fall a little and fade. The pieces may cross the
 /// squares around it, so the burst is one layer over the whole board, not a
-/// part of each square. It lasts as long as the die shrinking away under
-/// it, so the board has stopped moving when the next move can start.
+/// part of each square. Each die's burst lasts as long as the die shrinking
+/// away under it.
+///
+/// The dice burst one at a time, in the order of [captured], each
+/// [captureStagger] after the one before, as they shrink. So the whole
+/// effect lasts [settleDurationFor] the number of dice: the board has
+/// stopped moving when the next move can start.
 ///
 /// It plays when [captured] changes to dice the move captured, once. There
 /// is none when the device asks for less motion, and a burst still playing
@@ -32,7 +38,7 @@ class CaptureBurst extends StatefulWidget {
   final int rows;
   final int cols;
 
-  /// How long a burst lasts.
+  /// How long the burst of one die lasts.
   static const Duration duration = dieAnimationDuration;
 
   @override
@@ -55,7 +61,8 @@ class _CaptureBurstState extends State<CaptureBurst>
   /// fade.
   static const double _fadeFrom = 0.35;
 
-  /// How far through the burst it is, from 0 to 1.
+  /// How far through the whole effect it is, from 0 to 1. Its length
+  /// depends on the number of dice, and is set when it starts.
   late final AnimationController _run = AnimationController(
     vsync: this,
     duration: CaptureBurst.duration,
@@ -75,7 +82,9 @@ class _CaptureBurstState extends State<CaptureBurst>
     if (widget.captured.isEmpty || MediaQuery.disableAnimationsOf(context)) {
       _run.reset();
     } else {
-      _run.forward(from: 0);
+      _run
+        ..duration = settleDurationFor(widget.captured.length)
+        ..forward(from: 0);
     }
   }
 
@@ -124,12 +133,13 @@ class _CaptureBurstState extends State<CaptureBurst>
     // The same dice always burst the same way, so the burst can be tested.
     final random = math.Random(_seedOf(widget.captured));
     _madeFor = key;
+    final window = _windowOf;
     return _field = ParticleField(
       gravity: Offset(0, side * _gravity),
       drag: _drag,
       fadeFrom: _fadeFrom,
       particles: [
-        for (final die in widget.captured)
+        for (final (index, die) in widget.captured.indexed)
           for (final color in _colorsOf(die, colors))
             ...burstParticles(
               center: _centerOf(die, size),
@@ -138,20 +148,38 @@ class _CaptureBurstState extends State<CaptureBurst>
               pieceSize: side * _pieceSize,
               color: color,
               random: random,
+              startsAt: window(index).start,
+              endsAt: window(index).end,
             ),
       ],
     );
   }
 
-  /// Where each captured square's ring flashes, and in which colour.
-  List<({Offset center, Color color})> _flashesIn(
-    Size size,
-    BoardColors colors,
-  ) {
+  /// Where each captured square's ring flashes, in which colour, and during
+  /// which part of the whole effect.
+  List<Flash> _flashesIn(Size size, BoardColors colors) {
+    final window = _windowOf;
     return [
-      for (final die in widget.captured)
-        (center: _centerOf(die, size), color: _colorsOf(die, colors).last),
+      for (final (index, die) in widget.captured.indexed)
+        (
+          center: _centerOf(die, size),
+          color: _colorsOf(die, colors).last,
+          window: window(index),
+        ),
     ];
+  }
+
+  /// The part of the whole effect, as moments from 0 to 1, during which the
+  /// burst of the die at an index in [CapturedDieUi] order plays.
+  ({double start, double end}) Function(int index) get _windowOf {
+    final total = settleDurationFor(widget.captured.length).inMicroseconds;
+    return (index) {
+      final start = (captureStagger * index).inMicroseconds;
+      return (
+        start: start / total,
+        end: (start + CaptureBurst.duration.inMicroseconds) / total,
+      );
+    };
   }
 
   /// The face colour and the edge colour of [die], in that order.
@@ -180,8 +208,17 @@ class _CaptureBurstState extends State<CaptureBurst>
   }
 }
 
-/// A ring that flashes outward from each captured square at the start of a
-/// burst, and is gone by the time its pieces start to fade.
+/// A ring that flashes from a square at the centre, in a colour, during a
+/// window: the part of the whole effect, from 0 to 1, that its die's burst
+/// takes.
+typedef Flash = ({
+  Offset center,
+  Color color,
+  ({double start, double end}) window,
+});
+
+/// A ring that flashes outward from each captured square at the start of its
+/// die's burst, and is gone by the time its pieces start to fade.
 class _FlashPainter extends CustomPainter {
   const _FlashPainter({
     required this.flashes,
@@ -189,7 +226,7 @@ class _FlashPainter extends CustomPainter {
     required this.progress,
   });
 
-  final List<({Offset center, Color color})> flashes;
+  final List<Flash> flashes;
   final double squareSide;
   final double progress;
 
@@ -203,18 +240,23 @@ class _FlashPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (progress >= _end) {
-      return;
-    }
-    final t = progress / _end;
-    final radius =
-        squareSide * (_startRadius + (_endRadius - _startRadius) * t);
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = squareSide * _strokeWidth * (1 - t);
+    final paint = Paint()..style = PaintingStyle.stroke;
     for (final flash in flashes) {
-      paint.color = flash.color.withValues(alpha: 1 - t);
-      canvas.drawCircle(flash.center, radius, paint);
+      final (:start, :end) = flash.window;
+      // How far through its own burst this die is.
+      final burst = (progress - start) / (end - start);
+      if (burst < 0 || burst >= _end) {
+        continue;
+      }
+      final t = burst / _end;
+      paint
+        ..color = flash.color.withValues(alpha: 1 - t)
+        ..strokeWidth = squareSide * _strokeWidth * (1 - t);
+      canvas.drawCircle(
+        flash.center,
+        squareSide * (_startRadius + (_endRadius - _startRadius) * t),
+        paint,
+      );
     }
   }
 
