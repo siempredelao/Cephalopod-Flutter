@@ -111,7 +111,9 @@ Every push and pull request runs, in order:
 4. Architecture check
 5. Engine tests, 100% line coverage required
 6. App tests, 85% line coverage required
-7. Android APK smoke build
+
+At the same time, a separate job runs an Android APK smoke build, so the two
+finish together instead of one after the other.
 
 Run the same checks locally with `dart run melos run verify`. Optional git
 hooks: install [lefthook](https://lefthook.dev) and run `lefthook install`.
