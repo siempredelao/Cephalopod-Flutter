@@ -808,8 +808,9 @@ small)
   `game_effects.dart`: views may not import the domain, where
   `SoundEffects` lives.
 - **36c. `feat(game): play a sound when the player wins`** (feature, XS).
-  The same moments as the confetti. A winning move that also captures plays
-  only the win sound.
+  The same moments as the confetti. A move plays one sound at most, and a
+  win comes first. No move both captures and wins, though: a capture leaves
+  squares empty, and only a full board ends the game.
 
 Acceptance (36b, 36c):
 - With the fake: each sound plays when it should and not otherwise, and
