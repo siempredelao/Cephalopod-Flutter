@@ -1,4 +1,4 @@
-import 'package:cephalopod/features/game/data/shared_preferences_how_to_play_repository.dart';
+import 'package:cephalopod/features/how_to_play/data/shared_preferences_how_to_play_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';

@@ -1,7 +1,7 @@
-import 'package:cephalopod/features/game/presentation/view/how_to_play/tutorial_progress_text_mapper.dart';
+import 'package:cephalopod/features/how_to_play/presentation/view/tutorial_progress_text_mapper.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../../../../helpers/translations.dart';
+import '../../../../helpers/translations.dart';
 
 void main() {
   const mapper = TutorialProgressTextMapper();

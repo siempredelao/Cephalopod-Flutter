@@ -1,5 +1,5 @@
 import 'package:cephalopod/core/l10n/l10n.dart';
-import 'package:cephalopod/features/game/presentation/models/tutorial_topic.dart';
+import 'package:cephalopod/features/how_to_play/presentation/models/tutorial_topic.dart';
 
 /// Puts a page of How to play into words, in the language on screen: the
 /// title and the explanation of its topic.

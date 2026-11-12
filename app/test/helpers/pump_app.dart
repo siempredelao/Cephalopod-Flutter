@@ -5,10 +5,11 @@ import 'package:cephalopod/features/about/about_module.dart';
 import 'package:cephalopod/features/about/domain/app_version_source.dart';
 import 'package:cephalopod/features/about/domain/link_opener.dart';
 import 'package:cephalopod/features/game/data/in_memory_game_repository.dart';
-import 'package:cephalopod/features/game/data/in_memory_how_to_play_repository.dart';
 import 'package:cephalopod/features/game/domain/sound_effects.dart';
 import 'package:cephalopod/features/game/game_module.dart';
 import 'package:cephalopod/features/home/home_module.dart';
+import 'package:cephalopod/features/how_to_play/data/in_memory_how_to_play_repository.dart';
+import 'package:cephalopod/features/how_to_play/how_to_play_module.dart';
 import 'package:cephalopod/features/settings/data/in_memory_settings_repository.dart';
 import 'package:cephalopod/features/settings/settings_module.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
@@ -42,12 +43,14 @@ Future<void> pumpApp(
   final game = GameModule(
     cephalopodRules: CephalopodRules(),
     gameRepository: InMemoryGameRepository(),
-    howToPlayRepository: InMemoryHowToPlayRepository(
-      seenHowToPlay: !firstLaunch,
-    ),
     soundEffects: soundEffects ?? FakeSoundEffects(),
     highlightLastMove: settings.highlightLastMove,
     soundOn: settings.soundOn,
+  );
+  final howToPlay = HowToPlayModule(
+    howToPlayRepository: InMemoryHowToPlayRepository(
+      seenHowToPlay: !firstLaunch,
+    ),
   );
   final about = AboutModule(
     appVersionSource:
@@ -57,9 +60,9 @@ Future<void> pumpApp(
   final router = createRouter(
     home: HomeModule(
       hasGameToContinue: game.hasGameToContinue,
-      hasSeenHowToPlay: game.hasSeenHowToPlay,
+      hasSeenHowToPlay: howToPlay.hasSeenHowToPlay,
     ),
-    features: [game, settings, about],
+    features: [game, howToPlay, settings, about],
     initialLocation: location,
   );
   await tester.pumpWidget(

@@ -1,5 +1,5 @@
 import 'package:cephalopod/core/errors/error_reporter.dart';
-import 'package:cephalopod/features/game/domain/how_to_play_repository.dart';
+import 'package:cephalopod/features/how_to_play/domain/how_to_play_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// A [HowToPlayRepository] on shared_preferences (docs/adr/0012), with one

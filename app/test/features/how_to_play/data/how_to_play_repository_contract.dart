@@ -1,4 +1,4 @@
-import 'package:cephalopod/features/game/domain/how_to_play_repository.dart';
+import 'package:cephalopod/features/how_to_play/domain/how_to_play_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// What every [HowToPlayRepository] must do. Each implementation's test

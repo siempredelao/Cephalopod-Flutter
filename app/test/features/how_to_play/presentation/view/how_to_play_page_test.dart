@@ -1,15 +1,15 @@
+import 'package:cephalopod/core/board/board_grid.dart';
 import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/core/theme/board_colors.dart';
-import 'package:cephalopod/features/game/data/in_memory_how_to_play_repository.dart';
-import 'package:cephalopod/features/game/presentation/bloc/how_to_play_cubit.dart';
-import 'package:cephalopod/features/game/presentation/bloc/tutorial_steps.dart';
-import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
-import 'package:cephalopod/features/game/presentation/view/how_to_play/step_dots.dart';
-import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
+import 'package:cephalopod/features/how_to_play/data/in_memory_how_to_play_repository.dart';
+import 'package:cephalopod/features/how_to_play/presentation/bloc/how_to_play_cubit.dart';
+import 'package:cephalopod/features/how_to_play/presentation/bloc/tutorial_steps.dart';
+import 'package:cephalopod/features/how_to_play/presentation/view/how_to_play_page.dart';
+import 'package:cephalopod/features/how_to_play/presentation/view/step_dots.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
-import '../../../../../helpers/translations.dart';
+import '../../../../helpers/translations.dart';
 
 void main() {
   late InMemoryHowToPlayRepository repository;
@@ -63,7 +63,7 @@ void main() {
       await pumpTutorial(tester);
 
       expect(find.text(english.howToPlayTakeTurnsTitle), findsOne);
-      expect(find.byType(GameBoard), findsOne);
+      expect(find.byType(BoardGrid), findsOne);
     });
 
     testWidgets('counts as seen once it opens', (tester) async {
@@ -125,11 +125,11 @@ void main() {
       tester,
     ) async {
       await pumpTutorial(tester);
-      final first = tester.getRect(find.byType(GameBoard));
+      final first = tester.getRect(find.byType(BoardGrid));
 
       for (var step = 1; step < tutorialSteps.length; step++) {
         await tapNext(tester);
-        expect(tester.getRect(find.byType(GameBoard)), first);
+        expect(tester.getRect(find.byType(BoardGrid)), first);
       }
     });
 

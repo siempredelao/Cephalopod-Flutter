@@ -1,10 +1,10 @@
 import 'package:bloc/bloc.dart';
-import 'package:cephalopod/features/game/domain/how_to_play_repository.dart';
-import 'package:cephalopod/features/game/presentation/bloc/tutorial_step_ui_mapper.dart';
-import 'package:cephalopod/features/game/presentation/bloc/tutorial_steps.dart';
-import 'package:cephalopod/features/game/presentation/models/how_to_play_view_state.dart';
-import 'package:cephalopod/features/game/presentation/models/tutorial_right_button_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/tutorial_step_ui.dart';
+import 'package:cephalopod/features/how_to_play/domain/how_to_play_repository.dart';
+import 'package:cephalopod/features/how_to_play/presentation/bloc/tutorial_step_ui_mapper.dart';
+import 'package:cephalopod/features/how_to_play/presentation/bloc/tutorial_steps.dart';
+import 'package:cephalopod/features/how_to_play/presentation/models/how_to_play_view_state.dart';
+import 'package:cephalopod/features/how_to_play/presentation/models/tutorial_right_button_ui.dart';
+import 'package:cephalopod/features/how_to_play/presentation/models/tutorial_step_ui.dart';
 
 /// How to play's view model: maps the tutorial's steps to pages once, and
 /// follows which page is on screen. It starts on the first, and remembers

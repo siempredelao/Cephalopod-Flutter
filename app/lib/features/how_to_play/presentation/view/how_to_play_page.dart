@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:cephalopod/core/l10n/l10n.dart';
-import 'package:cephalopod/features/game/presentation/bloc/how_to_play_cubit.dart';
-import 'package:cephalopod/features/game/presentation/models/how_to_play_view_state.dart';
-import 'package:cephalopod/features/game/presentation/models/tutorial_right_button_ui.dart';
-import 'package:cephalopod/features/game/presentation/view/how_to_play/step_dots.dart';
-import 'package:cephalopod/features/game/presentation/view/how_to_play/tutorial_step_view.dart';
+import 'package:cephalopod/features/how_to_play/presentation/bloc/how_to_play_cubit.dart';
+import 'package:cephalopod/features/how_to_play/presentation/models/how_to_play_view_state.dart';
+import 'package:cephalopod/features/how_to_play/presentation/models/tutorial_right_button_ui.dart';
+import 'package:cephalopod/features/how_to_play/presentation/view/step_dots.dart';
+import 'package:cephalopod/features/how_to_play/presentation/view/tutorial_step_view.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
