@@ -871,10 +871,11 @@ Answers from the user (2026-11-12):
 | 8 | HM3 · the game describes its saved game for Home | foundation | S |
 | 9 | HM4a · a board drawn as a small picture | foundation | S |
 | 10 | HM4b · Home holds the saved game, not only whether there is one | refactor | S |
-| 11 | HM4c · continue from a card that shows the saved game | feature | S |
-| 12 | S1 · wait longer after a bigger capture | feature | S |
-| 13 | S2 · captured dice shrink and burst one at a time | feature | S |
-| 14 | S3 · one pop per captured die | feature | S |
+| 11 | HM4c · the saved game worded for the card | foundation | S |
+| 12 | HM4d · continue from a card that shows the saved game | feature | S |
+| 13 | S1 · wait longer after a bigger capture | feature | S |
+| 14 | S2 · captured dice shrink and burst one at a time | feature | S |
+| 15 | S3 · one pop per captured die | feature | S |
 
 H1–H4 come first: the Home board, the card's thumbnail and S2 all need the
 board's drawing in `core/`, where Home can use it without importing the
@@ -955,7 +956,7 @@ images.
   - `GameModule` gives it through a plain function, as it gave
     `hasGameToContinue`, which it replaces. Home's cubit only checks that
     there is one. Nothing draws it yet.
-- **HM4. Continue from a card that shows the saved game**, in three PRs
+- **HM4. Continue from a card that shows the saved game**, in four PRs
   (the first attempt was one PR and was too long to review):
   - **HM4a. `feat(core): draw a board as a small picture`** (foundation):
     a new `BoardThumbnail` in `core/board`: coloured squares without
@@ -964,10 +965,13 @@ images.
   - **HM4b. `refactor(home): let Home hold the saved game`**: Home's state
     carries a `SavedGameUi` (built by a mapper from HM3's summary) instead
     of "can continue". Home looks the same.
-  - **HM4c. `feat(home): continue from a card that shows the saved game`**:
+  - **HM4c. `feat(home): word the saved game for the card`**: a Home text
+    mapper, `SavedGameTextMapper`, and its strings in both languages: "vs
+    Computer · Hard", "Your turn · you 5, computer 5", and what a screen
+    reader says for the card. Nothing uses it yet.
+  - **HM4d. `feat(home): continue from a card that shows the saved game`**:
     - When a game is saved, Continue becomes a card.
-    - The card has the thumbnail, then "vs Computer · Hard" and "Your turn
-      · you 5, computer 5", worded by a Home text mapper in both languages.
+    - The card has the thumbnail and those words.
     - New game becomes the second, softer button.
 
 **S1–S3. Captured dice one at a time.** The timing lives in

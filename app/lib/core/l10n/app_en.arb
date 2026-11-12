@@ -14,6 +14,108 @@
   "@homeContinue": {
     "description": "Home: button that picks up the saved game."
   },
+  "homeContinueFriend": "vs a friend",
+  "@homeContinueFriend": {
+    "description": "Home: on the card of the saved game, the opponent when it is another person on the same device."
+  },
+  "homeContinueComputer": "vs Computer · {level}",
+  "@homeContinueComputer": {
+    "description": "Home: on the card of the saved game, the opponent when it is the computer. {level} is newGameEasy, newGameMedium or newGameHard.",
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "homeContinueTurnPerson": "Your turn",
+  "@homeContinueTurnPerson": {
+    "description": "Home: on the card of the saved game, when it is the person's turn against the computer."
+  },
+  "homeContinueTurnComputer": "Computer's turn",
+  "@homeContinueTurnComputer": {
+    "description": "Home: on the card of the saved game, when it is the computer's turn."
+  },
+  "homeContinueTurnPlayer": "{player}'s turn",
+  "@homeContinueTurnPlayer": {
+    "description": "Home: on the card of the saved game between two people, whose turn it is. {player} is gamePlayerName.",
+    "placeholders": {
+      "player": {
+        "type": "String"
+      }
+    }
+  },
+  "homeContinueDiceYou": "you\u00a0{count}",
+  "@homeContinueDiceYou": {
+    "description": "Home: on the card of the saved game, how many dice the person has on the board. Short, as it is followed by the other side's. A no-break space joins the word to the number, so they wrap together.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeContinueDiceComputer": "computer\u00a0{count}",
+  "@homeContinueDiceComputer": {
+    "description": "Home: on the card of the saved game, how many dice the computer has on the board. Short, like homeContinueDiceYou.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeContinueDicePlayer": "{player}:\u00a0{count}",
+  "@homeContinueDicePlayer": {
+    "description": "Home: on the card of the saved game between two people, how many dice a player has on the board. {player} is gamePlayerName.",
+    "placeholders": {
+      "player": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeContinueTally": "{first}, {second}",
+  "@homeContinueTally": {
+    "description": "Home: on the card of the saved game, the dice of both sides, Player 1's first.",
+    "placeholders": {
+      "first": {
+        "type": "String"
+      },
+      "second": {
+        "type": "String"
+      }
+    }
+  },
+  "homeContinueDetails": "{turn} · {tally}",
+  "@homeContinueDetails": {
+    "description": "Home: on the card of the saved game, the line with whose turn it is and the dice of both sides.",
+    "placeholders": {
+      "turn": {
+        "type": "String"
+      },
+      "tally": {
+        "type": "String"
+      }
+    }
+  },
+  "homeContinueSpoken": "{title}. {opponent}. {turn}. {tally}",
+  "@homeContinueSpoken": {
+    "description": "Home: what a screen reader says for the card of the saved game. {title} is homeContinue, {opponent} is homeContinueFriend or homeContinueComputer, {turn} is the player to move, and {tally} is gameTallySpoken.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "opponent": {
+        "type": "String"
+      },
+      "turn": {
+        "type": "String"
+      },
+      "tally": {
+        "type": "String"
+      }
+    }
+  },
   "homeNewGame": "New game",
   "@homeNewGame": {
     "description": "Home: button that opens the new-game dialog."
