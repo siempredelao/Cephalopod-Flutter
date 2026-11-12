@@ -114,7 +114,7 @@ class HomeView extends StatelessWidget {
                             ),
                           ),
                         ),
-                        if (state.canContinue) ...[
+                        if (state.savedGame != null) ...[
                           FilledButton(
                             style: mainButtonStyle,
                             onPressed: () => _continue(context),

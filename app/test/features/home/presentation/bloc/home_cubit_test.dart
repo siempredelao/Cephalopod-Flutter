@@ -2,14 +2,17 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:cephalopod/features/home/presentation/bloc/demo_script.dart';
 import 'package:cephalopod/features/home/presentation/bloc/demo_ui_mapper.dart';
 import 'package:cephalopod/features/home/presentation/bloc/home_cubit.dart';
+import 'package:cephalopod/features/home/presentation/bloc/saved_game_ui_mapper.dart';
 import 'package:cephalopod/features/home/presentation/models/home_view_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../helpers/saved_game_summary.dart';
 
 void main() {
-  const savedGame = HomeViewState(canContinue: true);
-  const noSavedGame = HomeViewState(canContinue: false);
+  final savedGame = HomeViewState(
+    savedGame: const SavedGameUiMapper().map(savedGameSummary),
+  );
+  const noSavedGame = HomeViewState();
 
   group('HomeCubit', () {
     test('starts without a game to continue', () {
