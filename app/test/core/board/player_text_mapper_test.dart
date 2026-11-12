@@ -1,8 +1,8 @@
 import 'package:cephalopod/core/board/models/player_ui.dart';
-import 'package:cephalopod/features/game/presentation/view/player_text_mapper.dart';
+import 'package:cephalopod/core/board/player_text_mapper.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../../../helpers/translations.dart';
+import '../../helpers/translations.dart';
 
 void main() {
   const mapper = PlayerTextMapper();

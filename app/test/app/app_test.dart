@@ -1,4 +1,5 @@
 import 'package:cephalopod/app/flavor.dart';
+import 'package:cephalopod/core/board/board_square.dart';
 import 'package:cephalopod/core/board/models/square_mark.dart';
 import 'package:cephalopod/features/about/presentation/view/about_page.dart';
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
@@ -7,7 +8,6 @@ import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
 import 'package:cephalopod/features/game/presentation/view/new_game_dialog.dart';
-import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
 import 'package:cephalopod/features/home/presentation/view/home_page.dart';
 import 'package:cephalopod/features/settings/presentation/view/settings_page.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';

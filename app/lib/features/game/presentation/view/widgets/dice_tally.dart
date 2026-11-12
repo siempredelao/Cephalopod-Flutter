@@ -1,8 +1,8 @@
+import 'package:cephalopod/core/board/die_face.dart';
 import 'package:cephalopod/core/board/models/die_ui.dart';
 import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/features/game/presentation/models/dice_tally_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/dice_tally_text_mapper.dart';
-import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// How many dice each side has on the board: a chip per side, Player 1's

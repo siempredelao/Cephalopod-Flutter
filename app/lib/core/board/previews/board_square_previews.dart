@@ -1,11 +1,11 @@
+import 'package:cephalopod/core/board/board_square.dart';
 import 'package:cephalopod/core/board/models/die_ui.dart';
 import 'package:cephalopod/core/board/models/player_ui.dart';
 import 'package:cephalopod/core/board/models/role_ui.dart';
 import 'package:cephalopod/core/board/models/side_ui.dart';
 import 'package:cephalopod/core/board/models/square_mark.dart';
 import 'package:cephalopod/core/board/models/square_ui.dart';
-import 'package:cephalopod/features/game/presentation/view/previews/board_preview_wrapper.dart';
-import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
+import 'package:cephalopod/core/board/previews/board_preview_wrapper.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:material_ui/material_ui.dart';
 

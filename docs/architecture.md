@@ -28,7 +28,7 @@ by feature first and by layer second.
 | Domain | `features/<f>/domain` | Use cases, repository interfaces | `core`, engine. **No Flutter** |
 | Data | `features/<f>/data` | Repository implementations, DTOs, services | Own `domain`, `core`, engine |
 | Module | `features/<f>/<f>_module.dart` | The feature's wiring and its routes | Own feature, `core`, engine, Flutter |
-| Core | `core` | Code shared by features: route names, the `FeatureModule` interface, theme, shared widgets | `core`, engine, Flutter |
+| Core | `core` | Code shared by features: route names, the `FeatureModule` interface, theme, the board's models and drawing, shared widgets | `core`, engine, Flutter |
 | App | `app` | `App` widget, router, theme, composition root | Anything |
 
 Inside presentation, views render UI models

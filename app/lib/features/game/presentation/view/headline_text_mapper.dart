@@ -1,6 +1,6 @@
+import 'package:cephalopod/core/board/player_text_mapper.dart';
 import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/features/game/presentation/models/headline_ui.dart';
-import 'package:cephalopod/features/game/presentation/view/player_text_mapper.dart';
 
 /// Puts the headline above the board into words, in the language on screen:
 /// what the game waits for, or how it ended, winner first. Against the

@@ -899,10 +899,12 @@ play moves out. All four are refactors, and the goldens don't change.
   `BoardUi`, `SquareUi`, `DieUi`, `SideUi`, `PlayerUi`, `RoleUi` and
   `SquareMark` move to `core/board/models/`. Only imports change.
 - **H2. `refactor(core): move the board's drawing to core`**:
-  `BoardSquare`, `SquareRing`, `DieFace`, `SquareTextMapper` and
-  `dieAnimationDuration` move to `core/board/`, with their previews. A new
-  `BoardGrid` is today's grid. The game's `GameBoard` becomes `BoardGrid`
-  plus the `CaptureBurst` layer, which stays in the game feature.
+  `BoardSquare`, `SquareRing`, `DieFace`, `SquareTextMapper`,
+  `PlayerTextMapper` (which `SquareTextMapper` uses) and
+  `dieAnimationDuration` move to `core/board/`, with their previews and
+  tests. A new `BoardGrid` is today's grid, with an optional `overlay` drawn
+  over the squares. The game's `GameBoard` becomes `BoardGrid` plus the
+  `CaptureBurst` layer as its overlay, which stays in the game feature.
 - **H3. `refactor(game): let the board mapper take marks, not a turn
   phase`**: a core `BoardUiMapper` builds a `BoardUi` from an engine
   `Board`, each player's `SideUi` and a map of square marks. The game's

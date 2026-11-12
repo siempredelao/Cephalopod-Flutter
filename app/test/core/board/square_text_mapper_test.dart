@@ -4,10 +4,10 @@ import 'package:cephalopod/core/board/models/role_ui.dart';
 import 'package:cephalopod/core/board/models/side_ui.dart';
 import 'package:cephalopod/core/board/models/square_mark.dart';
 import 'package:cephalopod/core/board/models/square_ui.dart';
-import 'package:cephalopod/features/game/presentation/view/square_text_mapper.dart';
+import 'package:cephalopod/core/board/square_text_mapper.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../../../helpers/translations.dart';
+import '../../helpers/translations.dart';
 
 void main() {
   const mapper = SquareTextMapper();

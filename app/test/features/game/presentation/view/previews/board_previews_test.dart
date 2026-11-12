@@ -1,17 +1,13 @@
-import 'package:cephalopod/core/board/models/square_mark.dart';
+import 'package:cephalopod/core/board/die_face.dart';
+import 'package:cephalopod/core/board/previews/board_preview_wrapper.dart';
 import 'package:cephalopod/core/l10n/l10n.dart';
-import 'package:cephalopod/features/game/presentation/view/previews/board_preview_wrapper.dart';
-import 'package:cephalopod/features/game/presentation/view/previews/board_square_previews.dart';
-import 'package:cephalopod/features/game/presentation/view/previews/die_face_previews.dart';
 import 'package:cephalopod/features/game/presentation/view/previews/game_board_previews.dart';
-import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
-import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// Builds every preview the way the previewer does, so a preview that stops
-/// rendering fails CI instead of the IDE panel.
+/// Builds the game board's previews the way the previewer does, so a preview
+/// that stops rendering fails CI instead of the IDE panel.
 void main() {
   Future<void> pumpPreview(WidgetTester tester, Widget preview) {
     final wrapped = boardPreviewWrapper(preview);
@@ -23,24 +19,7 @@ void main() {
     return tester.pumpWidget(app);
   }
 
-  group('Board previews', () {
-    testWidgets('show every die value for both players', (tester) async {
-      await pumpPreview(tester, player1DicePreview());
-      expect(find.byType(DieFace), findsNWidgets(6));
-
-      await pumpPreview(tester, player2DicePreview());
-      expect(find.byType(DieFace), findsNWidgets(6));
-    });
-
-    testWidgets('show a square for every mark', (tester) async {
-      await pumpPreview(tester, emptySquaresPreview());
-      expect(find.byType(BoardSquare), findsNWidgets(SquareMark.values.length));
-      expect(find.byType(DieFace), findsNothing);
-
-      await pumpPreview(tester, occupiedSquaresPreview());
-      expect(find.byType(DieFace), findsNWidgets(SquareMark.values.length));
-    });
-
+  group('Game board previews', () {
     testWidgets('show a new game, a game in progress and a capture', (
       tester,
     ) async {

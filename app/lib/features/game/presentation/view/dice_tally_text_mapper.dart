@@ -1,8 +1,8 @@
 import 'package:cephalopod/core/board/models/role_ui.dart';
 import 'package:cephalopod/core/board/models/side_ui.dart';
+import 'package:cephalopod/core/board/player_text_mapper.dart';
 import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/features/game/presentation/models/dice_tally_ui.dart';
-import 'package:cephalopod/features/game/presentation/view/player_text_mapper.dart';
 
 /// Words the dice count above the board, in the language on screen: each
 /// side's name, and what a screen reader says for the whole count.
