@@ -253,10 +253,10 @@ Acceptance:
 - Set `FLUTTER_VERSION` in `ci.yaml` to 3.47.9.
 
 ### Checkpoint: ready for M5
-- [ ] `dart run melos run verify` passes
-- [ ] By hand on Android: a game against Hard; leave mid-search and start a
+- [x] `dart run melos run verify` passes
+- [x] By hand on Android: a game against Hard; leave mid-search and start a
       game against a friend, then reopen the app; change the theme at
-      startup
+      startup (checked on a Pixel 10, 2026-11-12)
 
 ## M5: English and Spanish (first within M5)
 
@@ -835,9 +835,213 @@ Acceptance (36b, 36c):
    was seen" were approved before any feature. The store is How to play's,
    in the game feature (changed in #94 from Home's).
 
+## M6 follow-ups (planned 2026-11-12)
+
+Ideas raised during M6 were parked until M6 was done, then planned here
+together with a new Home screen. They come before M7, because they change
+screens and files that M7's translations and screenshots then cover once.
+
+Answers from the user (2026-11-12):
+- **Captured dice go one at a time.** Each die keeps the full 500 ms shrink,
+  the dice start 150 ms apart, and the wait after a move grows with the
+  number of dice captured.
+- **One pop per captured die**, timed with its burst.
+- **The licenses screen stays in M7.**
+- **Home gets a new look** (the user: "not attractive at all for the
+  player"). From mockups, the user chose all of these:
+  - a live demo board on top that plays a capture on a loop
+  - one big main button, with How to play, Settings and About as a row of
+    icons at the bottom
+  - a Continue card that shows the saved game
+  - a teal background
+  - a shorter tagline
+- **Whether the app needs a DI library is set aside for now.**
+
+### Order
+
+| # | PR | Kind | Size |
+| --- | --- | --- | --- |
+| 1 | T1 · one test file per use case | test | S |
+| 2 | H1 · the board's UI models move to `core/` | refactor | S |
+| 3 | H2 · the board's drawing moves to `core/` | refactor | S |
+| 4 | H3 · the board mapper takes marks, not a turn phase | refactor | S |
+| 5 | H4 · How to play becomes its own feature | refactor | S–M |
+| 6 | HM1 · a clearer Home: one main button, icons below, teal background, shorter tagline | feature | S |
+| 7 | HM2 · a demo board on Home that plays a capture | feature | S |
+| 8 | HM3 · the game describes its saved game for Home | foundation | S |
+| 9 | HM4 · continue from a card that shows the saved game | feature | S |
+| 10 | S1 · wait longer after a bigger capture | feature | S |
+| 11 | S2 · captured dice shrink and burst one at a time | feature | S |
+| 12 | S3 · one pop per captured die | feature | S |
+
+H1–H4 come first: the Home board, the card's thumbnail and S2 all need the
+board's drawing in `core/`, where Home can use it without importing the
+game feature.
+
+### Tasks
+
+**T1. `test(game): one test file per use case`** (S)
+- `game_use_cases_test.dart` (416 lines, 7 groups) becomes one file per use
+  case, named after its source file.
+- The shared setup goes to `test/helpers/use_case_fixture.dart`: the rules,
+  positions, opponents, in-memory repository, the four use cases, `saved()`
+  and `play()`. `_FixedAgent` joins `FirstMoveAgent` in
+  `test/helpers/computer_turns.dart`.
+- Acceptance: no test changes what it checks; the test count and coverage
+  stay the same.
+
+**H1–H4. How to play becomes its own feature.** How to play lives in the
+game feature only because its example boards use the game's board drawing
+and `BoardUiMapper`. That mapper needs the game's `TurnPhase`, `HintState`
+and `Opponent`. So the drawing moves to `core/board/` first, then How to
+play moves out. All four are refactors, and the goldens don't change.
+- **H1. `refactor(core): move the board's UI models to core`**:
+  `BoardUi`, `SquareUi`, `DieUi`, `SideUi`, `PlayerUi`, `RoleUi` and
+  `SquareMark` move to `core/board/models/`. Only imports change.
+- **H2. `refactor(core): move the board's drawing to core`**:
+  `BoardSquare`, `SquareRing`, `DieFace`, `SquareTextMapper` and
+  `dieAnimationDuration` move to `core/board/`, with their previews. A new
+  `BoardGrid` is today's grid. The game's `GameBoard` becomes `BoardGrid`
+  plus the `CaptureBurst` layer, which stays in the game feature.
+- **H3. `refactor(game): let the board mapper take marks, not a turn
+  phase`**: a core `BoardUiMapper` builds a `BoardUi` from an engine
+  `Board`, each player's `SideUi` and a map of square marks. The game's
+  mapper still works out the marks and sides, then calls it. A tutorial
+  example states its marks and sides directly.
+- **H4. `refactor(how_to_play): make How to play a feature of its own`**:
+  `features/how_to_play/` gets the repository, its two implementations, the
+  cubit, steps, mappers, view state, page and its widgets, and a module with
+  the route and `hasSeenHowToPlay`. `GameModule` loses them, and the game's
+  app bar still opens How to play by route name. Tests and goldens move
+  with them. If it grows well past 300 lines, split it first.
+
+**HM1–HM4. A new Home.** Mockups (2026-11-12): the PR that added this
+plan shows them. Each PR redraws the Home goldens and shows the old and new
+images.
+- **HM1. `feat(home): make Home clearer`**:
+  - One full-width main button.
+  - How to play, Settings and About become a row of icon-and-label buttons
+    at the bottom.
+  - A teal gradient from the top (the theme's primary container fading into
+    the surface), in light and dark.
+  - A shorter tagline: "Place dice. Add them up. Capture." and a Spanish
+    line to match.
+  - The title stays text, for now.
+  - Accessibility test: every button keeps its label.
+- **HM2. `feat(home): show a board that plays a capture`**:
+  - A 3 × 3 board above the title, drawn with `core/board`'s `BoardGrid`.
+  - It loops a scripted capture: dice grow in, one captures its neighbours,
+    and the sum appears.
+  - The frames are plain data with their timing, tested on their own.
+  - It is decorative, so screen readers skip it. Under reduced motion it
+    shows one still frame.
+  - No burst on Home, since the particles stay in the game feature.
+- **HM3. `feat(game): describe the saved game for Home`** (foundation):
+  - A small core model with the saved game's board, the opponent, whose
+    turn it is and each side's dice count.
+  - `GameModule` gives it through a plain function, as it gives
+    `hasGameToContinue` today, which it replaces. Nothing draws it yet.
+- **HM4. `feat(home): continue from a card that shows the saved game`**:
+  - When a game is saved, Continue becomes a card.
+  - The card has a thumbnail of the board: a new `BoardThumbnail` in
+    `core/board`, coloured squares without pips, because the full board's
+    gaps hide the dice at that size.
+  - Next to it, "vs Computer · Hard" and "Your turn · you 5, computer 5",
+    worded by a Home text mapper in both languages.
+  - New game becomes the second, softer button.
+
+**S1–S3. Captured dice one at a time.** The timing lives in
+`features/game/presentation/bloc/move_timing.dart`:
+- `captureStagger` is 150 ms.
+- Die `i` of a capture (in reading order) starts `i × 150 ms` after the
+  move shows.
+- `settleDurationFor(n)` is 500 ms + `(n − 1) × 150 ms`, and 500 ms with no
+  capture. So 4 dice wait 950 ms.
+
+- **S1. `feat(game): wait longer after a bigger capture`**:
+  - `PlayedMoveUi.captured` comes in reading order.
+  - `CountdownTimer.start` takes the length of the wait, which the bloc
+    sets from the move's captures. `moveSettleDuration` goes.
+- **S2. `feat(game): shrink and burst captured dice one at a time`**:
+  - `BoardSquare` takes an optional `shrinkDelay`.
+  - `CaptureBurst` gives each die's pieces their own start.
+  - Reduced motion still shows nothing, and undo and redo stay instant.
+  - A short screen recording goes in the PR.
+- **S3. `feat(game): pop once per captured die`**:
+  - The bloc plays one `playCapture()` per die, 150 ms apart.
+  - Pops still waiting are cancelled when the board changes or the bloc
+    closes.
+  - Tested with `fake_async`, and by ear on a phone.
+
+### Checkpoint
+
+`verify` green. By hand on Android:
+- How to play opens on first launch and from the game.
+- Home's board plays its capture, and stands still under reduced motion.
+- The Continue card shows the saved game.
+- A 3- or 4-die capture goes one die at a time, with a pop each, and the
+  computer waits for it.
+
 ## M7: Google Play
 
-- Crash reporting goes into Task 4's reporter.
+### Order (planned 2026-11-12)
+
+| # | PR | Kind | Size |
+| --- | --- | --- | --- |
+| 1 | feat(about): show the open-source licenses | feature | S |
+| 2 | L1 · get ready for more languages | foundation | S |
+| 3 | L2 · French, Italian, Portuguese (Brazil) | feature | M |
+| 4 | L3 · German, Dutch, Danish, Norwegian, Swedish | feature | M |
+| 5 | L4 · Polish, Turkish | feature | S |
+| 6 | R1 · the review feature counts finished games (`in_app_review`, ADR) | foundation | S |
+| 7 | R2 · ask for a review after a game | feature | S |
+| 8 | R3 · "Rate the app" on About | feature | XS |
+| 9 | I1 · launcher icons from `art/` | feature | S |
+| 10 | I2 · splash screen | feature | S |
+| 11 | P1 · sign release builds | build | S |
+| 12 | E1 · an on-device test plays, saves and resumes a game | test | S |
+| 13 | E2 · the same test takes the store screenshots | test | S |
+| 14 | docs: the store listing in English and Spanish | docs | S |
+
+The licenses screen comes first so L2–L4 translate its link with everything
+else. The languages come before the screenshots, which are made once per
+language.
+
+- **No crash reporting in the first release** (decided 2026-11-12). Errors
+  still go to `logError`, and Play Console's Android vitals show native
+  crashes and freezes. The Data safety form can then say no data is
+  collected. A service can be added later behind the same `ErrorReporter`,
+  without changing its callers.
+- **I1. `feat(app): use the Cephalopod icon on the launcher`** (S). The
+  launcher still shows Flutter's default icon. `flutter_launcher_icons`
+  (a dev dependency, with a short ADR) makes every Android size from `art/`:
+  - the adaptive background and foreground layers
+  - the monochrome layer, for Android 13 themed icons
+
+  `art/README.md` already has the settings.
+- **I2. `feat(app): show the icon on the splash screen`** (S). Android 12+
+  draws the splash from the theme: the background in the app's colours,
+  light and dark, with the icon's foreground. The older `launch_background`
+  matches it.
+- **P1. `build(android): sign release builds`** (S).
+  - The build reads an upload key from `android/key.properties`, which git
+    ignores, and falls back to debug signing without it, so CI still
+    builds.
+  - The README says how to make the key and back it up.
+  - Check `versionCode` and `versionName`, `targetSdk` against Play's
+    current minimum, and the app id `gc.david.cephalopod`.
+- **By hand in Play Console (the user):**
+  - the account, and Play App Signing with P1's key
+  - the listing: texts, screenshots, the icon and the feature graphic
+  - Data safety: no data collected or shared
+  - the content rating, and a privacy policy URL if asked
+  - internal testing, then production
+- **Checkpoint:**
+  - `verify` green, and E1 passes on an emulator.
+  - A signed bundle is installed from internal testing.
+  - The rating prompt shows after the 3rd game.
+  - Each language shows when the phone uses it.
+  - About → Licenses lists the packages.
 - **Play Store screenshots, made by a test.** An `integration_test` runs the
   real app on an emulator, sets up each moment (a game mid-capture, the
   new-game dialog with the computer chosen, How to play, the dark theme),

@@ -147,12 +147,15 @@ differently, and fail every golden.
 - [x] **M5 · Polish**: accessibility, English and Spanish, placement and capture
   animations, light and dark board palettes, rule-sheet link and app version on
   About, goldens
-- [ ] **M6 · UX**: How to play on first launch, a simpler game app bar, a dice
+- [x] **M6 · UX**: How to play on first launch, a simpler game app bar, a dice
   count, a hint, effects and sounds for captures and wins. (The first M6, a web
   release, was dropped with the web build.)
-- [ ] **M7 · Google Play**: twelve languages, launcher icons and splash screen,
-  crash reporting, a rating prompt, release signing, store listing and
-  screenshots
+- [ ] **M6 follow-ups**: a new Home screen with a board that plays a capture,
+  How to play as a feature of its own, and captured dice that burst one at
+  a time with a pop each
+- [ ] **M7 · Google Play**: twelve languages, an open-source licenses screen,
+  launcher icons and splash screen, a rating prompt, release signing, store
+  listing and screenshots
 
 ## Contributing
 
