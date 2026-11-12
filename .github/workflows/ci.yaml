@@ -53,7 +53,9 @@ jobs:
 
   build:
     name: Smoke build (${{ matrix.platform }})
-    needs: verify
+    # No `needs: verify`: the two jobs are independent, so they run side by
+    # side and a pull request waits for the slower one instead of for both.
+    # The cost is that this job still runs when verify fails.
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
