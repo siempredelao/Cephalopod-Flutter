@@ -869,10 +869,12 @@ Answers from the user (2026-11-12):
 | 6 | HM1 · a clearer Home: one main button, icons below, teal background, shorter tagline | feature | S |
 | 7 | HM2 · a demo board on Home that plays a capture | feature | S |
 | 8 | HM3 · the game describes its saved game for Home | foundation | S |
-| 9 | HM4 · continue from a card that shows the saved game | feature | S |
-| 10 | S1 · wait longer after a bigger capture | feature | S |
-| 11 | S2 · captured dice shrink and burst one at a time | feature | S |
-| 12 | S3 · one pop per captured die | feature | S |
+| 9 | HM4a · a board drawn as a small picture | foundation | S |
+| 10 | HM4b · Home holds the saved game, not only whether there is one | refactor | S |
+| 11 | HM4c · continue from a card that shows the saved game | feature | S |
+| 12 | S1 · wait longer after a bigger capture | feature | S |
+| 13 | S2 · captured dice shrink and burst one at a time | feature | S |
+| 14 | S3 · one pop per captured die | feature | S |
 
 H1–H4 come first: the Home board, the card's thumbnail and S2 all need the
 board's drawing in `core/`, where Home can use it without importing the
@@ -953,14 +955,20 @@ images.
   - `GameModule` gives it through a plain function, as it gave
     `hasGameToContinue`, which it replaces. Home's cubit only checks that
     there is one. Nothing draws it yet.
-- **HM4. `feat(home): continue from a card that shows the saved game`**:
-  - When a game is saved, Continue becomes a card.
-  - The card has a thumbnail of the board: a new `BoardThumbnail` in
-    `core/board`, coloured squares without pips, because the full board's
-    gaps hide the dice at that size.
-  - Next to it, "vs Computer · Hard" and "Your turn · you 5, computer 5",
-    worded by a Home text mapper in both languages.
-  - New game becomes the second, softer button.
+- **HM4. Continue from a card that shows the saved game**, in three PRs
+  (the first attempt was one PR and was too long to review):
+  - **HM4a. `feat(core): draw a board as a small picture`** (foundation):
+    a new `BoardThumbnail` in `core/board`: coloured squares without
+    pips, because the full board's gaps hide the dice at that size. Nothing
+    uses it yet.
+  - **HM4b. `refactor(home): let Home hold the saved game`**: Home's state
+    carries a `SavedGameUi` (built by a mapper from HM3's summary) instead
+    of "can continue". Home looks the same.
+  - **HM4c. `feat(home): continue from a card that shows the saved game`**:
+    - When a game is saved, Continue becomes a card.
+    - The card has the thumbnail, then "vs Computer · Hard" and "Your turn
+      · you 5, computer 5", worded by a Home text mapper in both languages.
+    - New game becomes the second, softer button.
 
 **S1–S3. Captured dice one at a time.** The timing lives in
 `features/game/presentation/bloc/move_timing.dart`:
