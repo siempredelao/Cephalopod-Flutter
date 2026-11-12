@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../../helpers/localized_app.dart';
+import '../../../../helpers/saved_game_summary.dart';
 
 void main() {
   group('HomePage', () {
@@ -21,7 +22,8 @@ void main() {
             data: ThemeData(extensions: const [BoardColors.light]),
             child: HomePage(
               createCubit: () => HomeCubit(
-                hasGameToContinue: () async => hasGameToContinue,
+                savedGameSummary: () async =>
+                    hasGameToContinue ? savedGameSummary : null,
                 hasSeenHowToPlay: () async => true,
               ),
             ),
