@@ -52,6 +52,8 @@ void main() {
     WidgetTester tester,
     BoardUi board, {
     ValueChanged<SquareUi>? onSquareTapped,
+    Duration Function(SquareUi square)? shrinkDelayOf,
+    bool animateDice = false,
   }) {
     return tester.pumpWidget(
       MaterialApp(
@@ -59,7 +61,18 @@ void main() {
         supportedLocales: AppLocalizations.supportedLocales,
         theme: ThemeData(extensions: const [BoardColors.light]),
         home: Center(
-          child: BoardGrid(board: board, onSquareTapped: onSquareTapped),
+          child: shrinkDelayOf == null
+              ? BoardGrid(
+                  board: board,
+                  onSquareTapped: onSquareTapped,
+                  animateDice: animateDice,
+                )
+              : BoardGrid(
+                  board: board,
+                  onSquareTapped: onSquareTapped,
+                  animateDice: animateDice,
+                  shrinkDelayOf: shrinkDelayOf,
+                ),
         ),
       ),
     );
@@ -148,6 +161,59 @@ void main() {
       await pumpBoard(tester, figure4);
 
       expect(squareAt(tester, 0, 2).onTap, isNull);
+    });
+
+    testWidgets('gives each square its own shrink delay', (tester) async {
+      Duration delayOf(SquareUi square) =>
+          Duration(milliseconds: 100 * square.col);
+
+      await pumpBoard(tester, figure4, shrinkDelayOf: delayOf);
+
+      expect(
+        squareAt(tester, 0, 1).shrinkDelay,
+        const Duration(milliseconds: 100),
+      );
+      expect(
+        squareAt(tester, 0, 3).shrinkDelay,
+        const Duration(milliseconds: 300),
+      );
+    });
+
+    testWidgets('has no shrink delay unless it is given one', (tester) async {
+      await pumpBoard(tester, figure4);
+
+      expect(squareAt(tester, 0, 1).shrinkDelay, Duration.zero);
+    });
+
+    testWidgets('keeps a die whole for its shrink delay, then shrinks it', (
+      tester,
+    ) async {
+      Duration delayOf(SquareUi square) =>
+          square.col == 3 ? const Duration(milliseconds: 300) : Duration.zero;
+      await pumpBoard(
+        tester,
+        figure4,
+        animateDice: true,
+        shrinkDelayOf: delayOf,
+      );
+
+      await pumpBoard(
+        tester,
+        boardOf({(1, 2): const DieUi(pips: 5, owner: player1)}),
+        animateDice: true,
+        shrinkDelayOf: delayOf,
+      );
+      // The die with no delay has finished shrinking (it takes 500 ms); the
+      // other started at 300 ms and is still shrinking.
+      await tester.pump(const Duration(milliseconds: 600));
+
+      final dice = find.descendant(
+        of: find.byType(BoardGrid),
+        matching: find.byType(DieFace),
+      );
+      expect(dice, findsNWidgets(2));
+      await tester.pumpAndSettle();
+      expect(dice, findsNWidgets(1));
     });
 
     testWidgets("shows each square's mark", (tester) async {

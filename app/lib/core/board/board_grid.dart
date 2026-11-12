@@ -13,6 +13,7 @@ class BoardGrid extends StatelessWidget {
     required this.board,
     required this.onSquareTapped,
     this.animateDice = false,
+    this.shrinkDelayOf = _noDelay,
     this.overlay,
     super.key,
   });
@@ -23,12 +24,19 @@ class BoardGrid extends StatelessWidget {
   /// in and shrink away. Otherwise they are drawn at once.
   final bool animateDice;
 
+  /// How long the die that goes away from a square stays whole before it
+  /// shrinks, so dice taken together can go one after another. None by
+  /// default.
+  final Duration Function(SquareUi square) shrinkDelayOf;
+
   /// Drawn over the squares, filling the grid inside its edge. Taps go
   /// through it to the squares.
   final Widget? overlay;
 
   /// Told which square was tapped; `null` while the board takes no taps.
   final ValueChanged<SquareUi>? onSquareTapped;
+
+  static Duration _noDelay(SquareUi square) => Duration.zero;
 
   static const double _gap = 2;
   static const double _cornerRadius = 16;
@@ -83,6 +91,7 @@ class BoardGrid extends StatelessWidget {
         key: ValueKey((square.row, square.col)),
         square: square,
         animateDie: animateDice,
+        shrinkDelay: shrinkDelayOf(square),
         onTap: onSquareTapped == null ? null : () => onSquareTapped(square),
       ),
     );
