@@ -1,6 +1,6 @@
+import 'package:cephalopod/core/board/models/die_ui.dart';
+import 'package:cephalopod/core/board/models/player_ui.dart';
 import 'package:cephalopod/core/theme/board_colors.dart';
-import 'package:cephalopod/features/game/presentation/models/die_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/player_ui.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// A [die] drawn as a rounded block with its pips on top, in its owner's

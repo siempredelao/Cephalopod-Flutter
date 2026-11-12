@@ -1,11 +1,11 @@
+import 'package:cephalopod/core/board/models/board_ui.dart';
+import 'package:cephalopod/core/board/models/die_ui.dart';
+import 'package:cephalopod/core/board/models/square_mark.dart';
+import 'package:cephalopod/core/board/models/square_ui.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/presentation/bloc/hint_state.dart';
 import 'package:cephalopod/features/game/presentation/bloc/side_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
-import 'package:cephalopod/features/game/presentation/models/board_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/die_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/square_mark.dart';
-import 'package:cephalopod/features/game/presentation/models/square_ui.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
 /// Turns the game on screen into the [BoardUi] the board draws: each

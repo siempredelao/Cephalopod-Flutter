@@ -1,5 +1,5 @@
+import 'package:cephalopod/core/board/models/player_ui.dart';
 import 'package:cephalopod/core/l10n/l10n.dart';
-import 'package:cephalopod/features/game/presentation/models/player_ui.dart';
 
 /// Names a numbered player: "Player 1" or "Player 2", in the language on
 /// screen.

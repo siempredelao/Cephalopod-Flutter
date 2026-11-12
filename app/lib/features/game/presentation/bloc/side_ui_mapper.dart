@@ -1,7 +1,7 @@
+import 'package:cephalopod/core/board/models/player_ui.dart';
+import 'package:cephalopod/core/board/models/role_ui.dart';
+import 'package:cephalopod/core/board/models/side_ui.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
-import 'package:cephalopod/features/game/presentation/models/player_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/role_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/side_ui.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
 /// Names one of the engine's players for the screen: its number, from its

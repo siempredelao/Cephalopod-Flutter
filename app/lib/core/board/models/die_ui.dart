@@ -1,4 +1,4 @@
-import 'package:cephalopod/features/game/presentation/models/side_ui.dart';
+import 'package:cephalopod/core/board/models/side_ui.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'die_ui.freezed.dart';

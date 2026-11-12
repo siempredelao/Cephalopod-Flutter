@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 
+import 'package:cephalopod/core/board/models/player_ui.dart';
 import 'package:cephalopod/core/theme/board_colors.dart';
 import 'package:cephalopod/features/game/presentation/models/captured_die_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/player_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/effects/particles.dart';
 import 'package:cephalopod/features/game/presentation/view/game_durations.dart';
 import 'package:flutter/foundation.dart' show listEquals;

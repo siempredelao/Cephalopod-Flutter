@@ -1,5 +1,5 @@
+import 'package:cephalopod/core/board/models/player_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/headline_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/player_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/headline_text_mapper.dart';
 import 'package:flutter_test/flutter_test.dart';
 

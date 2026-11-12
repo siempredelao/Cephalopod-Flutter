@@ -1,5 +1,5 @@
+import 'package:cephalopod/core/board/models/square_mark.dart';
 import 'package:cephalopod/core/l10n/l10n.dart';
-import 'package:cephalopod/features/game/presentation/models/square_mark.dart';
 import 'package:cephalopod/features/game/presentation/view/previews/board_preview_wrapper.dart';
 import 'package:cephalopod/features/game/presentation/view/previews/board_square_previews.dart';
 import 'package:cephalopod/features/game/presentation/view/previews/die_face_previews.dart';

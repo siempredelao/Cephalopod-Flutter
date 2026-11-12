@@ -1,5 +1,5 @@
-import 'package:cephalopod/features/game/presentation/models/die_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/square_mark.dart';
+import 'package:cephalopod/core/board/models/die_ui.dart';
+import 'package:cephalopod/core/board/models/square_mark.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'square_ui.freezed.dart';

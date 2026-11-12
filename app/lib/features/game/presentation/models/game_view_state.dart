@@ -1,4 +1,4 @@
-import 'package:cephalopod/features/game/presentation/models/board_ui.dart';
+import 'package:cephalopod/core/board/models/board_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/capture_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/dice_tally_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/headline_ui.dart';

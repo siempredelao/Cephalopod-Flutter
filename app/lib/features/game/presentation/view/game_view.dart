@@ -1,7 +1,7 @@
+import 'package:cephalopod/core/board/models/square_ui.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/models/game_view_state.dart';
-import 'package:cephalopod/features/game/presentation/models/square_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/capture_controls.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/dice_tally.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_app_bar.dart';
