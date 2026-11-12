@@ -16,7 +16,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] Any time: 13. refactor(game): keep each screen enum conversion in one place (S)
 - [x] Any time: 16. refactor(game): read saved games with map patterns (S)
 - [x] Any time: 18. ci: use the same Flutter version as local (XS)
-- [ ] Checkpoint: verify; by hand on Android: leave a game mid-search, change the theme at startup
+- [x] Checkpoint: verify; by hand on Android: leave a game mid-search, change the theme at startup
 
 ## M5: English and Spanish (first within M5)
 - [x] 8. feat(app): set up translations (M), after 7
@@ -68,13 +68,33 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] 36c. feat(game): play a sound when the player wins (XS)
 - [x] Checkpoint: verify; by hand on Android: first launch, hint on Hard, capture and win effects, sound off
 
-## M7: Google Play
+## M6 follow-ups, in this order
+- [ ] T1. test(game): one test file per use case (S)
+- [ ] W. refactor(app): build the app's modules in one place (S)
+- [ ] H1. refactor(core): move the board's UI models to core (S)
+- [ ] H2. refactor(core): move the board's drawing to core (S)
+- [ ] H3. refactor(game): let the board mapper take marks, not a turn phase (S)
+- [ ] H4. refactor(how_to_play): make How to play a feature of its own (S–M)
+- [ ] S1. feat(game): wait longer after a bigger capture (S)
+- [ ] S2. feat(game): shrink and burst captured dice one at a time (S)
+- [ ] S3. feat(game): pop once per captured die (S)
+- [ ] Checkpoint: verify; by hand on Android: How to play on first launch and from the game, a 3- or 4-die capture one die at a time with a pop each
+
+## M7: Google Play, in this order
+- [ ] feat(about): show the open-source licenses (S)
 - [ ] L1. feat(app): get ready for more languages (S)
 - [ ] L2. feat(app): translate into French, Italian and Portuguese (M)
 - [ ] L3. feat(app): translate into German, Dutch, Danish, Norwegian and Swedish (M)
 - [ ] L4. feat(app): translate into Polish and Turkish (S)
-- [ ] Ask for a rating: the review feature, then the prompt after games, then the About link
-- [ ] Crash reporting into Task 4's reporter
-- [ ] feat(about): show the open-source licenses (S)
-- [ ] Play Store screenshots made by an integration test, in both languages
-- [ ] The same test plays, saves and resumes a game on a device, as the release check
+- [ ] R1. feat(review): count finished games and decide when to ask for a review (S)
+- [ ] R2. feat(app): ask for a review after a finished game (S)
+- [ ] R3. feat(about): add a "Rate the app" link (XS)
+- [ ] I1. feat(app): use the Cephalopod icon on the launcher (S)
+- [ ] I2. feat(app): show the icon on the splash screen (S)
+- [ ] P1. build(android): sign release builds (S)
+- [ ] E1. test(app): play, save and resume a game on a device (S)
+- [ ] E2. test(app): take the store screenshots (S)
+- [ ] docs: the store listing in English and Spanish (S)
+- [ ] By hand in Play Console: listing, Data safety (no data collected), content rating, internal testing
+- [ ] Checkpoint: verify; E1 on an emulator; a signed bundle installed from internal testing
+- Not in the first release: crash reporting (decided 2026-11-12; Play Console's vitals instead)
