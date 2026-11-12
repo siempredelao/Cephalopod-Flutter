@@ -15,6 +15,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../helpers/board.dart';
+import '../helpers/fake_sound_effects.dart';
 import '../helpers/pump_app.dart';
 
 void main() {
@@ -243,6 +244,45 @@ void main() {
         squares.map((square) => square.square.mark),
         everyElement(SquareMark.none),
       );
+    });
+
+    group('in a game against a friend', () {
+      /// Player 1 and Player 2 place a 1 each, beside the top left corner,
+      /// and Player 1 captures both from the corner.
+      Future<void> captureInTheCorner(WidgetTester tester) async {
+        await startNewGame(tester);
+        for (final square in const [(0, 1), (1, 0), (0, 0)]) {
+          await tester.tap(find.byKey(ValueKey(square)));
+          await tester.pumpAndSettle();
+        }
+        expect(diceOnBoard, findsOne);
+      }
+
+      testWidgets('pops when dice are captured', (tester) async {
+        final sounds = FakeSoundEffects();
+        await pumpApp(tester, soundEffects: sounds);
+
+        await captureInTheCorner(tester);
+
+        expect(sounds.played, ['capture']);
+      });
+
+      testWidgets('keeps quiet when the settings turn sound off', (
+        tester,
+      ) async {
+        final sounds = FakeSoundEffects();
+        await pumpApp(tester, soundEffects: sounds);
+        await tester.tap(find.widgetWithText(OutlinedButton, 'Settings'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.widgetWithText(SwitchListTile, 'Sound'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byType(BackButton));
+        await tester.pumpAndSettle();
+
+        await captureInTheCorner(tester);
+
+        expect(sounds.played, isEmpty);
+      });
     });
 
     testWidgets('opens the about page from home', (tester) async {

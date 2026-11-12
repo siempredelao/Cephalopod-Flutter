@@ -23,6 +23,7 @@ import 'package:shared_preferences_platform_interface/shared_preferences_async_p
 
 import '../../../../helpers/counting_game_repository.dart';
 import '../../../../helpers/failing_shared_preferences.dart';
+import '../../../../helpers/fake_sound_effects.dart';
 import '../../../../helpers/game_bloc_factory.dart';
 
 void main() {
@@ -784,6 +785,85 @@ void main() {
         expect(saved?.record.moves, isEmpty);
       },
     );
+  });
+
+  group('GameBloc sounds', () {
+    late FakeSoundEffects sounds;
+
+    setUp(() => sounds = FakeSoundEffects());
+
+    /// White to move, with a 2 and a 3 beside the centre: a die there
+    /// captures both.
+    final beforeCapture = stateFromAscii('''
+      .  .  .  .  .
+      .  .  w2 .  .
+      .  b3 .  .  .
+      .  .  .  .  .
+      .  .  .  .  .
+    ''', toMove: Player.white);
+
+    blocTest<GameBloc, GameViewState>(
+      'pops when a move captures',
+      build: () =>
+          createTestGameBloc(position: beforeCapture, soundEffects: sounds),
+      act: (bloc) => bloc.add(tap(center)),
+      verify: (_) => expect(sounds.played, ['capture']),
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      'keeps quiet for a move that captures nothing',
+      build: () => createTestGameBloc(soundEffects: sounds),
+      act: (bloc) => bloc.add(tap(center)),
+      verify: (_) => expect(sounds.played, isEmpty),
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      'pops once for a capture, though the screen changes after it',
+      build: () =>
+          createTestGameBloc(position: beforeCapture, soundEffects: sounds),
+      act: (bloc) => bloc
+        ..add(tap(center))
+        ..add(const HintRequested()),
+      verify: (_) => expect(sounds.played, ['capture']),
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      'keeps quiet when a capture is taken back or played again',
+      build: () =>
+          createTestGameBloc(position: beforeCapture, soundEffects: sounds),
+      act: (bloc) => bloc
+        ..add(tap(center))
+        ..add(const UndoRequested())
+        ..add(const RedoRequested()),
+      verify: (_) => expect(sounds.played, ['capture']),
+    );
+
+    test("pops when the computer's move captures", () async {
+      // On a 3 × 3 board, Black and White place a 1 beside the top left
+      // corner. The computer, Black, plays its first legal move: the
+      // corner, capturing both.
+      final repository = InMemoryGameRepository();
+      await repository.save((
+        record: GameRecord(
+          config: const GameConfig(boardSize: 3),
+          moves: [Move(const Position(0, 1)), Move(const Position(1, 0))],
+        ),
+        opponent: const ComputerOpponent(
+          difficulty: Difficulty.easy,
+          player: Player.black,
+        ),
+      ));
+      final bloc = createTestGameBloc(
+        repository: repository,
+        soundEffects: sounds,
+      )..add(const GameResumed());
+      await pumpEventQueue();
+
+      expect(bloc.state.playedMove?.computer, isNotNull);
+      expect(bloc.state.playedMove?.captured, hasLength(2));
+      expect(sounds.played, ['capture']);
+      await bloc.close();
+    });
   });
 
   group('GameBloc after a game-ending move', () {

@@ -8,6 +8,7 @@ import 'package:cephalopod/app/uncaught_error_reporting.dart';
 import 'package:cephalopod/features/about/about_module.dart';
 import 'package:cephalopod/features/about/data/package_info_app_version_source.dart';
 import 'package:cephalopod/features/about/data/url_launcher_link_opener.dart';
+import 'package:cephalopod/features/game/data/audioplayers_sound_effects.dart';
 import 'package:cephalopod/features/game/data/saved_game_json_codec.dart';
 import 'package:cephalopod/features/game/data/shared_preferences_game_repository.dart';
 import 'package:cephalopod/features/game/data/shared_preferences_how_to_play_repository.dart';
@@ -53,7 +54,11 @@ void bootstrap(Flavor flavor) {
       sharedPreferencesAsync: preferences,
       errorReporter: logError,
     ),
+    // A sound that cannot play is reported, and the game goes on
+    // (docs/adr/0021).
+    soundEffects: AudioplayersSoundEffects(errorReporter: logError),
     highlightLastMove: settings.highlightLastMove,
+    soundOn: settings.soundOn,
   );
   final about = AboutModule(
     appVersionSource: packageInfoAppVersionSource(errorReporter: logError),

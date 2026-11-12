@@ -27,6 +27,10 @@ final class SettingsModule implements FeatureModule {
   /// may not import this one.
   bool highlightLastMove() => store.current.highlightLastMove;
 
+  /// Whether the game should play its sounds, as the settings say now. A
+  /// plain function, for the same reason as [highlightLastMove].
+  bool soundOn() => store.current.sound;
+
   @override
   List<RouteBase> get routes => [
     GoRoute(

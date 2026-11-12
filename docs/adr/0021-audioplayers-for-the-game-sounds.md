@@ -29,7 +29,11 @@ How the sounds play:
 - **Each sound has its own player**, made the first time that sound plays,
   so a win never cuts off a capture.
 - **Low-latency mode** (`PlayerMode.lowLatency`, Android's `SoundPool`),
-  which is meant for short sounds that must start at once.
+  which is meant for short sounds that must start at once. `SoundPool` never
+  says when a sound has ended, so audioplayers takes the player to be still
+  playing and ignores the next play. Each play therefore stops the player
+  first, and the player keeps its sound loaded when stopped
+  (`ReleaseMode.stop`).
 - **They leave other audio alone.** On Android they use the media volume,
   as games do (`AndroidUsageType.game`), and do not take the audio focus, so
   the player's music or podcast goes on. On iOS they use the `ambient`

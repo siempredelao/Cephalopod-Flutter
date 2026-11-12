@@ -5,12 +5,23 @@ import 'package:cephalopod/features/game/data/audioplayers_sound_effects.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// A player that records what it was asked to play, so no device is
-/// needed. It throws [failure] when one is set.
+/// A player that records what it was asked to play, and every call in
+/// order, so no device is needed. It throws [failure] when one is set.
 final class _FakeAudioPlayer extends Fake implements AudioPlayer {
   final List<({Source source, PlayerMode? mode, AudioContext? ctx})> plays = [];
 
+  /// The calls made to the player, by name, in order.
+  final List<String> calls = [];
+
   Exception? failure;
+
+  @override
+  Future<void> setReleaseMode(ReleaseMode releaseMode) async {
+    calls.add('setReleaseMode(${releaseMode.name})');
+  }
+
+  @override
+  Future<void> stop() async => calls.add('stop');
 
   @override
   Future<void> play(
@@ -21,6 +32,7 @@ final class _FakeAudioPlayer extends Fake implements AudioPlayer {
     Duration? position,
     PlayerMode? mode,
   }) async {
+    calls.add('play');
     plays.add((source: source, mode: mode, ctx: ctx));
     if (failure case final failure?) throw failure;
   }
@@ -95,6 +107,18 @@ void main() {
       expect(players, hasLength(2));
       expect(players.first.plays, hasLength(2));
       expect(players.last.plays, hasLength(1));
+    });
+
+    test('stops a sound before playing it again, keeping it loaded', () async {
+      // Android never tells a low-latency player that its sound ended, so
+      // without the stop it would ignore every play after the first.
+      final sounds = soundEffects();
+
+      await sounds.playCapture();
+      await sounds.playCapture();
+
+      const once = ['setReleaseMode(stop)', 'stop', 'play'];
+      expect(players.single.calls, [...once, ...once]);
     });
 
     test("leaves the player's own music playing", () async {
