@@ -18,9 +18,9 @@ import 'package:cephalopod/features/game/domain/use_cases/undo_move.dart';
 import 'package:cephalopod/features/game/presentation/bloc/countdown_timer.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
+import 'package:cephalopod/features/game/presentation/bloc/move_timing.dart';
 import 'package:cephalopod/features/game/presentation/bloc/opponent_query_codec.dart';
 import 'package:cephalopod/features/game/presentation/bloc/saved_game_summary_mapper.dart';
-import 'package:cephalopod/features/game/presentation/view/game_durations.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/new_game_dialog.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
@@ -143,7 +143,8 @@ final class GameModule implements FeatureModule {
       suggestMove: _suggestMove,
       highlightLastMove: _highlightLastMove(),
       soundEffects: _soundEffectsProxy,
-      moveCountdown: CountdownTimer(moveSettleDuration),
+      moveCountdown: CountdownTimer(),
+      settleDurationFor: settleDurationFor,
     );
   }
 

@@ -245,6 +245,27 @@ void main() {
       expect(screen.playedMove?.celebrate, isFalse);
     });
 
+    test('lists the captured dice in reading order', () {
+      const die = Die(owner: Player.white, pips: 1);
+      final capture = Move(
+        const Position(1, 1),
+        captures: {top, left, right, below},
+      );
+      final screen = map(
+        playedMove: (
+          move: capture,
+          byComputer: false,
+          // Not in reading order, to show that the mapper sorts them.
+          captured: {below: die, right: die, top: die, left: die},
+        ),
+      );
+
+      expect(
+        [for (final die in screen.playedMove!.captured) (die.row, die.col)],
+        [(0, 1), (0, 2), (0, 3), (1, 2)],
+      );
+    });
+
     group('celebrates', () {
       /// A full 3 × 3 board that Black wins, 5 dice to 4.
       final blackWins = stateFromAscii('''
