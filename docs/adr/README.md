@@ -27,3 +27,4 @@ supersedes an earlier one instead. Start new records from
 | [0018](0018-how-to-play-text-is-translated.md) | How to play's pages name a topic, and the view words it | Accepted |
 | [0019](0019-package-info-plus-for-the-app-version.md) | The app's version from package_info_plus | Accepted |
 | [0020](0020-url-launcher-for-the-rule-sheet-link.md) | The rule sheet link opens with url_launcher | Accepted |
+| [0021](0021-audioplayers-for-the-game-sounds.md) | The game's sounds play with audioplayers | Accepted |
