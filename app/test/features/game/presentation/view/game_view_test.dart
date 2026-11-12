@@ -405,15 +405,25 @@ void main() {
         expect(dieScale(tester, const Position(1, 1)), 0.5);
         expect(dieScale(tester, captured.first), 1);
 
+        // The new die and the first captured die shrink; the second waits
+        // for its turn, a little later.
         await tester.pump(const Duration(milliseconds: 100));
-        for (final square in [const Position(1, 1), ...captured]) {
+        for (final square in [const Position(1, 1), captured.first]) {
           expect(
             dieScale(tester, square),
             allOf(greaterThan(0.5), lessThan(1)),
           );
         }
+        expect(dieScale(tester, captured.last), 1);
         // A die that stays does not move.
         expect(dieScale(tester, const Position(1, 2)), 1);
+
+        await tester.pump(const Duration(milliseconds: 150));
+        await tester.pump(const Duration(milliseconds: 100));
+        expect(
+          dieScale(tester, captured.last),
+          allOf(greaterThan(0.5), lessThan(1)),
+        );
 
         await tester.pumpAndSettle();
         expect(diceOnBoard, findsNWidgets(3));
