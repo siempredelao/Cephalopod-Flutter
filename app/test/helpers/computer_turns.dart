@@ -21,3 +21,20 @@ final class FirstMoveAgent implements GameAgent {
   @override
   Move chooseMove(GameState state) => _moveGenerator.legalMoves(state).first;
 }
+
+/// An agent that always chooses [move], and keeps each position it is asked
+/// about.
+final class FixedMoveAgent implements GameAgent {
+  FixedMoveAgent(this.move);
+
+  final Move move;
+
+  /// Every position [chooseMove] was asked about, in order.
+  final List<GameState> positions = [];
+
+  @override
+  Move chooseMove(GameState state) {
+    positions.add(state);
+    return move;
+  }
+}

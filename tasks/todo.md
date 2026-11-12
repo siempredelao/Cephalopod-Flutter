@@ -69,7 +69,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] Checkpoint: verify; by hand on Android: first launch, hint on Hard, capture and win effects, sound off
 
 ## M6 follow-ups, in this order
-- [ ] T1. test(game): one test file per use case (S)
+- [x] T1. test(game): one test file per use case (S)
 - [ ] H1. refactor(core): move the board's UI models to core (S)
 - [ ] H2. refactor(core): move the board's drawing to core (S)
 - [ ] H3. refactor(game): let the board mapper take marks, not a turn phase (S)
