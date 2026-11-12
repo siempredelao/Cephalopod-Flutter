@@ -2,8 +2,8 @@ import 'package:cephalopod/core/board/board_ui_mapper.dart';
 import 'package:cephalopod/core/board/models/player_ui.dart';
 import 'package:cephalopod/core/board/models/role_ui.dart';
 import 'package:cephalopod/core/board/models/side_ui.dart';
-import 'package:cephalopod/features/game/presentation/bloc/tutorial_step.dart';
-import 'package:cephalopod/features/game/presentation/models/tutorial_step_ui.dart';
+import 'package:cephalopod/features/how_to_play/presentation/bloc/tutorial_step.dart';
+import 'package:cephalopod/features/how_to_play/presentation/models/tutorial_step_ui.dart';
 
 /// Turns a [TutorialStep] into the page How to play draws: its topic, and
 /// its example as a board.

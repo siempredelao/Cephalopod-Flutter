@@ -1,5 +1,5 @@
 import 'package:cephalopod/core/board/models/square_mark.dart';
-import 'package:cephalopod/features/game/presentation/models/tutorial_topic.dart';
+import 'package:cephalopod/features/how_to_play/presentation/models/tutorial_topic.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
 /// A position from the rules, shown as an example: the `game` on the board,

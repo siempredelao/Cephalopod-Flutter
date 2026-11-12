@@ -1,5 +1,5 @@
 import 'package:cephalopod/core/l10n/l10n.dart';
-import 'package:cephalopod/features/game/presentation/view/how_to_play/step_dots.dart';
+import 'package:cephalopod/features/how_to_play/presentation/view/step_dots.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 

@@ -1,5 +1,5 @@
 import 'package:cephalopod/core/board/models/board_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/tutorial_topic.dart';
+import 'package:cephalopod/features/how_to_play/presentation/models/tutorial_topic.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'tutorial_step_ui.freezed.dart';

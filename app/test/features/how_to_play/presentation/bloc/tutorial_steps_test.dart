@@ -1,7 +1,7 @@
 import 'package:cephalopod/core/board/models/square_mark.dart';
-import 'package:cephalopod/features/game/presentation/bloc/tutorial_step.dart';
-import 'package:cephalopod/features/game/presentation/bloc/tutorial_steps.dart';
-import 'package:cephalopod/features/game/presentation/models/tutorial_topic.dart';
+import 'package:cephalopod/features/how_to_play/presentation/bloc/tutorial_step.dart';
+import 'package:cephalopod/features/how_to_play/presentation/bloc/tutorial_steps.dart';
+import 'package:cephalopod/features/how_to_play/presentation/models/tutorial_topic.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
 

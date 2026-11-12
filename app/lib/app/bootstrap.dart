@@ -11,9 +11,10 @@ import 'package:cephalopod/features/about/data/url_launcher_link_opener.dart';
 import 'package:cephalopod/features/game/data/audioplayers_sound_effects.dart';
 import 'package:cephalopod/features/game/data/saved_game_json_codec.dart';
 import 'package:cephalopod/features/game/data/shared_preferences_game_repository.dart';
-import 'package:cephalopod/features/game/data/shared_preferences_how_to_play_repository.dart';
 import 'package:cephalopod/features/game/game_module.dart';
 import 'package:cephalopod/features/home/home_module.dart';
+import 'package:cephalopod/features/how_to_play/data/shared_preferences_how_to_play_repository.dart';
+import 'package:cephalopod/features/how_to_play/how_to_play_module.dart';
 import 'package:cephalopod/features/settings/data/shared_preferences_settings_repository.dart';
 import 'package:cephalopod/features/settings/settings_module.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
@@ -50,15 +51,17 @@ void bootstrap(Flavor flavor) {
       // (docs/adr/0016).
       errorReporter: logError,
     ),
-    howToPlayRepository: SharedPreferencesHowToPlayRepository(
-      sharedPreferencesAsync: preferences,
-      errorReporter: logError,
-    ),
     // A sound that cannot play is reported, and the game goes on
     // (docs/adr/0021).
     soundEffects: AudioplayersSoundEffects(errorReporter: logError),
     highlightLastMove: settings.highlightLastMove,
     soundOn: settings.soundOn,
+  );
+  final howToPlay = HowToPlayModule(
+    howToPlayRepository: SharedPreferencesHowToPlayRepository(
+      sharedPreferencesAsync: preferences,
+      errorReporter: logError,
+    ),
   );
   final about = AboutModule(
     appVersionSource: packageInfoAppVersionSource(errorReporter: logError),
@@ -67,9 +70,9 @@ void bootstrap(Flavor flavor) {
   final router = createRouter(
     home: HomeModule(
       hasGameToContinue: game.hasGameToContinue,
-      hasSeenHowToPlay: game.hasSeenHowToPlay,
+      hasSeenHowToPlay: howToPlay.hasSeenHowToPlay,
     ),
-    features: [game, settings, about],
+    features: [game, howToPlay, settings, about],
   );
 
   runApp(App(flavor: flavor, router: router, settings: settings.store));

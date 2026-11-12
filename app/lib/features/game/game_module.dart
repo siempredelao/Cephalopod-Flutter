@@ -4,7 +4,6 @@ import 'package:cephalopod/core/navigation/app_route.dart';
 import 'package:cephalopod/core/navigation/dialog_page.dart';
 import 'package:cephalopod/core/navigation/feature_module.dart';
 import 'package:cephalopod/features/game/domain/game_repository.dart';
-import 'package:cephalopod/features/game/domain/how_to_play_repository.dart';
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/sound_effects.dart';
 import 'package:cephalopod/features/game/domain/sound_effects_proxy.dart';
@@ -18,11 +17,9 @@ import 'package:cephalopod/features/game/domain/use_cases/undo_move.dart';
 import 'package:cephalopod/features/game/presentation/bloc/countdown_timer.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
-import 'package:cephalopod/features/game/presentation/bloc/how_to_play_cubit.dart';
 import 'package:cephalopod/features/game/presentation/bloc/opponent_query_codec.dart';
 import 'package:cephalopod/features/game/presentation/view/game_durations.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
-import 'package:cephalopod/features/game/presentation/view/how_to_play/how_to_play_page.dart';
 import 'package:cephalopod/features/game/presentation/view/new_game_dialog.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter/foundation.dart' show compute;
@@ -38,7 +35,6 @@ final class GameModule implements FeatureModule {
   GameModule({
     required this._cephalopodRules,
     required this._gameRepository,
-    required this._howToPlayRepository,
     required this._soundEffects,
     required this._highlightLastMove,
     required this._soundOn,
@@ -46,7 +42,6 @@ final class GameModule implements FeatureModule {
 
   final CephalopodRules _cephalopodRules;
   final GameRepository _gameRepository;
-  final HowToPlayRepository _howToPlayRepository;
   final SoundEffects _soundEffects;
   final bool Function() _highlightLastMove;
   final bool Function() _soundOn;
@@ -122,21 +117,7 @@ final class GameModule implements FeatureModule {
         opening: _openingOf(state.uri.queryParameters),
       ),
     ),
-    GoRoute(
-      path: 'how-to-play',
-      name: AppRoute.howToPlay.name,
-      builder: (_, _) => HowToPlayPage(createCubit: _createHowToPlayCubit),
-    ),
   ];
-
-  /// Whether How to play has been shown on this device. A plain function,
-  /// so the composition root can hand it to Home, which opens How to play
-  /// by itself on the first launch only.
-  Future<bool> hasSeenHowToPlay() => _howToPlayRepository.hasSeenHowToPlay();
-
-  HowToPlayCubit _createHowToPlayCubit() {
-    return HowToPlayCubit(howToPlayRepository: _howToPlayRepository);
-  }
 
   /// The game route's first event, from its query parameters.
   GameEvent _openingOf(Map<String, String> parameters) {

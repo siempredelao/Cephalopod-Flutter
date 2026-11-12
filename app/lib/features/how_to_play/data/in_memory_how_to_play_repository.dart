@@ -1,4 +1,4 @@
-import 'package:cephalopod/features/game/domain/how_to_play_repository.dart';
+import 'package:cephalopod/features/how_to_play/domain/how_to_play_repository.dart';
 
 /// A [HowToPlayRepository] that remembers in memory only, so it forgets
 /// when the app closes. For tests, and as the reference the contract tests

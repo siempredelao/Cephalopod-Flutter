@@ -1,13 +1,13 @@
 import 'package:cephalopod/core/board/models/square_mark.dart';
 import 'package:cephalopod/core/l10n/l10n.dart';
-import 'package:cephalopod/features/game/presentation/bloc/tutorial_step.dart';
-import 'package:cephalopod/features/game/presentation/bloc/tutorial_steps.dart';
-import 'package:cephalopod/features/game/presentation/models/tutorial_topic.dart';
-import 'package:cephalopod/features/game/presentation/view/how_to_play/tutorial_text_mapper.dart';
+import 'package:cephalopod/features/how_to_play/presentation/bloc/tutorial_step.dart';
+import 'package:cephalopod/features/how_to_play/presentation/bloc/tutorial_steps.dart';
+import 'package:cephalopod/features/how_to_play/presentation/models/tutorial_topic.dart';
+import 'package:cephalopod/features/how_to_play/presentation/view/tutorial_text_mapper.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../../../../helpers/translations.dart';
+import '../../../../helpers/translations.dart';
 
 void main() {
   const mapper = TutorialTextMapper();

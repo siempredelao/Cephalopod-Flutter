@@ -1,7 +1,7 @@
+import 'package:cephalopod/core/board/board_grid.dart';
 import 'package:cephalopod/core/l10n/l10n.dart';
-import 'package:cephalopod/features/game/presentation/models/tutorial_step_ui.dart';
-import 'package:cephalopod/features/game/presentation/view/how_to_play/tutorial_text_mapper.dart';
-import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
+import 'package:cephalopod/features/how_to_play/presentation/models/tutorial_step_ui.dart';
+import 'package:cephalopod/features/how_to_play/presentation/view/tutorial_text_mapper.dart';
 import 'package:material_ui/material_ui.dart';
 
 const double _spacing = 16;
@@ -40,7 +40,7 @@ class TutorialStepView extends StatelessWidget {
             child: Center(
               child: ExcludeSemantics(
                 child: IgnorePointer(
-                  child: GameBoard(board: step.board, onSquareTapped: null),
+                  child: BoardGrid(board: step.board, onSquareTapped: null),
                 ),
               ),
             ),
