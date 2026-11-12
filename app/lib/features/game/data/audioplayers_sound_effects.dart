@@ -55,6 +55,8 @@ final class AudioplayersSoundEffects implements SoundEffects {
   /// Plays [asset], a path under `assets/`, on [player], from its start.
   Future<void> _play(AudioPlayer player, String asset) async {
     try {
+      // Set on every play, not once, so a failure costs this sound only.
+      // Android ignores it after the first time.
       await player.setReleaseMode(ReleaseMode.stop);
       await player.stop();
       await player.play(
