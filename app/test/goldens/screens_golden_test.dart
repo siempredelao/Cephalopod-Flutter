@@ -19,6 +19,7 @@ void main() {
   /// Each screen, by the name its images take.
   final goldenScreens = {
     'home': homeWithLessMotionScreen,
+    'home_continue': homeWithSavedGameAndLessMotionScreen,
     'new_game_dialog': newGameDialogScreen,
     'game': gameScreen,
     'how_to_play': howToPlayScreen,
