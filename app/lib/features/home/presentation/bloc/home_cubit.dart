@@ -1,4 +1,7 @@
 import 'package:bloc/bloc.dart';
+import 'package:cephalopod/features/home/presentation/bloc/demo_script.dart';
+import 'package:cephalopod/features/home/presentation/bloc/demo_ui_mapper.dart';
+import 'package:cephalopod/features/home/presentation/models/demo_ui.dart';
 import 'package:cephalopod/features/home/presentation/models/home_view_state.dart';
 
 /// Home's view model. Its [HomeViewState] says whether there is a saved
@@ -16,7 +19,13 @@ class HomeCubit extends Cubit<HomeViewState> {
   HomeCubit({
     required this._hasGameToContinue,
     required this._hasSeenHowToPlay,
-  }) : super(const HomeViewState(canContinue: false));
+    DemoUiMapper demoUiMapper = const DemoUiMapper(),
+  }) : demo = demoUiMapper.map(homeDemoScript),
+       super(const HomeViewState(canContinue: false));
+
+  /// The demo Home plays above the title. It is the same for as long as
+  /// Home is open, so it is not part of [state].
+  final DemoUi demo;
 
   final Future<bool> Function() _hasGameToContinue;
   final Future<bool> Function() _hasSeenHowToPlay;

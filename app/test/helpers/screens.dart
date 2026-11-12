@@ -14,6 +14,19 @@ typedef Screen = ({
 /// The home screen.
 final Screen homeScreen = (name: 'Home', open: (tester, _) => pumpApp(tester));
 
+/// The home screen with the device asking for less motion, so its demo board
+/// stands still on one frame, and a picture of it does not depend on when it
+/// is taken.
+final Screen homeWithLessMotionScreen = (
+  name: 'Home, with less motion',
+  open: (tester, _) {
+    tester.platformDispatcher.accessibilityFeaturesTestValue =
+        const FakeAccessibilityFeatures(disableAnimations: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+    return pumpApp(tester);
+  },
+);
+
 /// The new-game dialog, against the computer, where it shows the most
 /// controls.
 final Screen newGameDialogScreen = (

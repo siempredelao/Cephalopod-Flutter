@@ -75,7 +75,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] H3. refactor(game): let the board mapper take marks, not a turn phase (S)
 - [x] H4. refactor(how_to_play): make How to play a feature of its own (S–M)
 - [x] HM1. feat(home): make Home clearer (S)
-- [ ] HM2. feat(home): show a board that plays a capture (S)
+- [x] HM2. feat(home): show a board that plays a capture (S)
 - [ ] HM3. feat(game): describe the saved game for Home (S)
 - [ ] HM4. feat(home): continue from a card that shows the saved game (S)
 - [ ] S1. feat(game): wait longer after a bigger capture (S)
