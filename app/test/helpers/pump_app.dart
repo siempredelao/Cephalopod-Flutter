@@ -59,7 +59,7 @@ Future<void> pumpApp(
   );
   final router = createRouter(
     home: HomeModule(
-      hasGameToContinue: game.hasGameToContinue,
+      savedGameSummary: game.savedGameSummary,
       hasSeenHowToPlay: howToPlay.hasSeenHowToPlay,
     ),
     features: [game, howToPlay, settings, about],

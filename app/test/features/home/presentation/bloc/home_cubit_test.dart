@@ -5,6 +5,8 @@ import 'package:cephalopod/features/home/presentation/bloc/home_cubit.dart';
 import 'package:cephalopod/features/home/presentation/models/home_view_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../../../helpers/saved_game_summary.dart';
+
 void main() {
   const savedGame = HomeViewState(canContinue: true);
   const noSavedGame = HomeViewState(canContinue: false);
@@ -12,7 +14,7 @@ void main() {
   group('HomeCubit', () {
     test('starts without a game to continue', () {
       final cubit = HomeCubit(
-        hasGameToContinue: () async => true,
+        savedGameSummary: () async => savedGameSummary,
         hasSeenHowToPlay: () async => true,
       );
       addTearDown(cubit.close);
@@ -22,7 +24,7 @@ void main() {
 
     test('has the demo Home plays', () {
       final cubit = HomeCubit(
-        hasGameToContinue: () async => true,
+        savedGameSummary: () async => savedGameSummary,
         hasSeenHowToPlay: () async => true,
       );
       addTearDown(cubit.close);
@@ -33,7 +35,7 @@ void main() {
     blocTest<HomeCubit, HomeViewState>(
       'offers to continue when there is a saved game',
       build: () => HomeCubit(
-        hasGameToContinue: () async => true,
+        savedGameSummary: () async => savedGameSummary,
         hasSeenHowToPlay: () async => true,
       ),
       act: (cubit) => cubit.refresh(),
@@ -44,7 +46,7 @@ void main() {
     blocTest<HomeCubit, HomeViewState>(
       'does not offer to continue when nothing is saved',
       build: () => HomeCubit(
-        hasGameToContinue: () async => false,
+        savedGameSummary: () async => null,
         hasSeenHowToPlay: () async => true,
       ),
       act: (cubit) => cubit.refresh(),
@@ -56,7 +58,7 @@ void main() {
       'follows the saved game each time it asks again',
       setUp: () => saved = true,
       build: () => HomeCubit(
-        hasGameToContinue: () async => saved,
+        savedGameSummary: () async => saved ? savedGameSummary : null,
         hasSeenHowToPlay: () async => true,
       ),
       act: (cubit) async {
@@ -73,7 +75,7 @@ void main() {
       HomeCubit buildFirstLaunch() {
         askedAboutHowToPlay = 0;
         return HomeCubit(
-          hasGameToContinue: () async => false,
+          savedGameSummary: () async => null,
           hasSeenHowToPlay: () async {
             askedAboutHowToPlay++;
             return false;
@@ -104,7 +106,7 @@ void main() {
     blocTest<HomeCubit, HomeViewState>(
       'does not open How to play once it was seen',
       build: () => HomeCubit(
-        hasGameToContinue: () async => true,
+        savedGameSummary: () async => savedGameSummary,
         hasSeenHowToPlay: () async => true,
       ),
       act: (cubit) => cubit.refresh(),
@@ -113,7 +115,7 @@ void main() {
 
     test('does not emit once closed', () async {
       final cubit = HomeCubit(
-        hasGameToContinue: () async => true,
+        savedGameSummary: () async => savedGameSummary,
         hasSeenHowToPlay: () async => true,
       );
       final refreshing = cubit.refresh();

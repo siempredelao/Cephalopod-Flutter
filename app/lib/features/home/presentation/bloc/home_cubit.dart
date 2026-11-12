@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:cephalopod/core/saved_game/saved_game_summary.dart';
 import 'package:cephalopod/features/home/presentation/bloc/demo_script.dart';
 import 'package:cephalopod/features/home/presentation/bloc/demo_ui_mapper.dart';
 import 'package:cephalopod/features/home/presentation/models/demo_ui.dart';
@@ -13,11 +14,12 @@ import 'package:cephalopod/features/home/presentation/models/home_view_state.dar
 /// [refresh] also asks whether How to play was ever shown; if not, Home
 /// opens it, once, and says so with [howToPlayOpened].
 class HomeCubit extends Cubit<HomeViewState> {
-  /// `hasGameToContinue` and `hasSeenHowToPlay` are plain functions rather
-  /// than the game feature's own code, because features may not import each
-  /// other. The composition root wires them to the game module.
+  /// `savedGameSummary` and `hasSeenHowToPlay` are plain functions rather
+  /// than other features' own code, because features may not import each
+  /// other. The composition root wires them to the game and How to play
+  /// modules.
   HomeCubit({
-    required this._hasGameToContinue,
+    required this._savedGameSummary,
     required this._hasSeenHowToPlay,
     DemoUiMapper demoUiMapper = const DemoUiMapper(),
   }) : demo = demoUiMapper.map(homeDemoScript),
@@ -27,7 +29,7 @@ class HomeCubit extends Cubit<HomeViewState> {
   /// Home is open, so it is not part of [state].
   final DemoUi demo;
 
-  final Future<bool> Function() _hasGameToContinue;
+  final Future<SavedGameSummary?> Function() _savedGameSummary;
   final Future<bool> Function() _hasSeenHowToPlay;
 
   /// Whether [refresh] has asked about How to play yet. It asks only once:
@@ -39,7 +41,7 @@ class HomeCubit extends Cubit<HomeViewState> {
   Future<void> refresh() async {
     final firstTime = !_askedAboutHowToPlay;
     _askedAboutHowToPlay = true;
-    final canContinue = await _hasGameToContinue();
+    final canContinue = await _savedGameSummary() != null;
     final showHowToPlay = firstTime && !await _hasSeenHowToPlay();
     // Home may have closed while storage answered.
     if (isClosed) return;

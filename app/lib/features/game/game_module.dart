@@ -3,12 +3,13 @@ import 'dart:math';
 import 'package:cephalopod/core/navigation/app_route.dart';
 import 'package:cephalopod/core/navigation/dialog_page.dart';
 import 'package:cephalopod/core/navigation/feature_module.dart';
+import 'package:cephalopod/core/saved_game/saved_game_summary.dart';
 import 'package:cephalopod/features/game/domain/game_repository.dart';
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/sound_effects.dart';
 import 'package:cephalopod/features/game/domain/sound_effects_proxy.dart';
 import 'package:cephalopod/features/game/domain/use_cases/choose_agent_move.dart';
-import 'package:cephalopod/features/game/domain/use_cases/has_game_to_continue.dart';
+import 'package:cephalopod/features/game/domain/use_cases/game_to_continue.dart';
 import 'package:cephalopod/features/game/domain/use_cases/play_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/resume_game.dart';
 import 'package:cephalopod/features/game/domain/use_cases/start_new_game.dart';
@@ -18,6 +19,7 @@ import 'package:cephalopod/features/game/presentation/bloc/countdown_timer.dart'
 import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/bloc/opponent_query_codec.dart';
+import 'package:cephalopod/features/game/presentation/bloc/saved_game_summary_mapper.dart';
 import 'package:cephalopod/features/game/presentation/view/game_durations.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/new_game_dialog.dart';
@@ -71,9 +73,11 @@ final class GameModule implements FeatureModule {
     cephalopodRules: _cephalopodRules,
     gameRepository: _gameRepository,
   );
-  late final HasGameToContinue _hasGameToContinue = HasGameToContinue(
+  late final GameToContinue _gameToContinue = GameToContinue(
     resumeGame: _resumeGame,
   );
+  final SavedGameSummaryMapper _savedGameSummaryMapper =
+      const SavedGameSummaryMapper();
 
   /// The computer's moves are chosen with Flutter's `compute`, on another
   /// isolate, so the screen stays responsive while the Hard level thinks.
@@ -88,10 +92,13 @@ final class GameModule implements FeatureModule {
     backgroundRunner: compute,
   );
 
-  /// Whether there is a saved game worth continuing. A plain function, so
-  /// the composition root can hand it to features that may not import this
-  /// one.
-  Future<bool> hasGameToContinue() => _hasGameToContinue();
+  /// The saved game worth continuing, described for Home; `null` when there
+  /// is none. A plain function, so the composition root can hand it to
+  /// features that may not import this one.
+  Future<SavedGameSummary?> savedGameSummary() async {
+    final game = await _gameToContinue();
+    return game == null ? null : _savedGameSummaryMapper.map(game);
+  }
 
   /// The new-game route is a dialog that chooses an opponent and closes with
   /// the game's location. The game route starts a game against the opponent

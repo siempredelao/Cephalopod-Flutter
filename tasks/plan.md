@@ -943,10 +943,16 @@ images.
     shows one still frame.
   - No burst on Home, since the particles stay in the game feature.
 - **HM3. `feat(game): describe the saved game for Home`** (foundation):
-  - A small core model with the saved game's board, the opponent, whose
-    turn it is and each side's dice count.
-  - `GameModule` gives it through a plain function, as it gives
-    `hasGameToContinue` today, which it replaces. Nothing draws it yet.
+  - A small core model, `SavedGameSummary`, with the saved game's board,
+    each side's identity, dice count and whether it is to move, and the
+    computer's level (`null` against a friend). The sides are the
+    `SideUi`s the board already uses, so Home can word "you", "computer"
+    or "Player 1" without knowing the game.
+  - `HasGameToContinue` becomes `GameToContinue`, which gives the game
+    worth continuing, and `SavedGameSummaryMapper` describes it.
+  - `GameModule` gives it through a plain function, as it gave
+    `hasGameToContinue`, which it replaces. Home's cubit only checks that
+    there is one. Nothing draws it yet.
 - **HM4. `feat(home): continue from a card that shows the saved game`**:
   - When a game is saved, Continue becomes a card.
   - The card has a thumbnail of the board: a new `BoardThumbnail` in
