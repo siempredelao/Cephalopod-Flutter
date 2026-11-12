@@ -14,6 +14,7 @@ import 'package:cephalopod/features/game/presentation/bloc/countdown_timer.dart'
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_view_state_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/hint_state.dart';
+import 'package:cephalopod/features/game/presentation/bloc/move_timing.dart';
 import 'package:cephalopod/features/game/presentation/bloc/played_move.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod/features/game/presentation/models/game_view_state.dart';
@@ -34,13 +35,14 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// Shows a new game under [config] until the opening event replaces it,
   /// or the given [position], which tests use to start mid-game. The board
   /// marks the last move when [highlightLastMove] is on. A move that
-  /// captures, by either side, plays a pop on [soundEffects], and one that
-  /// wins the game for the player a chime; the [soundEffects] decide whether
-  /// they are heard, as the Sound switch in Settings says. After every
-  /// move, the game runs [moveCountdown] for [settleDurationFor] the number
-  /// of dice the move captured, so the player sees what changed before
-  /// anything else moves: taps are ignored, and the computer does not reply,
-  /// until it ends. By default [settleDurationFor] gives no wait.
+  /// captures, by either side, plays a pop on [soundEffects] for each die it
+  /// captured, one every [captureStagger], as the dice shrink away, and one
+  /// that wins the game for the player a chime; the [soundEffects] decide
+  /// whether they are heard, as the Sound switch in Settings says. After
+  /// every move, the game runs [moveCountdown] for [settleDurationFor] the
+  /// number of dice the move captured, so the player sees what changed
+  /// before anything else moves: taps are ignored, and the computer does not
+  /// reply, until it ends. By default [settleDurationFor] gives no wait.
   ///
   /// A factory, so that it builds the starting game once and hands it to
   /// `GameBloc._`, which both keeps it and maps the first screen from it.
@@ -136,6 +138,10 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// How long [_moveCountdown] runs after a move that captured the given
   /// number of dice.
   final Duration Function(int captures) _settleDurationFor;
+
+  /// The pops of a capture's dice after the first, still waiting for their
+  /// turn.
+  final List<Timer> _pendingPops = [];
 
   /// The game on screen, as the use cases take and give it. The bloc keeps
   /// it here; its state only describes the screen.
@@ -411,6 +417,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     Emitter<GameViewState> emit, {
     PlayedMove? playedMove,
   }) {
+    _cancelPops();
     _currentGame = game;
     _playedMove = playedMove;
     _turnPhase = _phaseOf(game);
@@ -429,20 +436,44 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// move just played has one, so a turn taken back or played again, or a
   /// finished game picked up again, is silent.
   ///
-  /// A move plays one sound at most. A capture leaves squares empty, so it
+  /// A capture pops once for each captured die: the first at once, and the
+  /// next one every [captureStagger], as each die starts to shrink. The
+  /// pops still waiting are dropped when the board changes again, or the
+  /// bloc closes.
+  ///
+  /// A move plays one kind of sound. A capture leaves squares empty, so it
   /// never ends the game, but the win would come first if one did.
   void _playSoundOfPlayedMove() {
     final move = state.playedMove;
     if (move == null) return;
     if (move.celebrate) {
       unawaited(_soundEffects.playWin());
-    } else if (move.captured.isNotEmpty) {
-      unawaited(_soundEffects.playCapture());
+    } else {
+      for (var die = 0; die < move.captured.length; die++) {
+        if (die == 0) {
+          unawaited(_soundEffects.playCapture());
+        } else {
+          _pendingPops.add(
+            Timer(
+              captureStagger * die,
+              () => unawaited(_soundEffects.playCapture()),
+            ),
+          );
+        }
+      }
     }
+  }
+
+  void _cancelPops() {
+    for (final pop in _pendingPops) {
+      pop.cancel();
+    }
+    _pendingPops.clear();
   }
 
   @override
   Future<void> close() {
+    _cancelPops();
     _moveCountdown.cancel();
     return super.close();
   }
