@@ -9,6 +9,11 @@ import 'package:material_ui/material_ui.dart';
 /// 0 is its start and 1 its end, however long it lasts on screen. So
 /// [velocity] is how far the piece would fly in the whole run with nothing
 /// slowing it down, and [spin] is how far it turns in that run.
+///
+/// A piece may live for only part of its field's run, from [startsAt] to
+/// [endsAt]: it is not there before it, and everything above, its fall and
+/// its fade, then counts that part as its own run. So pieces can start one
+/// after another in the same field.
 final class Particle {
   const Particle({
     required this.origin,
@@ -17,7 +22,12 @@ final class Particle {
     required this.size,
     this.angle = 0,
     this.spin = 0,
-  });
+    this.startsAt = 0,
+    this.endsAt = 1,
+  }) : assert(
+         startsAt >= 0 && startsAt < endsAt && endsAt <= 1,
+         'A piece lives within the run, and for some time.',
+       );
 
   /// Where the piece's centre starts.
   final Offset origin;
@@ -35,6 +45,13 @@ final class Particle {
 
   /// How far the piece turns during the run, in radians.
   final double spin;
+
+  /// The moment of the field's run, from 0 to 1, at which the piece appears.
+  final double startsAt;
+
+  /// The moment of the field's run, from 0 to 1, at which the piece's own run
+  /// ends.
+  final double endsAt;
 }
 
 /// Where a [Particle] is, and how it looks, at one moment of its effect.
@@ -79,9 +96,17 @@ final class ParticleField {
   final double fadeFrom;
 
   /// Every piece at [progress], a moment of the run from 0 (its start) to 1
-  /// (its end). Moments outside the run count as its start or end.
+  /// (its end). Moments outside the run count as its start or end. A piece
+  /// that has not started yet is there, but fully faded.
   List<ParticleFrame> at(double progress) {
-    final t = progress.clamp(0.0, 1.0);
+    return [for (final particle in particles) _frameOf(particle, progress)];
+  }
+
+  ParticleFrame _frameOf(Particle particle, double progress) {
+    // The moment of the piece's own run.
+    final t =
+        ((progress - particle.startsAt) / (particle.endsAt - particle.startsAt))
+            .clamp(0.0, 1.0);
     // How far a piece has moved along its starting velocity, and how far
     // gravity has pulled it, at t. With drag k, a piece's speed falls by
     // e^(-kt), so both distances come out shorter than without air.
@@ -94,21 +119,17 @@ final class ParticleField {
       alongVelocity = (1 - math.exp(-drag * t)) / drag;
       byGravity = (t - alongVelocity) / drag;
     }
-    final opacity = _opacityAt(t);
-
-    return [
-      for (final particle in particles)
-        (
-          position:
-              particle.origin +
-              particle.velocity * alongVelocity +
-              gravity * byGravity,
-          angle: particle.angle + particle.spin * t,
-          opacity: opacity,
-          color: particle.color,
-          size: particle.size,
-        ),
-    ];
+    final notStarted = particle.startsAt > 0 && progress < particle.startsAt;
+    return (
+      position:
+          particle.origin +
+          particle.velocity * alongVelocity +
+          gravity * byGravity,
+      angle: particle.angle + particle.spin * t,
+      opacity: notStarted ? 0 : _opacityAt(t),
+      color: particle.color,
+      size: particle.size,
+    );
   }
 
   /// How opaque the pieces are at [t]: fully until [fadeFrom], then less
@@ -128,7 +149,8 @@ final class ParticleField {
 /// its place, so the burst looks random but leaves no side empty. Each one
 /// flies between 60% and 100% of [speed], and is between 70% and 100% of
 /// [pieceSize] wide. [random] decides all of this, so the same seed gives
-/// the same burst every time.
+/// the same burst every time. The pieces live from [startsAt] to [endsAt],
+/// moments of the field's run (see [Particle]).
 List<Particle> burstParticles({
   required Offset center,
   required int count,
@@ -136,6 +158,8 @@ List<Particle> burstParticles({
   required double pieceSize,
   required Color color,
   required math.Random random,
+  double startsAt = 0,
+  double endsAt = 1,
 }) {
   final slice = 2 * math.pi / count;
   return [
@@ -150,6 +174,8 @@ List<Particle> burstParticles({
         size: Size.square(pieceSize * _between(0.7, 1, random)),
         angle: random.nextDouble() * math.pi,
         spin: _between(-2, 2, random) * math.pi,
+        startsAt: startsAt,
+        endsAt: endsAt,
       ),
   ];
 }

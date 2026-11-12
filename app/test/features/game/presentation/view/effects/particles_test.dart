@@ -124,6 +124,50 @@ void main() {
       expect(field.at(0.25).single.opacity, 0.75);
     });
 
+    group('a piece that lives for part of the run', () {
+      const late = Particle(
+        origin: origin,
+        velocity: Offset(40, 0),
+        color: red,
+        size: Size(4, 2),
+        startsAt: 0.5,
+      );
+      const field = ParticleField(particles: [late]);
+
+      test('is not there until it starts', () {
+        expect(field.at(0.25).single.opacity, 0);
+        expect(positionAt(field, 0.25), origin);
+      });
+
+      test('counts the part it lives for as its own run', () {
+        // Halfway through its own run, which is the last half of the field's.
+        expect(positionAt(field, 0.75), origin + const Offset(20, 0));
+        expect(field.at(0.75).single.opacity, closeTo(0.5, 1e-9));
+      });
+
+      test('is faded when its run ends, before the field ends', () {
+        const early = Particle(
+          origin: origin,
+          velocity: Offset(40, 0),
+          color: red,
+          size: Size(4, 2),
+          endsAt: 0.5,
+        );
+        const earlyField = ParticleField(particles: [early]);
+
+        expect(earlyField.at(0.5).single.opacity, 0);
+        expect(positionAt(earlyField, 1), positionAt(earlyField, 0.5));
+      });
+
+      test('lets pieces in one field start one after another', () {
+        const both = ParticleField(particles: [piece, late]);
+
+        final frames = both.at(0.25);
+        expect(frames[0].opacity, greaterThan(0));
+        expect(frames[1].opacity, 0);
+      });
+    });
+
     test('counts moments outside the run as its start or its end', () {
       const field = ParticleField(particles: [piece]);
 
@@ -172,6 +216,22 @@ void main() {
       for (var i = 0; i < 12; i++) {
         expect(directions[i], inInclusiveRange(i * slice, (i + 1) * slice));
       }
+    });
+
+    test('lets the pieces start and end within the run it is given', () {
+      final pieces = burstParticles(
+        center: origin,
+        count: 4,
+        speed: 10,
+        pieceSize: 4,
+        color: red,
+        random: math.Random(1),
+        startsAt: 0.2,
+        endsAt: 0.8,
+      );
+
+      expect(pieces.map((piece) => piece.startsAt), everyElement(0.2));
+      expect(pieces.map((piece) => piece.endsAt), everyElement(0.8));
     });
 
     test('gives the same burst for the same seed', () {

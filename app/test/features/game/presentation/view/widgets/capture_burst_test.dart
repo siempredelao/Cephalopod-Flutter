@@ -18,6 +18,9 @@ void main() {
   /// Player 1's die in the middle of the board.
   const middleDie = CapturedDieUi(row: 2, col: 2, owner: player1);
 
+  /// Player 1's die at the bottom right of the board.
+  const cornerDie = CapturedDieUi(row: 4, col: 4, owner: player1);
+
   const halfway = Duration(milliseconds: 250);
 
   /// A burst of [captured] over a 5 × 5 board of 200 × 200 px, so each
@@ -66,6 +69,18 @@ void main() {
     return (paint.foregroundPainter! as ParticlePainter).field;
   }
 
+  /// The squares whose pieces are showing now, not yet started or faded.
+  Set<Offset> originsShowing(WidgetTester tester) {
+    final painter =
+        tester.widget<CustomPaint>(drawing).foregroundPainter!
+            as ParticlePainter;
+    final frames = painter.field.at(painter.progress);
+    return {
+      for (final (i, frame) in frames.indexed)
+        if (frame.opacity > 0) painter.field.particles[i].origin,
+    };
+  }
+
   group('CaptureBurst', () {
     testWidgets('draws nothing before anything is captured', (tester) async {
       await pumpBurst(tester, const []);
@@ -92,6 +107,61 @@ void main() {
 
     test('lasts as long as the die shrinking away', () {
       expect(CaptureBurst.duration, const Duration(milliseconds: 500));
+    });
+
+    group('with several dice', () {
+      testWidgets('bursts them one after another, 150 ms apart', (
+        tester,
+      ) async {
+        await burst(tester, const [topDie, middleDie, cornerDie]);
+
+        // The first die's burst is under way; the others have not started,
+        // so only its pieces show.
+        await tester.pump(const Duration(milliseconds: 100));
+        expect(originsShowing(tester), {const Offset(60, 20)});
+
+        // 100 ms later, the second has started too.
+        await tester.pump(const Duration(milliseconds: 100));
+        expect(originsShowing(tester), {
+          const Offset(60, 20),
+          const Offset(100, 100),
+        });
+
+        await tester.pump(const Duration(milliseconds: 150));
+        expect(originsShowing(tester), {
+          const Offset(60, 20),
+          const Offset(100, 100),
+          const Offset(180, 180),
+        });
+      });
+
+      testWidgets('flashes the ring of each die when its own burst starts', (
+        tester,
+      ) async {
+        await burst(tester, const [topDie, middleDie]);
+
+        // 50 ms in, only the first die's ring is out.
+        await tester.pump(const Duration(milliseconds: 50));
+        expect(drawing, paints..circle(x: 60, y: 20));
+        expect(drawing, isNot(paints..circle(x: 100, y: 100)));
+
+        // 200 ms in, the second die's ring has started, 50 ms into it.
+        await tester.pump(const Duration(milliseconds: 150));
+        expect(drawing, paints..circle(x: 100, y: 100));
+      });
+
+      testWidgets('lasts until the last die has burst', (tester) async {
+        await burst(tester, const [topDie, middleDie]);
+
+        // One die takes 500 ms; the second starts 150 ms later.
+        await tester.pump(const Duration(milliseconds: 600));
+        expect(drawing, findsOne);
+
+        await tester.pump(const Duration(milliseconds: 50));
+        await tester.pump(const Duration(milliseconds: 1));
+        expect(drawing, findsNothing);
+        expect(tester.hasRunningAnimations, isFalse);
+      });
     });
 
     testWidgets('sends pieces in both colours of each die out of its square', (
