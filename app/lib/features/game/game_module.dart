@@ -7,6 +7,7 @@ import 'package:cephalopod/features/game/domain/game_repository.dart';
 import 'package:cephalopod/features/game/domain/how_to_play_repository.dart';
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/sound_effects.dart';
+import 'package:cephalopod/features/game/domain/sound_effects_proxy.dart';
 import 'package:cephalopod/features/game/domain/use_cases/choose_agent_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/has_game_to_continue.dart';
 import 'package:cephalopod/features/game/domain/use_cases/play_move.dart';
@@ -49,6 +50,12 @@ final class GameModule implements FeatureModule {
   final SoundEffects _soundEffects;
   final bool Function() _highlightLastMove;
   final bool Function() _soundOn;
+
+  /// The game's sounds, heard only while the Sound switch is on.
+  late final SoundEffects _soundEffectsProxy = SoundEffectsProxy(
+    soundEffects: _soundEffects,
+    soundOn: _soundOn,
+  );
 
   final PositionEvaluator _positionEvaluator = PositionEvaluator();
   final OpponentQueryCodec _opponentQueryCodec = const OpponentQueryCodec();
@@ -109,7 +116,7 @@ final class GameModule implements FeatureModule {
       path: 'game',
       name: AppRoute.game.name,
       // Settings cannot change while a game is on screen, so the game reads
-      // the highlight and sound settings once, when it opens.
+      // the highlight setting once, when it opens.
       builder: (_, state) => GamePage(
         createBloc: _createBloc,
         opening: _openingOf(state.uri.queryParameters),
@@ -147,7 +154,7 @@ final class GameModule implements FeatureModule {
       chooseAgentMove: _chooseAgentMove,
       suggestMove: _suggestMove,
       highlightLastMove: _highlightLastMove(),
-      soundEffects: _soundOn() ? _soundEffects : null,
+      soundEffects: _soundEffectsProxy,
       moveCountdown: CountdownTimer(moveSettleDuration),
     );
   }

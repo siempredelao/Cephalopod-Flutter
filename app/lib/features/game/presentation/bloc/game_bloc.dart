@@ -34,11 +34,11 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// Shows a new game under [config] until the opening event replaces it,
   /// or the given [position], which tests use to start mid-game. The board
   /// marks the last move when [highlightLastMove] is on. A move that
-  /// captures, by either side, plays a pop on [soundEffects]; with none, as
-  /// when the settings turn sound off, the game is silent. After every move,
-  /// the game runs [moveCountdown], so the player sees what changed before
-  /// anything else moves: taps are ignored, and the computer does not
-  /// reply, until it ends. By default it has no length.
+  /// captures, by either side, plays a pop on [soundEffects], which decide
+  /// whether it is heard, as the Sound switch in Settings says. After every
+  /// move, the game runs [moveCountdown], so the player sees what changed
+  /// before anything else moves: taps are ignored, and the computer does
+  /// not reply, until it ends. By default it has no length.
   ///
   /// A factory, so that it builds the starting game once and hands it to
   /// `GameBloc._`, which both keeps it and maps the first screen from it.
@@ -52,9 +52,9 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     required ResumeGame resumeGame,
     required ChooseAgentMove chooseAgentMove,
     required SuggestMove suggestMove,
+    required SoundEffects soundEffects,
     GameViewStateMapper gameViewStateMapper = const GameViewStateMapper(),
     bool highlightLastMove = true,
-    SoundEffects? soundEffects,
     CountdownTimer? moveCountdown,
     GameConfig config = GameConfig.standard,
     @visibleForTesting GameState? position,
@@ -122,8 +122,8 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// Whether the board marks the last move, as the player's settings say.
   final bool _highlightLastMove;
 
-  /// The sounds the game plays, or `null` for none.
-  final SoundEffects? _soundEffects;
+  /// The sounds the game plays.
+  final SoundEffects _soundEffects;
 
   /// Runs after every move, so the player sees it before the next one.
   final CountdownTimer _moveCountdown;
@@ -416,10 +416,9 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// it, as the capture's burst does: a pop when it captured. Only a move
   /// just played has one, so a turn taken back or played again is silent.
   void _playSoundOfPlayedMove() {
-    final soundEffects = _soundEffects;
     final move = state.playedMove;
-    if (soundEffects == null || move == null) return;
-    if (move.captured.isNotEmpty) unawaited(soundEffects.playCapture());
+    if (move == null) return;
+    if (move.captured.isNotEmpty) unawaited(_soundEffects.playCapture());
   }
 
   @override

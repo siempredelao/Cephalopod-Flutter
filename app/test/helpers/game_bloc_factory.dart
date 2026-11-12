@@ -14,6 +14,7 @@ import 'package:cephalopod/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
 import 'computer_turns.dart';
+import 'fake_sound_effects.dart';
 
 /// A [GameBloc] on the real engine and [repository] (in memory by default),
 /// wired the way the composition root wires it to device storage.
@@ -23,7 +24,7 @@ import 'computer_turns.dart';
 /// [backgroundRunner] says otherwise. After a move, the bloc runs
 /// [moveCountdown], which has no length by default. The bloc starts from a
 /// new game under [config], or from [position] when given. It plays its
-/// sounds on [soundEffects], and none without.
+/// sounds on [soundEffects], or on a fake that only records them.
 GameBloc createTestGameBloc({
   GameRepository? repository,
   GameConfig config = GameConfig.standard,
@@ -60,7 +61,7 @@ GameBloc createTestGameBloc({
     chooseAgentMove: chooseAgentMove,
     suggestMove: suggestMove,
     moveCountdown: moveCountdown,
-    soundEffects: soundEffects,
+    soundEffects: soundEffects ?? FakeSoundEffects(),
     config: config,
     position: position,
   );
