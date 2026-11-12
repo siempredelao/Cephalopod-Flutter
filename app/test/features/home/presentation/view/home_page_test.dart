@@ -2,6 +2,7 @@ import 'package:cephalopod/core/theme/board_colors.dart';
 import 'package:cephalopod/features/home/presentation/bloc/home_cubit.dart';
 import 'package:cephalopod/features/home/presentation/view/home_page.dart';
 import 'package:cephalopod/features/home/presentation/view/home_view.dart';
+import 'package:cephalopod/features/home/presentation/view/widgets/continue_card.dart';
 import 'package:cephalopod/features/home/presentation/view/widgets/demo_board.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -43,8 +44,26 @@ void main() {
     testWidgets('offers to continue when a game is saved', (tester) async {
       await pumpHome(tester, hasGameToContinue: true);
 
-      expect(find.widgetWithText(FilledButton, 'Continue'), findsOne);
-      expect(find.text('New game'), findsOne);
+      expect(find.byType(ContinueCard), findsOne);
+      expect(find.widgetWithText(FilledButton, 'New game'), findsOne);
+    });
+
+    testWidgets('shows no card when nothing is saved', (tester) async {
+      await pumpHome(tester, hasGameToContinue: false);
+
+      expect(find.byType(ContinueCard), findsNothing);
+    });
+
+    testWidgets('puts the card above the softer new-game button', (
+      tester,
+    ) async {
+      await pumpHome(tester, hasGameToContinue: true);
+
+      final card = tester.getRect(find.byType(ContinueCard));
+      final newGame = tester.getRect(find.byType(FilledButton));
+
+      expect(card.bottom, lessThanOrEqualTo(newGame.top));
+      expect(card.width, newGame.width);
     });
 
     testWidgets('says what the game is in one short line', (tester) async {
@@ -102,8 +121,11 @@ void main() {
       final semantics = tester.ensureSemantics();
       await pumpHome(tester, hasGameToContinue: true);
 
+      expect(
+        find.bySemanticsLabel(RegExp('^Continue')),
+        findsOne,
+      );
       for (final label in [
-        'Continue',
         'New game',
         'How to play',
         'Settings',

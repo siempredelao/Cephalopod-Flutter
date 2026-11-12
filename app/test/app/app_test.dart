@@ -8,6 +8,7 @@ import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/new_game_dialog.dart';
 import 'package:cephalopod/features/home/presentation/view/home_page.dart';
+import 'package:cephalopod/features/home/presentation/view/widgets/continue_card.dart';
 import 'package:cephalopod/features/how_to_play/presentation/view/how_to_play_page.dart';
 import 'package:cephalopod/features/settings/presentation/view/settings_page.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
@@ -136,7 +137,7 @@ void main() {
 
     testWidgets('offers to continue a game left unfinished', (tester) async {
       await pumpApp(tester);
-      expect(find.text('Continue'), findsNothing);
+      expect(find.byType(ContinueCard), findsNothing);
 
       await startNewGame(tester);
       await tester.tap(find.byType(BoardSquare).first);
@@ -144,7 +145,8 @@ void main() {
       await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
+      expect(find.byType(ContinueCard), findsOneWidget);
+      await tester.tap(find.byType(ContinueCard));
       await tester.pumpAndSettle();
 
       expect(find.byType(GamePage), findsOneWidget);
