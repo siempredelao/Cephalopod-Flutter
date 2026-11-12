@@ -798,11 +798,12 @@ small)
   question. Declared as app assets. Nothing plays them.
 - **36a-2. `feat(game): add audio playback`** (foundation, S).
   `audioplayers`, with ADR 0021. A `SoundEffects` interface (`playCapture`,
-  `playWin`), its `audioplayers` implementation built in `GameModule`, and a
-  fake for tests. Nothing calls it yet.
+  `playWin`) in the domain, and its `audioplayers` implementation in
+  `data/`, tested with a fake player. Nothing builds or calls it yet.
 - **36b. `feat(game): play a sound on a capture`** (feature, S). On every
   capture, by either side, when the switch is on. Undo and redo stay silent.
-  `GameModule` gets `soundOn` here.
+  `GameModule` gets `soundOn` and the `SoundEffects` here (the composition
+  root builds the audioplayers one), and the tests get a fake.
 - **36c. `feat(game): play a sound when the player wins`** (feature, XS).
   The same moments as the confetti. A winning move that also captures plays
   only the win sound.
@@ -810,7 +811,7 @@ small)
 Acceptance (36b, 36c):
 - With the fake: each sound plays when it should and not otherwise, and
   never with the switch off. By hand on Android: it follows the media volume
-  and stays silent in silent mode.
+  and leaves music from another app playing (ADR 0021).
 
 ### Decisions for M6 (answered 2026-11-11)
 
