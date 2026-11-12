@@ -1,10 +1,10 @@
+import 'package:cephalopod/core/board/die_face.dart';
 import 'package:cephalopod/core/board/models/die_ui.dart';
 import 'package:cephalopod/core/board/models/player_ui.dart';
 import 'package:cephalopod/core/board/models/role_ui.dart';
 import 'package:cephalopod/core/board/models/side_ui.dart';
 import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/core/theme/board_colors.dart';
-import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 

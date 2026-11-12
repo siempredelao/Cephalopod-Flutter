@@ -1,11 +1,11 @@
+import 'package:cephalopod/core/board/board_durations.dart';
+import 'package:cephalopod/core/board/die_face.dart';
 import 'package:cephalopod/core/board/models/die_ui.dart';
 import 'package:cephalopod/core/board/models/square_ui.dart';
+import 'package:cephalopod/core/board/square_ring.dart';
+import 'package:cephalopod/core/board/square_text_mapper.dart';
 import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/core/theme/board_colors.dart';
-import 'package:cephalopod/features/game/presentation/view/game_durations.dart';
-import 'package:cephalopod/features/game/presentation/view/square_text_mapper.dart';
-import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
-import 'package:cephalopod/features/game/presentation/view/widgets/square_ring.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// One [square] of the board: a tile or the die on it, with a glowing ring

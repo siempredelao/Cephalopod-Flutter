@@ -1,4 +1,4 @@
-import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
+import 'package:cephalopod/core/board/die_face.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/game_board.dart';
 import 'package:flutter_test/flutter_test.dart';
 

@@ -1,3 +1,4 @@
+import 'package:cephalopod/core/board/board_square.dart';
 import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:cephalopod/core/theme/board_colors.dart';
 import 'package:cephalopod/features/game/data/in_memory_game_repository.dart';
@@ -6,7 +7,6 @@ import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_event.dart';
 import 'package:cephalopod/features/game/presentation/view/game_page.dart';
 import 'package:cephalopod/features/game/presentation/view/game_view.dart';
-import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';

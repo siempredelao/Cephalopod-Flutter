@@ -1,8 +1,8 @@
 import 'package:cephalopod/core/board/models/role_ui.dart';
 import 'package:cephalopod/core/board/models/square_mark.dart';
 import 'package:cephalopod/core/board/models/square_ui.dart';
+import 'package:cephalopod/core/board/player_text_mapper.dart';
 import 'package:cephalopod/core/l10n/l10n.dart';
-import 'package:cephalopod/features/game/presentation/view/player_text_mapper.dart';
 
 /// Words what screen readers announce for a square, in the language on
 /// screen: where it is, counting rows and columns from 1, what is on it,
