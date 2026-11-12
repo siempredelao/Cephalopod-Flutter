@@ -6,6 +6,7 @@ import 'package:cephalopod/core/navigation/feature_module.dart';
 import 'package:cephalopod/features/game/domain/game_repository.dart';
 import 'package:cephalopod/features/game/domain/how_to_play_repository.dart';
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
+import 'package:cephalopod/features/game/domain/sound_effects.dart';
 import 'package:cephalopod/features/game/domain/use_cases/choose_agent_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/has_game_to_continue.dart';
 import 'package:cephalopod/features/game/domain/use_cases/play_move.dart';
@@ -30,20 +31,24 @@ import 'package:go_router/go_router.dart';
 /// they are needed, on the rules and the repository the composition root
 /// picks, and each visit to the game route gets its own [GameBloc].
 final class GameModule implements FeatureModule {
-  /// `highlightLastMove` is a plain function rather than the settings
-  /// feature's cubit, because features may not import each other. The
-  /// composition root wires it to the settings module.
+  /// `highlightLastMove` and `soundOn` are plain functions rather than the
+  /// settings feature's cubit, because features may not import each other.
+  /// The composition root wires them to the settings module.
   GameModule({
     required this._cephalopodRules,
     required this._gameRepository,
     required this._howToPlayRepository,
+    required this._soundEffects,
     required this._highlightLastMove,
+    required this._soundOn,
   });
 
   final CephalopodRules _cephalopodRules;
   final GameRepository _gameRepository;
   final HowToPlayRepository _howToPlayRepository;
+  final SoundEffects _soundEffects;
   final bool Function() _highlightLastMove;
+  final bool Function() _soundOn;
 
   final PositionEvaluator _positionEvaluator = PositionEvaluator();
   final OpponentQueryCodec _opponentQueryCodec = const OpponentQueryCodec();
@@ -104,7 +109,7 @@ final class GameModule implements FeatureModule {
       path: 'game',
       name: AppRoute.game.name,
       // Settings cannot change while a game is on screen, so the game reads
-      // the highlight setting once, when it opens.
+      // the highlight and sound settings once, when it opens.
       builder: (_, state) => GamePage(
         createBloc: _createBloc,
         opening: _openingOf(state.uri.queryParameters),
@@ -142,6 +147,7 @@ final class GameModule implements FeatureModule {
       chooseAgentMove: _chooseAgentMove,
       suggestMove: _suggestMove,
       highlightLastMove: _highlightLastMove(),
+      soundEffects: _soundOn() ? _soundEffects : null,
       moveCountdown: CountdownTimer(moveSettleDuration),
     );
   }

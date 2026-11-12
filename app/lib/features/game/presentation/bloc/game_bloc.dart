@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:cephalopod/features/game/domain/models/current_game.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
+import 'package:cephalopod/features/game/domain/sound_effects.dart';
 import 'package:cephalopod/features/game/domain/use_cases/choose_agent_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/play_move.dart';
 import 'package:cephalopod/features/game/domain/use_cases/resume_game.dart';
@@ -22,14 +25,17 @@ import 'package:meta/meta.dart';
 /// what the screen shows. The rules stay in the engine; this class only asks
 /// it which moves are legal, and plays, undoes and saves them through the
 /// use cases. Against the computer, it lets the computer play its turns. On
-/// request, it looks for a hint.
+/// request, it looks for a hint. It plays the sound of each move as it
+/// shows it.
 ///
 /// It keeps the game to itself and emits a [GameViewState], which only
 /// describes the screen (docs/adr/0015).
 class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// Shows a new game under [config] until the opening event replaces it,
   /// or the given [position], which tests use to start mid-game. The board
-  /// marks the last move when [highlightLastMove] is on. After every move,
+  /// marks the last move when [highlightLastMove] is on. A move that
+  /// captures, by either side, plays a pop on [soundEffects]; with none, as
+  /// when the settings turn sound off, the game is silent. After every move,
   /// the game runs [moveCountdown], so the player sees what changed before
   /// anything else moves: taps are ignored, and the computer does not
   /// reply, until it ends. By default it has no length.
@@ -48,6 +54,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     required SuggestMove suggestMove,
     GameViewStateMapper gameViewStateMapper = const GameViewStateMapper(),
     bool highlightLastMove = true,
+    SoundEffects? soundEffects,
     CountdownTimer? moveCountdown,
     GameConfig config = GameConfig.standard,
     @visibleForTesting GameState? position,
@@ -62,6 +69,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
       suggestMove: suggestMove,
       gameViewStateMapper: gameViewStateMapper,
       highlightLastMove: highlightLastMove,
+      soundEffects: soundEffects,
       moveCountdown: moveCountdown ?? CountdownTimer(Duration.zero),
       currentGame: (
         record: GameRecord(config: config),
@@ -83,6 +91,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     required this._suggestMove,
     required this._gameViewStateMapper,
     required this._highlightLastMove,
+    required this._soundEffects,
     required this._moveCountdown,
     required this._currentGame,
   }) : super(
@@ -112,6 +121,9 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
 
   /// Whether the board marks the last move, as the player's settings say.
   final bool _highlightLastMove;
+
+  /// The sounds the game plays, or `null` for none.
+  final SoundEffects? _soundEffects;
 
   /// Runs after every move, so the player sees it before the next one.
   final CountdownTimer _moveCountdown;
@@ -397,6 +409,17 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
       _moveCountdown.cancel();
     }
     _emitScreen(emit);
+    _playSoundOfPlayedMove();
+  }
+
+  /// Plays the sound of the move just shown, from what the screen shows of
+  /// it, as the capture's burst does: a pop when it captured. Only a move
+  /// just played has one, so a turn taken back or played again is silent.
+  void _playSoundOfPlayedMove() {
+    final soundEffects = _soundEffects;
+    final move = state.playedMove;
+    if (soundEffects == null || move == null) return;
+    if (move.captured.isNotEmpty) unawaited(soundEffects.playCapture());
   }
 
   @override

@@ -803,7 +803,10 @@ small)
 - **36b. `feat(game): play a sound on a capture`** (feature, S). On every
   capture, by either side, when the switch is on. Undo and redo stay silent.
   `GameModule` gets `soundOn` and the `SoundEffects` here (the composition
-  root builds the audioplayers one), and the tests get a fake.
+  root builds the audioplayers one), and the tests get a fake. The
+  `GameBloc` plays the sound as it shows the move, not a listener in
+  `game_effects.dart`: views may not import the domain, where
+  `SoundEffects` lives.
 - **36c. `feat(game): play a sound when the player wins`** (feature, XS).
   The same moments as the confetti. A winning move that also captures plays
   only the win sound.
