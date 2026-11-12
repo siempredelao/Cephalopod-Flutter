@@ -34,8 +34,9 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// Shows a new game under [config] until the opening event replaces it,
   /// or the given [position], which tests use to start mid-game. The board
   /// marks the last move when [highlightLastMove] is on. A move that
-  /// captures, by either side, plays a pop on [soundEffects], which decide
-  /// whether it is heard, as the Sound switch in Settings says. After every
+  /// captures, by either side, plays a pop on [soundEffects], and one that
+  /// wins the game for the player a chime; the [soundEffects] decide whether
+  /// they are heard, as the Sound switch in Settings says. After every
   /// move, the game runs [moveCountdown], so the player sees what changed
   /// before anything else moves: taps are ignored, and the computer does
   /// not reply, until it ends. By default it has no length.
@@ -413,12 +414,21 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   }
 
   /// Plays the sound of the move just shown, from what the screen shows of
-  /// it, as the capture's burst does: a pop when it captured. Only a move
-  /// just played has one, so a turn taken back or played again is silent.
+  /// it, as the capture's burst and the win's confetti do: a chime when it
+  /// won the game for the player, or else a pop when it captured. Only a
+  /// move just played has one, so a turn taken back or played again, or a
+  /// finished game picked up again, is silent.
+  ///
+  /// A move plays one sound at most. A capture leaves squares empty, so it
+  /// never ends the game, but the win would come first if one did.
   void _playSoundOfPlayedMove() {
     final move = state.playedMove;
     if (move == null) return;
-    if (move.captured.isNotEmpty) unawaited(_soundEffects.playCapture());
+    if (move.celebrate) {
+      unawaited(_soundEffects.playWin());
+    } else if (move.captured.isNotEmpty) {
+      unawaited(_soundEffects.playCapture());
+    }
   }
 
   @override

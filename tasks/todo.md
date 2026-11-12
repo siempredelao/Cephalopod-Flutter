@@ -65,7 +65,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] 36a-1. feat(game): add the capture and win sounds (S)
 - [x] 36a-2. feat(game): add audio playback (S)
 - [x] 36b. feat(game): play a sound on a capture (S)
-- [ ] 36c. feat(game): play a sound when the player wins (XS)
+- [x] 36c. feat(game): play a sound when the player wins (XS)
 - [ ] Checkpoint: verify; by hand on Android: first launch, hint on Hard, capture and win effects, sound off
 
 ## M7: Google Play

@@ -866,6 +866,75 @@ void main() {
     });
   });
 
+  group('GameBloc win sound', () {
+    late FakeSoundEffects sounds;
+    late InMemoryGameRepository repository;
+    const oneSquare = GameConfig(boardSize: 1);
+
+    setUp(() {
+      sounds = FakeSoundEffects();
+      repository = InMemoryGameRepository();
+    });
+
+    GameBloc buildOnOneSquare() => createTestGameBloc(
+      config: oneSquare,
+      repository: repository,
+      soundEffects: sounds,
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      'chimes when the move fills the board in a game between two people',
+      build: buildOnOneSquare,
+      act: (bloc) => bloc.add(tap(const Position(0, 0))),
+      verify: (_) => expect(sounds.played, ['win']),
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      'keeps quiet when the game ends in a win taken back and played again',
+      build: buildOnOneSquare,
+      act: (bloc) => bloc
+        ..add(tap(const Position(0, 0)))
+        ..add(const UndoRequested())
+        ..add(const RedoRequested()),
+      verify: (_) => expect(sounds.played, ['win']),
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      'keeps quiet when the computer wins',
+      // The computer plays Black, which moves first, and fills the board.
+      setUp: () => repository.save((
+        record: GameRecord(config: oneSquare),
+        opponent: const ComputerOpponent(
+          difficulty: Difficulty.easy,
+          player: Player.black,
+        ),
+      )),
+      build: buildOnOneSquare,
+      act: (bloc) => bloc.add(const GameResumed()),
+      verify: (bloc) {
+        expect(bloc.state.playedMove?.computer, isNotNull);
+        expect(sounds.played, isEmpty);
+      },
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      'keeps quiet when a game the player won is picked up again',
+      setUp: () => repository.save((
+        record: GameRecord(
+          config: oneSquare,
+          moves: [Move(const Position(0, 0))],
+        ),
+        opponent: const FriendOpponent(),
+      )),
+      build: buildOnOneSquare,
+      act: (bloc) => bloc.add(const GameResumed()),
+      verify: (bloc) {
+        expect(bloc.state.headline, isA<PlayerWonHeadline>());
+        expect(sounds.played, isEmpty);
+      },
+    );
+  });
+
   group('GameBloc after a game-ending move', () {
     test('celebrates the move that fills the board', () async {
       final bloc = createTestGameBloc(config: const GameConfig(boardSize: 1))
