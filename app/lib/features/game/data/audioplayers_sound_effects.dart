@@ -10,6 +10,12 @@ import 'package:cephalopod/features/game/domain/sound_effects.dart';
 /// makes no player. Both play in low-latency mode, meant for short sounds
 /// that must start at once.
 ///
+/// A low-latency player on Android is never told that its sound has ended,
+/// so it would take itself to be still playing and ignore every play after
+/// the first. Each play therefore stops the player first. The player keeps
+/// its sound loaded when it stops (`ReleaseMode.stop`), so the sound need
+/// not be read again.
+///
 /// A sound that does not play never stops the game: when the plugin fails,
 /// the error goes to [_errorReporter] and nothing is heard. Only
 /// `Exception`s are caught; an `Error` is a bug, so it goes on to the
@@ -46,9 +52,11 @@ final class AudioplayersSoundEffects implements SoundEffects {
   @override
   Future<void> playWin() => _play(_winPlayer, 'sounds/win.wav');
 
-  /// Plays [asset], a path under `assets/`, on [player].
+  /// Plays [asset], a path under `assets/`, on [player], from its start.
   Future<void> _play(AudioPlayer player, String asset) async {
     try {
+      await player.setReleaseMode(ReleaseMode.stop);
+      await player.stop();
       await player.play(
         AssetSource(asset),
         mode: PlayerMode.lowLatency,
