@@ -88,6 +88,52 @@ void main() {
       expect(tapped, [board.rows[1][1]]);
     });
 
+    testWidgets('has the captured dice shrink one after another', (
+      tester,
+    ) async {
+      const two = [
+        CapturedDieUi(
+          row: 0,
+          col: 1,
+          owner: SideUi(player: PlayerUi.two, role: RoleUi.player),
+        ),
+        CapturedDieUi(
+          row: 0,
+          col: 0,
+          owner: SideUi(player: PlayerUi.two, role: RoleUi.player),
+        ),
+      ];
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: appLocalizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          theme: ThemeData(extensions: const [BoardColors.light]),
+          home: Center(
+            child: GameBoard(
+              board: board,
+              captured: two,
+              onSquareTapped: null,
+            ),
+          ),
+        ),
+      );
+
+      Duration delayAt(int row, int col) {
+        final squares = tester.widgetList<BoardSquare>(
+          find.byType(BoardSquare),
+        );
+        return squares
+            .singleWhere((s) => s.square.row == row && s.square.col == col)
+            .shrinkDelay;
+      }
+
+      // In the order the dice were given, not reading order: the mapper
+      // sorts them, the board keeps their order.
+      expect(delayAt(0, 1), Duration.zero);
+      expect(delayAt(0, 0), const Duration(milliseconds: 150));
+      expect(delayAt(2, 2), Duration.zero);
+    });
+
     testWidgets('hands the dice animation on to the grid', (tester) async {
       await pumpBoard(tester, animateDice: true);
 
