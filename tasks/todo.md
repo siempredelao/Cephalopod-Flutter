@@ -79,7 +79,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] HM3. feat(game): describe the saved game for Home (S)
 - [x] HM4a. feat(core): draw a board as a small picture (S)
 - [x] HM4b. refactor(home): let Home hold the saved game (S)
-- [ ] HM4c. feat(home): continue from a card that shows the saved game (S)
+- [x] HM4c. feat(home): continue from a card that shows the saved game (S)
 - [ ] S1. feat(game): wait longer after a bigger capture (S)
 - [ ] S2. feat(game): shrink and burst captured dice one at a time (S)
 - [ ] S3. feat(game): pop once per captured die (S)
