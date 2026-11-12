@@ -177,7 +177,7 @@ void main() {
     testWidgets('opens how to play from home', (tester) async {
       await pumpApp(tester);
 
-      await tester.tap(find.widgetWithText(OutlinedButton, 'How to play'));
+      await tester.tap(find.widgetWithText(TextButton, 'How to play'));
       await tester.pumpAndSettle();
 
       expect(find.byType(HowToPlayPage), findsOneWidget);
@@ -203,7 +203,7 @@ void main() {
     testWidgets('switches to the dark theme from the settings', (tester) async {
       await pumpApp(tester);
 
-      await tester.tap(find.widgetWithText(OutlinedButton, 'Settings'));
+      await tester.tap(find.widgetWithText(TextButton, 'Settings'));
       await tester.pumpAndSettle();
       expect(find.byType(SettingsPage), findsOneWidget);
       await tester.tap(find.text('Dark'));
@@ -226,7 +226,7 @@ void main() {
     ) async {
       await pumpApp(tester);
 
-      await tester.tap(find.widgetWithText(OutlinedButton, 'Settings'));
+      await tester.tap(find.widgetWithText(TextButton, 'Settings'));
       await tester.pumpAndSettle();
       await tester.tap(
         find.widgetWithText(SwitchListTile, 'Highlight the last move'),
@@ -272,7 +272,7 @@ void main() {
       ) async {
         final sounds = FakeSoundEffects();
         await pumpApp(tester, soundEffects: sounds);
-        await tester.tap(find.widgetWithText(OutlinedButton, 'Settings'));
+        await tester.tap(find.widgetWithText(TextButton, 'Settings'));
         await tester.pumpAndSettle();
         await tester.tap(find.widgetWithText(SwitchListTile, 'Sound'));
         await tester.pumpAndSettle();
@@ -288,7 +288,7 @@ void main() {
     testWidgets('opens the about page from home', (tester) async {
       await pumpApp(tester);
 
-      await tester.tap(find.widgetWithText(OutlinedButton, 'About'));
+      await tester.tap(find.widgetWithText(TextButton, 'About'));
       await tester.pumpAndSettle();
 
       expect(find.byType(AboutPage), findsOneWidget);

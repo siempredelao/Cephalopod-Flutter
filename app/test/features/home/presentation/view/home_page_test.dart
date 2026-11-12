@@ -1,5 +1,6 @@
 import 'package:cephalopod/features/home/presentation/bloc/home_cubit.dart';
 import 'package:cephalopod/features/home/presentation/view/home_page.dart';
+import 'package:cephalopod/features/home/presentation/view/home_view.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -36,6 +37,79 @@ void main() {
 
       expect(find.widgetWithText(FilledButton, 'Continue'), findsOne);
       expect(find.text('New game'), findsOne);
+    });
+
+    testWidgets('says what the game is in one short line', (tester) async {
+      await pumpHome(tester, hasGameToContinue: false);
+
+      expect(find.text('Place dice. Add them up. Capture.'), findsOne);
+    });
+
+    testWidgets('gives the main button the width of the screen', (
+      tester,
+    ) async {
+      await pumpHome(tester, hasGameToContinue: false);
+
+      final screen = tester.getSize(find.byType(HomeView));
+      final button = tester.getSize(
+        find.widgetWithText(FilledButton, 'New game'),
+      );
+
+      // 24 px of space on each side of the page.
+      expect(button.width, screen.width - 2 * 24);
+    });
+
+    testWidgets('puts How to play, Settings and About in a row below it', (
+      tester,
+    ) async {
+      await pumpHome(tester, hasGameToContinue: false);
+
+      final main = tester.getRect(
+        find.widgetWithText(FilledButton, 'New game'),
+      );
+      final links = [
+        for (final label in ['How to play', 'Settings', 'About'])
+          tester.getRect(find.widgetWithText(TextButton, label)),
+      ];
+
+      for (final link in links) {
+        expect(link.top, greaterThanOrEqualTo(main.bottom));
+        expect(link.top, links.first.top);
+      }
+      expect(links[0].right, lessThanOrEqualTo(links[1].left));
+      expect(links[1].right, lessThanOrEqualTo(links[2].left));
+    });
+
+    testWidgets('names every button for screen readers', (tester) async {
+      final semantics = tester.ensureSemantics();
+      await pumpHome(tester, hasGameToContinue: true);
+
+      for (final label in [
+        'Continue',
+        'New game',
+        'How to play',
+        'Settings',
+        'About',
+      ]) {
+        expect(find.bySemanticsLabel(label), findsOne, reason: label);
+      }
+      semantics.dispose();
+    });
+
+    testWidgets("fades the theme's teal into the background", (tester) async {
+      await pumpHome(tester, hasGameToContinue: false);
+
+      final scheme = Theme.of(tester.element(find.byType(HomeView)))
+          .colorScheme;
+      final background = tester
+          .widgetList<DecoratedBox>(find.byType(DecoratedBox))
+          .map((box) => box.decoration)
+          .whereType<BoxDecoration>()
+          .map((decoration) => decoration.gradient)
+          .whereType<LinearGradient>()
+          .single;
+
+      expect(background.colors, [scheme.primaryContainer, scheme.surface]);
     });
   });
 }

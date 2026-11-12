@@ -33,10 +33,10 @@ void main() {
 
       await pumpApp(tester);
 
-      expect(find.textContaining('Un juego de dados'), findsOne);
+      expect(find.text('Coloca dados. Súmalos. Captura.'), findsOne);
       expect(find.widgetWithText(FilledButton, 'Nueva partida'), findsOne);
       for (final button in ['Cómo se juega', 'Ajustes', 'Acerca de']) {
-        expect(find.widgetWithText(OutlinedButton, button), findsOne);
+        expect(find.widgetWithText(TextButton, button), findsOne);
       }
     });
 
@@ -89,7 +89,7 @@ void main() {
     testWidgets('shows every page of How to play', (tester) async {
       useSpanishPhone(tester);
       await pumpApp(tester);
-      await tester.tap(find.widgetWithText(OutlinedButton, 'Cómo se juega'));
+      await tester.tap(find.widgetWithText(TextButton, 'Cómo se juega'));
       await tester.pumpAndSettle();
 
       var pages = 1;

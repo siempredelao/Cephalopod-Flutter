@@ -6,7 +6,7 @@
     "description": "The game's name: the app's title, and the heading on Home and About. Mark Steere's name for the game; not translated."
   },
 
-  "homeTagline": "A two-player dice game on a 5×5 board.",
+  "homeTagline": "Place dice. Add them up. Capture.",
   "@homeTagline": {
     "description": "Home: the line under the game's name."
   },
