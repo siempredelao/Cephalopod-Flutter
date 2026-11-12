@@ -150,8 +150,9 @@ differently, and fail every golden.
 - [x] **M6 · UX**: How to play on first launch, a simpler game app bar, a dice
   count, a hint, effects and sounds for captures and wins. (The first M6, a web
   release, was dropped with the web build.)
-- [ ] **M6 follow-ups**: How to play as a feature of its own, captured dice
-  that burst one at a time with a pop each, and one place that wires the app
+- [ ] **M6 follow-ups**: a new Home screen with a board that plays a capture,
+  How to play as a feature of its own, and captured dice that burst one at
+  a time with a pop each
 - [ ] **M7 · Google Play**: twelve languages, an open-source licenses screen,
   launcher icons and splash screen, a rating prompt, release signing, store
   listing and screenshots

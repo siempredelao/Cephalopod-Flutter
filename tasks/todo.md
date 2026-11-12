@@ -70,15 +70,18 @@ The numbers are the ones first planned, so they are not in order here.
 
 ## M6 follow-ups, in this order
 - [ ] T1. test(game): one test file per use case (S)
-- [ ] W. refactor(app): build the app's modules in one place (S)
 - [ ] H1. refactor(core): move the board's UI models to core (S)
 - [ ] H2. refactor(core): move the board's drawing to core (S)
 - [ ] H3. refactor(game): let the board mapper take marks, not a turn phase (S)
 - [ ] H4. refactor(how_to_play): make How to play a feature of its own (S–M)
+- [ ] HM1. feat(home): make Home clearer (S)
+- [ ] HM2. feat(home): show a board that plays a capture (S)
+- [ ] HM3. feat(game): describe the saved game for Home (S)
+- [ ] HM4. feat(home): continue from a card that shows the saved game (S)
 - [ ] S1. feat(game): wait longer after a bigger capture (S)
 - [ ] S2. feat(game): shrink and burst captured dice one at a time (S)
 - [ ] S3. feat(game): pop once per captured die (S)
-- [ ] Checkpoint: verify; by hand on Android: How to play on first launch and from the game, a 3- or 4-die capture one die at a time with a pop each
+- [ ] Checkpoint: verify; by hand on Android: How to play on first launch and from the game, the new Home (demo board, Continue card), a 3- or 4-die capture one die at a time with a pop each
 
 ## M7: Google Play, in this order
 - [ ] feat(about): show the open-source licenses (S)

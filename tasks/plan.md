@@ -838,9 +838,8 @@ Acceptance (36b, 36c):
 ## M6 follow-ups (planned 2026-11-12)
 
 Ideas raised during M6 were parked until M6 was done, then planned here
-together, with the question of whether the app needs a DI library. They
-come before M7, because moving How to play changes files that M7's
-translations and screenshots then cover once.
+together with a new Home screen. They come before M7, because they change
+screens and files that M7's translations and screenshots then cover once.
 
 Answers from the user (2026-11-12):
 - **Captured dice go one at a time.** Each die keeps the full 500 ms shrink,
@@ -848,43 +847,36 @@ Answers from the user (2026-11-12):
   number of dice captured.
 - **One pop per captured die**, timed with its burst.
 - **The licenses screen stays in M7.**
-
-### Do we need a DI library? No.
-
-What was checked (2026-11-12):
-- **Size.** 5 features, each with a hand-written module (ADR 0013). All the
-  wiring is about 540 lines: `bootstrap.dart` (76), five modules (24 to 183
-  each), and the test helpers `pumpApp` (69) and `createTestGameBloc` (68).
-- **Safety.** Every dependency is a constructor argument, so a missing one
-  is a compile error, and the architecture check keeps features apart. A
-  service locator (`get_it`, with `injectable` generating the
-  registrations) would turn those compile errors into lookups that fail at
-  run time, add code generation, and invite calling the locator from
-  inside widgets and blocs. Riverpod would overlap with Bloc (ADR 0002).
-- **The one real cost.** `pumpApp` repeats `bootstrap`'s module wiring, so
-  every new dependency changes both; #113 did. One wiring function that
-  both call removes that, with no library (Task W).
-- **When to look again.** Once wiring dominates PRs: beyond about 10
-  features, or a module past about 300 lines. The modules still map onto
-  `injectable` modules if that day comes.
+- **Home gets a new look** (the user: "not attractive at all for the
+  player"). From mockups, the user chose all of these:
+  - a live demo board on top that plays a capture on a loop
+  - one big main button, with How to play, Settings and About as a row of
+    icons at the bottom
+  - a Continue card that shows the saved game
+  - a teal background
+  - a shorter tagline
+- **Whether the app needs a DI library is set aside for now.**
 
 ### Order
 
 | # | PR | Kind | Size |
 | --- | --- | --- | --- |
 | 1 | T1 · one test file per use case | test | S |
-| 2 | W · build the app's modules in one place | refactor | S |
-| 3 | H1 · the board's UI models move to `core/` | refactor | S |
-| 4 | H2 · the board's drawing moves to `core/` | refactor | S |
-| 5 | H3 · the board mapper takes marks, not a turn phase | refactor | S |
-| 6 | H4 · How to play becomes its own feature | refactor | S–M |
-| 7 | S1 · wait longer after a bigger capture | feature | S |
-| 8 | S2 · captured dice shrink and burst one at a time | feature | S |
-| 9 | S3 · one pop per captured die | feature | S |
+| 2 | H1 · the board's UI models move to `core/` | refactor | S |
+| 3 | H2 · the board's drawing moves to `core/` | refactor | S |
+| 4 | H3 · the board mapper takes marks, not a turn phase | refactor | S |
+| 5 | H4 · How to play becomes its own feature | refactor | S–M |
+| 6 | HM1 · a clearer Home: one main button, icons below, teal background, shorter tagline | feature | S |
+| 7 | HM2 · a demo board on Home that plays a capture | feature | S |
+| 8 | HM3 · the game describes its saved game for Home | foundation | S |
+| 9 | HM4 · continue from a card that shows the saved game | feature | S |
+| 10 | S1 · wait longer after a bigger capture | feature | S |
+| 11 | S2 · captured dice shrink and burst one at a time | feature | S |
+| 12 | S3 · one pop per captured die | feature | S |
 
-W comes before H4, which adds a module and would otherwise change both
-`bootstrap` and `pumpApp`. H1–H4 come before S2, which changes
-`BoardSquare` after H2 has moved it.
+H1–H4 come first: the Home board, the card's thumbnail and S2 all need the
+board's drawing in `core/`, where Home can use it without importing the
+game feature.
 
 ### Tasks
 
@@ -897,16 +889,6 @@ W comes before H4, which adds a module and would otherwise change both
   `test/helpers/computer_turns.dart`.
 - Acceptance: no test changes what it checks; the test count and coverage
   stay the same.
-
-**W. `refactor(app): build the app's modules in one place`** (S)
-- `app/lib/app/app_wiring.dart`: one function. It takes the concrete
-  implementations (repositories, `SoundEffects`, `AppVersionSource`,
-  `LinkOpener`, initial location), builds and connects every module, and
-  returns the router and the settings store.
-- `bootstrap.dart` calls it with the device's implementations. `pumpApp`
-  calls it with the in-memory ones and fakes.
-- ADR 0013 gets a "Reviewed 2026-11-12" note with the findings above.
-- Acceptance: every app test passes unchanged.
 
 **H1–H4. How to play becomes its own feature.** How to play lives in the
 game feature only because its example boards use the game's board drawing
@@ -932,6 +914,41 @@ play moves out. All four are refactors, and the goldens don't change.
   the route and `hasSeenHowToPlay`. `GameModule` loses them, and the game's
   app bar still opens How to play by route name. Tests and goldens move
   with them. If it grows well past 300 lines, split it first.
+
+**HM1–HM4. A new Home.** Mockups (2026-11-12): the PR that added this
+plan shows them. Each PR redraws the Home goldens and shows the old and new
+images.
+- **HM1. `feat(home): make Home clearer`**:
+  - One full-width main button.
+  - How to play, Settings and About become a row of icon-and-label buttons
+    at the bottom.
+  - A teal gradient from the top (the theme's primary container fading into
+    the surface), in light and dark.
+  - A shorter tagline: "Place dice. Add them up. Capture." and a Spanish
+    line to match.
+  - The title stays text, for now.
+  - Accessibility test: every button keeps its label.
+- **HM2. `feat(home): show a board that plays a capture`**:
+  - A 3 × 3 board above the title, drawn with `core/board`'s `BoardGrid`.
+  - It loops a scripted capture: dice grow in, one captures its neighbours,
+    and the sum appears.
+  - The frames are plain data with their timing, tested on their own.
+  - It is decorative, so screen readers skip it. Under reduced motion it
+    shows one still frame.
+  - No burst on Home, since the particles stay in the game feature.
+- **HM3. `feat(game): describe the saved game for Home`** (foundation):
+  - A small core model with the saved game's board, the opponent, whose
+    turn it is and each side's dice count.
+  - `GameModule` gives it through a plain function, as it gives
+    `hasGameToContinue` today, which it replaces. Nothing draws it yet.
+- **HM4. `feat(home): continue from a card that shows the saved game`**:
+  - When a game is saved, Continue becomes a card.
+  - The card has a thumbnail of the board: a new `BoardThumbnail` in
+    `core/board`, coloured squares without pips, because the full board's
+    gaps hide the dice at that size.
+  - Next to it, "vs Computer · Hard" and "Your turn · you 5, computer 5",
+    worded by a Home text mapper in both languages.
+  - New game becomes the second, softer button.
 
 **S1–S3. Captured dice one at a time.** The timing lives in
 `features/game/presentation/bloc/move_timing.dart`:
@@ -960,6 +977,8 @@ play moves out. All four are refactors, and the goldens don't change.
 
 `verify` green. By hand on Android:
 - How to play opens on first launch and from the game.
+- Home's board plays its capture, and stands still under reduced motion.
+- The Continue card shows the saved game.
 - A 3- or 4-die capture goes one die at a time, with a pop each, and the
   computer waits for it.
 
