@@ -45,3 +45,6 @@ flutter:
   # Generates the translations (lib/core/l10n/generated) on `flutter pub get`.
   generate: true
   uses-material-design: true
+  # The game's sounds, made by tool/make_sounds.dart.
+  assets:
+    - assets/sounds/
