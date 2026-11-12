@@ -1,4 +1,4 @@
-import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
+import 'package:cephalopod/core/board/models/square_mark.dart';
 import 'package:cephalopod/features/game/presentation/bloc/tutorial_step.dart';
 import 'package:cephalopod/features/game/presentation/models/tutorial_topic.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
@@ -103,7 +103,7 @@ TutorialExample _fullBoard() {
   const result = Finished(winner: Player.black, blackDice: 13, whiteDice: 12);
   final board = Board(size: size, dice: dice);
   final game = GameState(board: board, status: result);
-  return (game: game, phase: const TurnPhase.gameEnded(result), lastMove: null);
+  return (game: game, marks: const {});
 }
 
 /// Player 1 on the squares where row + column is even, so 13 dice to 12,
@@ -128,13 +128,12 @@ TutorialExample _placing(
   Map<Position, Die> dice, {
   required Position lastMove,
 }) {
-  return (
-    game: _gameWith(dice),
-    phase: const TurnPhase.awaitingPlacement(),
-    lastMove: Move(lastMove),
-  );
+  return (game: _gameWith(dice), marks: {lastMove: SquareMark.lastMove});
 }
 
+/// A die is to be placed on [_centre], where it can capture in the ways in
+/// [options]: the target and every die in an option stand out, and the dice
+/// in [selected] stand out as chosen.
 TutorialExample _choosing(
   Map<Position, Die> dice, {
   required List<Set<Position>> options,
@@ -142,11 +141,11 @@ TutorialExample _choosing(
 }) {
   return (
     game: _gameWith(dice),
-    phase: TurnPhase.choosingCapture(
-      target: _centre,
-      options: options,
-      selected: selected,
-    ),
-    lastMove: null,
+    marks: {
+      for (final option in options)
+        for (final square in option) square: SquareMark.captureOption,
+      for (final square in selected) square: SquareMark.captureSelected,
+      _centre: SquareMark.captureTarget,
+    },
   );
 }

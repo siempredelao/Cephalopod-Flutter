@@ -3,7 +3,6 @@ import 'package:cephalopod/core/board/models/player_ui.dart';
 import 'package:cephalopod/core/board/models/role_ui.dart';
 import 'package:cephalopod/core/board/models/side_ui.dart';
 import 'package:cephalopod/core/board/models/square_mark.dart';
-import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod/features/game/presentation/bloc/tutorial_step.dart';
 import 'package:cephalopod/features/game/presentation/bloc/tutorial_step_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/models/tutorial_topic.dart';
@@ -24,8 +23,7 @@ void main() {
         .  w1 .
         .  .  .
       ''', toMove: Player.black),
-      phase: const TurnPhase.awaitingPlacement(),
-      lastMove: Move(centre),
+      marks: {centre: SquareMark.lastMove},
     ),
   );
 

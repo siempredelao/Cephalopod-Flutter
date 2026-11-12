@@ -908,8 +908,12 @@ play moves out. All four are refactors, and the goldens don't change.
 - **H3. `refactor(game): let the board mapper take marks, not a turn
   phase`**: a core `BoardUiMapper` builds a `BoardUi` from an engine
   `Board`, each player's `SideUi` and a map of square marks. The game's
-  mapper still works out the marks and sides, then calls it. A tutorial
-  example states its marks and sides directly.
+  mapper, renamed `GameBoardUiMapper` so the two names differ, still works
+  out the marks and sides, then calls it. A tutorial example states its
+  marks directly (`TutorialExample` is a `game` and its `marks`, no longer
+  a `TurnPhase` and a last move), and the tutorial's mapper gives it the
+  two sides of a game between people. The tests that check the examples
+  against the rules (R5, R7) read the marks instead.
 - **H4. `refactor(how_to_play): make How to play a feature of its own`**:
   `features/how_to_play/` gets the repository, its two implementations, the
   cubit, steps, mappers, view state, page and its widgets, and a module with

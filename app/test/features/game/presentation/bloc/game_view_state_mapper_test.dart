@@ -3,8 +3,8 @@ import 'package:cephalopod/core/board/models/role_ui.dart';
 import 'package:cephalopod/core/board/models/side_ui.dart';
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
-import 'package:cephalopod/features/game/presentation/bloc/board_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/dice_tally_ui_mapper.dart';
+import 'package:cephalopod/features/game/presentation/bloc/game_board_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/game_view_state_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/hint_state.dart';
 import 'package:cephalopod/features/game/presentation/bloc/played_move.dart';
@@ -69,7 +69,7 @@ void main() {
 
   group('GameViewStateMapper', () {
     test('draws the board with its marks', () {
-      final board = const BoardUiMapper().map(
+      final board = const GameBoardUiMapper().map(
         game: figure4,
         phase: placing,
         lastMove: Move(center),
@@ -188,7 +188,7 @@ void main() {
         expect(screen.hint, const HintUi(row: 0, col: 2, captures: 2));
         expect(
           screen.board,
-          const BoardUiMapper().map(
+          const GameBoardUiMapper().map(
             game: figure4,
             phase: phase,
             lastMove: Move(center),

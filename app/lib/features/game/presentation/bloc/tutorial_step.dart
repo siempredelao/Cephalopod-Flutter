@@ -1,13 +1,17 @@
-import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
+import 'package:cephalopod/core/board/models/square_mark.dart';
 import 'package:cephalopod/features/game/presentation/models/tutorial_topic.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
 /// A position from the rules, shown as an example: the `game` on the board,
-/// what the screen would be waiting for in it (`phase`), and the `lastMove`,
-/// if any, to mark.
+/// and the `marks` that make squares stand out in it, such as the last move
+/// or the dice a capture can take. A square without a mark does not stand
+/// out.
 ///
 /// A Dart record, so it is plain data with value equality.
-typedef TutorialExample = ({GameState game, TurnPhase phase, Move? lastMove});
+typedef TutorialExample = ({
+  GameState game,
+  Map<Position, SquareMark> marks,
+});
 
 /// One page of the how-to-play tutorial: the [topic] it teaches, and an
 /// [example] board that shows it. The words for the topic are in the
