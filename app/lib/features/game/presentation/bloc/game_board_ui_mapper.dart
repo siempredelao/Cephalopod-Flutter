@@ -1,18 +1,22 @@
+import 'package:cephalopod/core/board/board_ui_mapper.dart';
 import 'package:cephalopod/core/board/models/board_ui.dart';
-import 'package:cephalopod/core/board/models/die_ui.dart';
 import 'package:cephalopod/core/board/models/square_mark.dart';
-import 'package:cephalopod/core/board/models/square_ui.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/presentation/bloc/hint_state.dart';
 import 'package:cephalopod/features/game/presentation/bloc/side_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
-/// Turns the game on screen into the [BoardUi] the board draws: each
-/// square's die, whose it is, and how the square stands out.
-final class BoardUiMapper {
-  const BoardUiMapper({this._sideUiMapper = const SideUiMapper()});
+/// Turns the game on screen into the [BoardUi] the board draws: it works out
+/// how each player appears and how each square stands out, and has the core
+/// [BoardUiMapper] draw them.
+final class GameBoardUiMapper {
+  const GameBoardUiMapper({
+    this._boardUiMapper = const BoardUiMapper(),
+    this._sideUiMapper = const SideUiMapper(),
+  });
 
+  final BoardUiMapper _boardUiMapper;
   final SideUiMapper _sideUiMapper;
 
   /// The board of [game] against [opponent], with its squares marked for
@@ -28,29 +32,20 @@ final class BoardUiMapper {
   }) {
     final board = game.board;
     final shownLastMove = highlightLastMove ? lastMove : null;
-
-    SquareUi squareAt(int row, int col) {
-      final position = Position(row, col);
-      final die = board.dice[position];
-      return SquareUi(
-        row: row,
-        col: col,
-        die: die == null ? null : _dieUiOf(die, opponent),
-        mark: _markOf(position, phase, shownLastMove),
-      );
+    final marks = <Position, SquareMark>{};
+    for (var row = 0; row < board.size; row++) {
+      for (var col = 0; col < board.size; col++) {
+        final position = Position(row, col);
+        final mark = _markOf(position, phase, shownLastMove);
+        if (mark != SquareMark.none) marks[position] = mark;
+      }
     }
-
-    return BoardUi(
-      rows: [
-        for (var row = 0; row < board.size; row++)
-          [for (var col = 0; col < board.size; col++) squareAt(row, col)],
-      ],
+    return _boardUiMapper.map(
+      board: board,
+      black: _sideUiMapper.map(Player.black, opponent),
+      white: _sideUiMapper.map(Player.white, opponent),
+      marks: marks,
     );
-  }
-
-  DieUi _dieUiOf(Die die, Opponent opponent) {
-    final owner = _sideUiMapper.map(die.owner, opponent);
-    return DieUi(pips: die.pips, owner: owner);
   }
 
   /// While a capture is being chosen, the target and the dice that can be

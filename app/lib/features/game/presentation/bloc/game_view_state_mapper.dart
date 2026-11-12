@@ -1,6 +1,6 @@
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
-import 'package:cephalopod/features/game/presentation/bloc/board_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/dice_tally_ui_mapper.dart';
+import 'package:cephalopod/features/game/presentation/bloc/game_board_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/headline_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/hint_state.dart';
 import 'package:cephalopod/features/game/presentation/bloc/played_move.dart';
@@ -19,13 +19,13 @@ import 'package:cephalopod_engine/cephalopod_engine.dart';
 /// controls.
 final class GameViewStateMapper {
   const GameViewStateMapper({
-    this._boardUiMapper = const BoardUiMapper(),
+    this._boardUiMapper = const GameBoardUiMapper(),
     this._headlineUiMapper = const HeadlineUiMapper(),
     this._diceTallyUiMapper = const DiceTallyUiMapper(),
     this._sideUiMapper = const SideUiMapper(),
   });
 
-  final BoardUiMapper _boardUiMapper;
+  final GameBoardUiMapper _boardUiMapper;
   final HeadlineUiMapper _headlineUiMapper;
   final DiceTallyUiMapper _diceTallyUiMapper;
   final SideUiMapper _sideUiMapper;

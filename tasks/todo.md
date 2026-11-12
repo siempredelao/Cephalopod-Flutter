@@ -72,7 +72,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] T1. test(game): one test file per use case (S)
 - [x] H1. refactor(core): move the board's UI models to core (S)
 - [x] H2. refactor(core): move the board's drawing to core (S)
-- [ ] H3. refactor(game): let the board mapper take marks, not a turn phase (S)
+- [x] H3. refactor(game): let the board mapper take marks, not a turn phase (S)
 - [ ] H4. refactor(how_to_play): make How to play a feature of its own (S–M)
 - [ ] HM1. feat(home): make Home clearer (S)
 - [ ] HM2. feat(home): show a board that plays a capture (S)

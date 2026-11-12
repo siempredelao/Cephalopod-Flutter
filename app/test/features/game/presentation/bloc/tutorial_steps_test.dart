@@ -1,4 +1,5 @@
-import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
+import 'package:cephalopod/core/board/models/square_mark.dart';
+import 'package:cephalopod/features/game/presentation/bloc/tutorial_step.dart';
 import 'package:cephalopod/features/game/presentation/bloc/tutorial_steps.dart';
 import 'package:cephalopod/features/game/presentation/models/tutorial_topic.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
@@ -16,6 +17,12 @@ void main() {
       if (move.position == square) move.captures,
   ];
 
+  /// The squares of [step]'s example that carry [mark].
+  List<Position> squaresMarked(TutorialStep step, SquareMark mark) => [
+    for (final MapEntry(:key, :value) in step.example.marks.entries)
+      if (value == mark) key,
+  ];
+
   group('tutorialSteps', () {
     test('teach every topic once, in order', () {
       expect([
@@ -23,25 +30,31 @@ void main() {
       ], TutorialTopic.values);
     });
 
-    test('R5: show exactly the capture choices the rules allow', () {
+    test('R5: mark exactly the dice the rules let a capture take', () {
       final choosing = [
         for (final step in tutorialSteps)
-          if (step.example.phase case final ChoosingCapture phase)
-            (game: step.example.game, phase: phase),
+          if (squaresMarked(step, SquareMark.captureTarget) case [final target])
+            (game: step.example.game, target: target, step: step),
       ];
 
       expect(choosing, isNotEmpty);
-      for (final (:game, :phase) in choosing) {
-        final allowed = capturesAt(game, phase.target);
-        expect(phase.options, unorderedEquals(allowed));
+      for (final (:game, :target, :step) in choosing) {
+        final allowed = capturesAt(game, target);
+        final choices = {
+          ...squaresMarked(step, SquareMark.captureOption),
+          ...squaresMarked(step, SquareMark.captureSelected),
+        };
+        expect(choices, allowed.expand((captures) => captures).toSet());
       }
     });
 
     test('R7: show a 1 only where nothing could be captured', () {
       for (final step in tutorialSteps) {
-        final square = step.example.lastMove?.position;
+        final marked = squaresMarked(step, SquareMark.lastMove);
+        if (marked.length != 1) continue;
+        final square = marked.single;
         final die = step.example.game.board.dice[square];
-        if (square == null || die == null || die.pips != 1) continue;
+        if (die == null || die.pips != 1) continue;
 
         final before = GameState(
           board: Board(

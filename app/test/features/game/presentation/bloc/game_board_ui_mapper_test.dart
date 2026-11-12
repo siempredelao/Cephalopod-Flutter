@@ -7,7 +7,7 @@ import 'package:cephalopod/core/board/models/square_mark.dart';
 import 'package:cephalopod/core/board/models/square_ui.dart';
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
-import 'package:cephalopod/features/game/presentation/bloc/board_ui_mapper.dart';
+import 'package:cephalopod/features/game/presentation/bloc/game_board_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/bloc/hint_state.dart';
 import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
@@ -15,7 +15,7 @@ import 'package:cephalopod_engine/testing.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  const mapper = BoardUiMapper();
+  const mapper = GameBoardUiMapper();
   const top = Position(0, 2);
   const left = Position(0, 1);
   const right = Position(0, 3);
@@ -52,7 +52,7 @@ void main() {
     return board.rows[position.row][position.col];
   }
 
-  group('BoardUiMapper', () {
+  group('GameBoardUiMapper', () {
     test("marks a hint's square and the dice it would capture", () {
       final hint = Move(top, captures: {left, right});
 

@@ -1,5 +1,5 @@
+import 'package:cephalopod/core/board/models/square_mark.dart';
 import 'package:cephalopod/core/l10n/l10n.dart';
-import 'package:cephalopod/features/game/presentation/bloc/turn_phase.dart';
 import 'package:cephalopod/features/game/presentation/bloc/tutorial_step.dart';
 import 'package:cephalopod/features/game/presentation/bloc/tutorial_steps.dart';
 import 'package:cephalopod/features/game/presentation/models/tutorial_topic.dart';
@@ -78,13 +78,16 @@ void main() {
   group("The tutorial's words match its examples:", () {
     test('the sum is the one the capture gives', () {
       final capture = exampleOf(TutorialTopic.captureWhenYouCan);
-      final choosing = capture.phase as ChoosingCapture;
       final captured = [
-        for (final square in choosing.options.single)
-          capture.game.board.dice[square]!.pips,
+        for (final MapEntry(:key, :value) in capture.marks.entries)
+          if (value == SquareMark.captureOption)
+            capture.game.board.dice[key]!.pips,
       ]..sort();
       final after = exampleOf(TutorialTopic.dieShowsTheSum);
-      final newDie = after.game.board.dice[after.lastMove!.position]!;
+      final lastMove = after.marks.entries
+          .singleWhere((mark) => mark.value == SquareMark.lastMove)
+          .key;
+      final newDie = after.game.board.dice[lastMove]!;
 
       final sum = '${captured.join(' + ')} = ${newDie.pips}';
       for (final l10n in languages.values) {
