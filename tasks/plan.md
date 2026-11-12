@@ -874,8 +874,9 @@ Answers from the user (2026-11-12):
 | 11 | HM4c · the saved game worded for the card | foundation | S |
 | 12 | HM4d · continue from a card that shows the saved game | feature | S |
 | 13 | S1 · wait longer after a bigger capture | feature | S |
-| 14 | S2 · captured dice shrink and burst one at a time | feature | S |
-| 15 | S3 · one pop per captured die | feature | S |
+| 14 | S2a · a square can wait before its die shrinks | foundation | S |
+| 15 | S2b · captured dice shrink and burst one at a time | feature | S |
+| 16 | S3 · one pop per captured die | feature | S |
 
 H1–H4 come first: the Home board, the card's thumbnail and S2 all need the
 board's drawing in `core/`, where Home can use it without importing the
@@ -986,9 +987,14 @@ images.
   - `PlayedMoveUi.captured` comes in reading order.
   - `CountdownTimer.start` takes the length of the wait, which the bloc
     sets from the move's captures. `moveSettleDuration` goes.
-- **S2. `feat(game): shrink and burst captured dice one at a time`**:
-  - `BoardSquare` takes an optional `shrinkDelay`.
-  - `CaptureBurst` gives each die's pieces their own start.
+- **S2a. `feat(core): let a square wait before its die shrinks`**
+  (foundation):
+  - `BoardSquare` takes a `shrinkDelay`: a die that goes away stays whole
+    that long, then shrinks. `BoardGrid` takes `shrinkDelayOf(square)`.
+  - Nothing uses it yet. Reduced motion and undo and redo stay instant.
+- **S2b. `feat(game): shrink and burst captured dice one at a time`**:
+  - `GameBoard` gives each captured die `index × captureStagger`.
+  - `CaptureBurst` gives each die's pieces and ring the same start.
   - Reduced motion still shows nothing, and undo and redo stay instant.
   - A short screen recording goes in the PR.
 - **S3. `feat(game): pop once per captured die`**:

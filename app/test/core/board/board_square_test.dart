@@ -30,6 +30,7 @@ void main() {
     WidgetTester tester,
     SquareUi square, {
     bool animateDie = true,
+    Duration shrinkDelay = Duration.zero,
   }) {
     return tester.pumpWidget(
       MaterialApp(
@@ -42,6 +43,7 @@ void main() {
             child: BoardSquare(
               square: square,
               animateDie: animateDie,
+              shrinkDelay: shrinkDelay,
               onTap: null,
             ),
           ),
@@ -177,6 +179,91 @@ void main() {
 
       await tester.pumpAndSettle();
       expect(find.byType(DieFace), findsNothing);
+    });
+
+    group('with a shrink delay', () {
+      const delay = Duration(milliseconds: 300);
+
+      testWidgets('keeps the die whole until the delay has passed', (
+        tester,
+      ) async {
+        await pumpSquare(tester, withDie);
+
+        await pumpSquare(tester, empty, shrinkDelay: delay);
+        await tester.pump(const Duration(milliseconds: 250));
+
+        expect(dieScale(tester), 1);
+        expect(dieOpacity(tester), 1);
+      });
+
+      testWidgets('then shrinks it as usual', (tester) async {
+        await pumpSquare(tester, withDie);
+
+        await pumpSquare(tester, empty, shrinkDelay: delay);
+        await tester.pump(delay);
+        await tester.pump(const Duration(milliseconds: 100));
+        expect(dieScale(tester), allOf(greaterThan(0.5), lessThan(1)));
+
+        await tester.pumpAndSettle();
+        expect(find.byType(DieFace), findsNothing);
+      });
+
+      testWidgets('takes the die away at once when the device asks for less '
+          'motion', (tester) async {
+        askForLessMotion(tester);
+        await pumpSquare(tester, withDie);
+
+        await pumpSquare(tester, empty, shrinkDelay: delay);
+
+        expect(find.byType(DieFace), findsNothing);
+        expect(tester.hasRunningAnimations, isFalse);
+      });
+
+      testWidgets('takes the die away at once without a move', (tester) async {
+        await pumpSquare(tester, withDie);
+
+        await pumpSquare(tester, empty, animateDie: false, shrinkDelay: delay);
+
+        expect(find.byType(DieFace), findsNothing);
+      });
+
+      testWidgets('brings back at once a die that was waiting to shrink', (
+        tester,
+      ) async {
+        // A capture taken back before its dice have gone.
+        await pumpSquare(tester, withDie);
+        await pumpSquare(tester, empty, shrinkDelay: delay);
+        await tester.pump(const Duration(milliseconds: 100));
+
+        await pumpSquare(tester, withDie, animateDie: false);
+        await tester.pump(delay);
+
+        expect(dieScale(tester), 1);
+        expect(tester.hasRunningAnimations, isFalse);
+      });
+
+      testWidgets('does not grow again a new die put where one waited', (
+        tester,
+      ) async {
+        await pumpSquare(tester, withDie);
+        await pumpSquare(tester, empty, shrinkDelay: delay);
+        await tester.pump(const Duration(milliseconds: 100));
+
+        await pumpSquare(tester, withDie);
+
+        expect(dieScale(tester), 1);
+        await tester.pump(delay);
+        expect(dieScale(tester), 1);
+      });
+
+      testWidgets('stops waiting when the square goes away', (tester) async {
+        await pumpSquare(tester, withDie);
+        await pumpSquare(tester, empty, shrinkDelay: delay);
+
+        await tester.pumpWidget(const SizedBox());
+
+        // A timer left running would fail the test.
+      });
     });
 
     testWidgets('keeps the tile under the die while it shrinks', (

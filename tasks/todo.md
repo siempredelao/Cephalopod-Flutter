@@ -82,7 +82,8 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] HM4c. feat(home): word the saved game for the card (S)
 - [x] HM4d. feat(home): continue from a card that shows the saved game (S)
 - [x] S1. feat(game): wait longer after a bigger capture (S)
-- [ ] S2. feat(game): shrink and burst captured dice one at a time (S)
+- [x] S2a. feat(core): let a square wait before its die shrinks (S)
+- [ ] S2b. feat(game): shrink and burst captured dice one at a time (S)
 - [ ] S3. feat(game): pop once per captured die (S)
 - [ ] Checkpoint: verify; by hand on Android: How to play on first launch and from the game, the new Home (demo board, Continue card), a 3- or 4-die capture one die at a time with a pop each
 

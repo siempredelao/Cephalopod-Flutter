@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cephalopod/core/board/board_durations.dart';
 import 'package:cephalopod/core/board/die_face.dart';
 import 'package:cephalopod/core/board/models/die_ui.dart';
@@ -16,11 +18,15 @@ import 'package:material_ui/material_ui.dart';
 /// that goes away shrinks out of it, unless the device asks for less motion.
 /// Without it, and for a die already there when the square first shows, the
 /// change is drawn at once.
+///
+/// A die that goes away waits [shrinkDelay] first, whole, so that several
+/// dice taken at once can go one after another.
 class BoardSquare extends StatefulWidget {
   const BoardSquare({
     required this.square,
     required this.onTap,
     this.animateDie = false,
+    this.shrinkDelay = Duration.zero,
     this._squareTextMapper = const SquareTextMapper(),
     super.key,
   });
@@ -32,6 +38,10 @@ class BoardSquare extends StatefulWidget {
   /// Whether the die that appears or goes away, now that [square] has
   /// changed, grows in or shrinks away.
   final bool animateDie;
+
+  /// How long a die that goes away stays whole before it shrinks. It has no
+  /// effect when the die goes without animation.
+  final Duration shrinkDelay;
 
   /// Called when the square is tapped; `null` when it takes no taps.
   final VoidCallback? onTap;
@@ -58,6 +68,10 @@ class _BoardSquareState extends State<BoardSquare>
   /// and is still shrinking away.
   DieUi? _drawnDie;
 
+  /// Waits [BoardSquare.shrinkDelay] before the die starts to shrink, while
+  /// there is one to wait for.
+  Timer? _shrinkWait;
+
   @override
   void initState() {
     super.initState();
@@ -78,19 +92,23 @@ class _BoardSquareState extends State<BoardSquare>
     final now = widget.square.die;
     if (now == before) return;
 
+    final waitingToShrink = _shrinkWait != null;
+    _shrinkWait?.cancel();
+    _shrinkWait = null;
     final animate =
         widget.animateDie && !MediaQuery.disableAnimationsOf(context);
     if (now == null) {
       if (animate) {
-        // The die stays drawn while it shrinks.
-        _presence.reverse();
+        // The die stays drawn while it waits and while it shrinks.
+        _shrinkAfterDelay();
       } else {
         _drawnDie = null;
         _presence.value = 0;
       }
     } else {
       _drawnDie = now;
-      if (before == null && animate) {
+      // A die still waiting to shrink is whole, so it is not grown again.
+      if (before == null && animate && !waitingToShrink) {
         _presence.forward(from: 0);
       } else {
         _presence.value = 1;
@@ -98,8 +116,21 @@ class _BoardSquareState extends State<BoardSquare>
     }
   }
 
+  void _shrinkAfterDelay() {
+    final delay = widget.shrinkDelay;
+    if (delay == Duration.zero) {
+      _presence.reverse();
+    } else {
+      _shrinkWait = Timer(delay, () {
+        _shrinkWait = null;
+        _presence.reverse();
+      });
+    }
+  }
+
   @override
   void dispose() {
+    _shrinkWait?.cancel();
     _opacity.dispose();
     _presence.dispose();
     super.dispose();
