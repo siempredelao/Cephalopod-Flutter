@@ -1,8 +1,8 @@
+import 'package:cephalopod/core/board/models/role_ui.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/presentation/bloc/hint_state.dart';
 import 'package:cephalopod/features/game/presentation/bloc/side_ui_mapper.dart';
 import 'package:cephalopod/features/game/presentation/models/headline_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/role_ui.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 
 /// Turns how the game stands into the [HeadlineUi] above the board: whose

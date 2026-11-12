@@ -1,9 +1,9 @@
+import 'package:cephalopod/core/board/models/player_ui.dart';
+import 'package:cephalopod/core/board/models/role_ui.dart';
+import 'package:cephalopod/core/board/models/side_ui.dart';
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
 import 'package:cephalopod/features/game/presentation/bloc/side_ui_mapper.dart';
-import 'package:cephalopod/features/game/presentation/models/player_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/role_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/side_ui.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
 

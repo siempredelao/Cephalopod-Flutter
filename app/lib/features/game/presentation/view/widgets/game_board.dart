@@ -1,7 +1,7 @@
+import 'package:cephalopod/core/board/models/board_ui.dart';
+import 'package:cephalopod/core/board/models/square_ui.dart';
 import 'package:cephalopod/core/theme/board_colors.dart';
-import 'package:cephalopod/features/game/presentation/models/board_ui.dart';
 import 'package:cephalopod/features/game/presentation/models/captured_die_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/square_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/board_square.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/capture_burst.dart';
 import 'package:material_ui/material_ui.dart';

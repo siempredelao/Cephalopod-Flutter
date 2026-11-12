@@ -1,8 +1,8 @@
+import 'package:cephalopod/core/board/models/player_ui.dart';
+import 'package:cephalopod/core/board/models/role_ui.dart';
+import 'package:cephalopod/core/board/models/side_ui.dart';
 import 'package:cephalopod/core/theme/board_colors.dart';
 import 'package:cephalopod/features/game/presentation/models/captured_die_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/player_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/role_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/side_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/effects/particles.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/capture_burst.dart';
 import 'package:flutter_test/flutter_test.dart';

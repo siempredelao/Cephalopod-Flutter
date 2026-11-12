@@ -1,7 +1,7 @@
-import 'package:cephalopod/features/game/presentation/models/die_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/player_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/role_ui.dart';
-import 'package:cephalopod/features/game/presentation/models/side_ui.dart';
+import 'package:cephalopod/core/board/models/die_ui.dart';
+import 'package:cephalopod/core/board/models/player_ui.dart';
+import 'package:cephalopod/core/board/models/role_ui.dart';
+import 'package:cephalopod/core/board/models/side_ui.dart';
 import 'package:cephalopod/features/game/presentation/view/previews/board_preview_wrapper.dart';
 import 'package:cephalopod/features/game/presentation/view/widgets/die_face.dart';
 import 'package:flutter/widget_previews.dart';
