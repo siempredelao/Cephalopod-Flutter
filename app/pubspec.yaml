@@ -33,6 +33,8 @@ dependencies:
 dev_dependencies:
   bloc_test: ^10.0.0
   build_runner: ^2.15.0
+  flutter_driver:
+    sdk: flutter
   flutter_test:
     sdk: flutter
   # freezed 4.0.2+ needs analyzer 14, but the `test` version that Flutter
