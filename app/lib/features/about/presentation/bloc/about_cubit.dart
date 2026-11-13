@@ -11,10 +11,9 @@ class AboutCubit extends Cubit<AboutViewState> {
   AboutCubit({
     required this._appVersionSource,
     required this._linkOpener,
+    required this._storeListing,
     required Credits credits,
-    required Uri storeListing,
   }) : _credits = credits,
-       _storeListing = storeListing,
        super(
          AboutViewState(
            copyright: credits.copyright,

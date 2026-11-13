@@ -74,7 +74,7 @@ void main() {
       expect(find.textContaining('could not be opened'), findsNothing);
     });
 
-    testWidgets('opens the app\'s page on the store from its link', (
+    testWidgets("opens the app's page on the store from its link", (
       tester,
     ) async {
       await pumpApp(

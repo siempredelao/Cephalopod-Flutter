@@ -112,7 +112,7 @@ void main() {
       await cubit.close();
     });
 
-    test('opens the app\'s page on the store', () async {
+    test("opens the app's page on the store", () async {
       final cubit = build();
 
       await cubit.openStoreListing();
