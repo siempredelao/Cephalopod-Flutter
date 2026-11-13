@@ -37,7 +37,7 @@ void main() {
       defineGoldens(locale, brightness, goldenScreens);
     }
   }
-  for (final locale in [const Locale('fr')]) {
+  for (final locale in [const Locale('fr'), const Locale('it')]) {
     defineGoldens(locale, Brightness.light, listedScreens);
   }
 }
