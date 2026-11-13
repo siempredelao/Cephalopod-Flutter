@@ -25,20 +25,39 @@ void main() {
     'how_to_play': howToPlayScreen,
   };
 
-  for (final locale in [const Locale('en'), const Locale('es', 'ES')]) {
-    final words = lookupAppLocalizations(locale);
-    for (final brightness in Brightness.values) {
-      group('In ${locale.languageCode}, ${brightness.name}', () {
-        for (final MapEntry(key: file, value: screen)
-            in goldenScreens.entries) {
-          testWidgets('${screen.name} looks as its image', (tester) async {
-            useGoldenPhone(tester, locale, brightness);
-            await screen.open(tester, words);
+  /// The two screens a store listing shows. A language added after Spanish
+  /// has images of only these, in the light theme.
+  final listedScreens = {
+    'game': gameScreen,
+    'how_to_play': howToPlayScreen,
+  };
 
-            await expectGolden(file, locale, brightness);
-          });
-        }
-      });
+  for (final locale in [const Locale('en'), const Locale('es', 'ES')]) {
+    for (final brightness in Brightness.values) {
+      defineGoldens(locale, brightness, goldenScreens);
     }
   }
+  for (final locale in [const Locale('fr')]) {
+    defineGoldens(locale, Brightness.light, listedScreens);
+  }
+}
+
+/// Defines a test for each of [screens] that draws it in [locale]'s language
+/// and [brightness], and compares it with its image.
+void defineGoldens(
+  Locale locale,
+  Brightness brightness,
+  Map<String, Screen> screens,
+) {
+  final words = lookupAppLocalizations(locale);
+  group('In ${locale.languageCode}, ${brightness.name}', () {
+    for (final MapEntry(key: file, value: screen) in screens.entries) {
+      testWidgets('${screen.name} looks as its image', (tester) async {
+        useGoldenPhone(tester, locale, brightness);
+        await screen.open(tester, words);
+
+        await expectGolden(file, locale, brightness);
+      });
+    }
+  });
 }
