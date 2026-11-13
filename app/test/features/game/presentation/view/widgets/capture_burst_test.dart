@@ -110,7 +110,7 @@ void main() {
     });
 
     group('with several dice', () {
-      testWidgets('bursts them one after another, 150 ms apart', (
+      testWidgets('bursts them one after another, 300 ms apart', (
         tester,
       ) async {
         await burst(tester, const [topDie, middleDie, cornerDie]);
@@ -120,16 +120,16 @@ void main() {
         await tester.pump(const Duration(milliseconds: 100));
         expect(originsShowing(tester), {const Offset(60, 20)});
 
-        // 100 ms later, the second has started too.
-        await tester.pump(const Duration(milliseconds: 100));
+        // 250 ms later, the second has started too.
+        await tester.pump(const Duration(milliseconds: 250));
         expect(originsShowing(tester), {
           const Offset(60, 20),
           const Offset(100, 100),
         });
 
-        await tester.pump(const Duration(milliseconds: 150));
+        // 300 ms later the first has burst out and the third has started.
+        await tester.pump(const Duration(milliseconds: 300));
         expect(originsShowing(tester), {
-          const Offset(60, 20),
           const Offset(100, 100),
           const Offset(180, 180),
         });
@@ -145,19 +145,19 @@ void main() {
         expect(drawing, paints..circle(x: 60, y: 20));
         expect(drawing, isNot(paints..circle(x: 100, y: 100)));
 
-        // 200 ms in, the second die's ring has started, 50 ms into it.
-        await tester.pump(const Duration(milliseconds: 150));
+        // 350 ms in, the second die's ring has started, 50 ms into it.
+        await tester.pump(const Duration(milliseconds: 300));
         expect(drawing, paints..circle(x: 100, y: 100));
       });
 
       testWidgets('lasts until the last die has burst', (tester) async {
         await burst(tester, const [topDie, middleDie]);
 
-        // One die takes 500 ms; the second starts 150 ms later.
-        await tester.pump(const Duration(milliseconds: 600));
+        // One die takes 500 ms; the second starts 300 ms later.
+        await tester.pump(const Duration(milliseconds: 700));
         expect(drawing, findsOne);
 
-        await tester.pump(const Duration(milliseconds: 50));
+        await tester.pump(const Duration(milliseconds: 100));
         await tester.pump(const Duration(milliseconds: 1));
         expect(drawing, findsNothing);
         expect(tester.hasRunningAnimations, isFalse);

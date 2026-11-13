@@ -843,7 +843,7 @@ screens and files that M7's translations and screenshots then cover once.
 
 Answers from the user (2026-11-12):
 - **Captured dice go one at a time.** Each die keeps the full 500 ms shrink,
-  the dice start 150 ms apart, and the wait after a move grows with the
+  the dice start 300 ms apart, and the wait after a move grows with the
   number of dice captured.
 - **One pop per captured die**, timed with its burst.
 - **The licenses screen stays in M7.**
@@ -978,10 +978,10 @@ images.
 
 **S1–S3. Captured dice one at a time.** The timing lives in
 `features/game/presentation/bloc/move_timing.dart`:
-- `captureStagger` is 150 ms.
-- Die `i` of a capture (in reading order) starts `i × 150 ms` after the
+- `captureStagger` is 300 ms.
+- Die `i` of a capture (in reading order) starts `i × 300 ms` after the
   move shows.
-- `settleDurationFor(n)` is 500 ms + `(n − 1) × 150 ms`, and 500 ms with no
+- `settleDurationFor(n)` is 500 ms + `(n − 1) × 300 ms`, and 500 ms with no
   capture. So 4 dice wait 950 ms.
 
 - **S1. `feat(game): wait longer after a bigger capture`**:
@@ -1003,7 +1003,7 @@ images.
     die's shrinking, and lasts as long as the whole wait.
   - A short screen recording goes in the PR.
 - **S3. `feat(game): pop once per captured die`**:
-  - The bloc plays one `playCapture()` per die, 150 ms apart.
+  - The bloc plays one `playCapture()` per die, 300 ms apart.
   - Pops still waiting are cancelled when the board changes or the bloc
     closes.
   - Tested with `fake_async`, and by ear on a phone.

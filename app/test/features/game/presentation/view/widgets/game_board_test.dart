@@ -130,7 +130,7 @@ void main() {
       // In the order the dice were given, not reading order: the mapper
       // sorts them, the board keeps their order.
       expect(delayAt(0, 1), Duration.zero);
-      expect(delayAt(0, 0), const Duration(milliseconds: 150));
+      expect(delayAt(0, 0), const Duration(milliseconds: 300));
       expect(delayAt(2, 2), Duration.zero);
     });
 
