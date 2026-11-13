@@ -6,16 +6,13 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-/**
- * The upload key's details, from `android/keystore.properties`. The file is
- * not in git, so without it this is empty and the release build uses the
- * debug key.
- */
+// The upload key for Google Play, kept out of git in android/keystore.properties
+// (storeFile, storePassword, keyAlias, keyPassword). Without it, release builds
+// come out unsigned, so nothing can install them.
+val keystorePropertiesFile = rootProject.file("keystore.properties")
 val keystoreProperties = Properties().apply {
-    val file = rootProject.file("keystore.properties")
-    if (file.exists()) file.inputStream().use { load(it) }
+    if (keystorePropertiesFile.exists()) keystorePropertiesFile.inputStream().use { load(it) }
 }
-val hasKeystore = !keystoreProperties.isEmpty
 
 android {
     namespace = "gc.david.cephalopod"
@@ -42,7 +39,7 @@ android {
     }
 
     signingConfigs {
-        if (hasKeystore) {
+        if (keystorePropertiesFile.exists()) {
             create("release") {
                 keyAlias = keystoreProperties.getProperty("keyAlias")
                 keyPassword = keystoreProperties.getProperty("keyPassword")
@@ -54,9 +51,7 @@ android {
 
     buildTypes {
         release {
-            // Without the upload key (CI, a fresh clone) the release build is
-            // signed with the debug key: it installs, but Play rejects it.
-            signingConfig = signingConfigs.getByName(if (hasKeystore) "release" else "debug")
+            signingConfig = signingConfigs.findByName("release")
         }
     }
 }

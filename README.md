@@ -141,8 +141,9 @@ differently, and fail every golden.
 ## Releasing to Google Play
 
 Play only accepts a release signed with your own upload key. Without one,
-`flutter build appbundle` still works, but signs with the debug key, so CI and
-a fresh clone build fine. Play rejects that bundle.
+a release build still finishes, but its APK or bundle is unsigned: a phone
+will not install it and Play rejects it. Debug builds, which CI makes, are
+signed by Android's own debug key and need nothing.
 
 ### Make the upload key (once)
 
