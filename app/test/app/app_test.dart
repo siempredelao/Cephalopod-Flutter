@@ -94,6 +94,19 @@ void main() {
       },
     );
 
+    testWidgets('speaks Bokmål on a Norwegian phone that says no or nn', (
+      tester,
+    ) async {
+      for (final code in ['no', 'nn']) {
+        tester.platformDispatcher.localesTestValue = [Locale(code, 'NO')];
+        addTearDown(tester.platformDispatcher.clearLocalesTestValue);
+
+        await pumpApp(tester);
+
+        expect(find.text('Nytt spill'), findsOneWidget);
+      }
+    });
+
     testWidgets('speaks English on a device in any other language', (
       tester,
     ) async {
