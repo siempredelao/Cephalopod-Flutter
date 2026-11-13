@@ -1,8 +1,20 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
+
+/**
+ * The upload key's details, from `android/key.properties`. The file is not in
+ * git, so without it this is empty and the release build uses the debug key.
+ */
+val uploadKeyProperties = Properties().apply {
+    val file = rootProject.file("key.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
+val hasUploadKey = !uploadKeyProperties.isEmpty
 
 android {
     namespace = "gc.david.cephalopod"
@@ -15,7 +27,6 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "gc.david.cephalopod"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
@@ -29,11 +40,22 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (hasUploadKey) {
+            create("upload") {
+                keyAlias = uploadKeyProperties.getProperty("keyAlias")
+                keyPassword = uploadKeyProperties.getProperty("keyPassword")
+                storeFile = file(uploadKeyProperties.getProperty("storeFile"))
+                storePassword = uploadKeyProperties.getProperty("storePassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            // Without the upload key (CI, a fresh clone) the release build is
+            // signed with the debug key: it installs, but Play rejects it.
+            signingConfig = signingConfigs.getByName(if (hasUploadKey) "upload" else "debug")
         }
     }
 }
