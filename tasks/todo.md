@@ -95,7 +95,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] L1c. feat(app): map Norwegian phones to Bokmål, and keep Turkish letters safe (S)
 - [x] L2a. feat(app): translate into French (S)
 - [x] L2b. feat(app): translate into Italian (S)
-- [ ] L2c. feat(app): translate into Portuguese (Brazil) (S)
+- [x] L2c. feat(app): translate into Portuguese (Brazil) (S)
 - [ ] L3. feat(app): translate into German, Dutch, Danish, Norwegian and Swedish (M)
 - [ ] L4. feat(app): translate into Polish and Turkish (S)
 - [ ] R1. feat(review): count finished games and decide when to ask for a review (S)
