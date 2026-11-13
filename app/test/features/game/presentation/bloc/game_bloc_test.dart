@@ -838,6 +838,85 @@ void main() {
       verify: (_) => expect(sounds.played, ['capture']),
     );
 
+    /// A little longer than one `captureStagger`, in real time.
+    Future<void> waitForAPop() =>
+        Future<void>.delayed(const Duration(milliseconds: 200));
+
+    test('pops once for each captured die, 150 ms apart', () async {
+      final bloc = createTestGameBloc(
+        position: beforeCapture,
+        soundEffects: sounds,
+      )..add(tap(center));
+      await pumpEventQueue();
+
+      // Two dice are captured: the first pops at once.
+      expect(sounds.played, ['capture']);
+
+      await waitForAPop();
+      expect(sounds.played, ['capture', 'capture']);
+      await bloc.close();
+    });
+
+    test('pops three times for a capture of three dice', () async {
+      final threeDice = stateFromAscii('''
+        .  .  .  .  .
+        .  .  w1 .  .
+        .  b1 .  w1 .
+        .  .  .  .  .
+        .  .  .  .  .
+      ''', toMove: Player.black);
+      final bloc =
+          createTestGameBloc(
+              position: threeDice,
+              soundEffects: sounds,
+            )
+            ..add(tap(center))
+            // Three dice are options for a capture, so the player picks all
+            // three.
+            ..add(tap(const Position(2, 1)))
+            ..add(tap(const Position(1, 2)))
+            ..add(tap(const Position(2, 3)))
+            ..add(const CaptureConfirmed());
+      await pumpEventQueue();
+      expect(sounds.played, hasLength(1));
+
+      await waitForAPop();
+      expect(sounds.played, hasLength(2));
+      await waitForAPop();
+      expect(sounds.played, hasLength(3));
+      await bloc.close();
+    });
+
+    test(
+      'drops the pops still waiting when the capture is taken back',
+      () async {
+        final bloc = createTestGameBloc(
+          position: beforeCapture,
+          soundEffects: sounds,
+        )..add(tap(center));
+        await pumpEventQueue();
+
+        bloc.add(const UndoRequested());
+        await waitForAPop();
+
+        expect(sounds.played, ['capture']);
+        await bloc.close();
+      },
+    );
+
+    test('drops the pops still waiting when the screen closes', () async {
+      final bloc = createTestGameBloc(
+        position: beforeCapture,
+        soundEffects: sounds,
+      )..add(tap(center));
+      await pumpEventQueue();
+
+      await bloc.close();
+      await waitForAPop();
+
+      expect(sounds.played, ['capture']);
+    });
+
     blocTest<GameBloc, GameViewState>(
       'keeps quiet for a move that captures nothing',
       build: () => createTestGameBloc(soundEffects: sounds),

@@ -260,13 +260,14 @@ void main() {
         expect(diceOnBoard, findsOne);
       }
 
-      testWidgets('pops when dice are captured', (tester) async {
+      testWidgets('pops once for each die captured', (tester) async {
         final sounds = FakeSoundEffects();
         await pumpApp(tester, soundEffects: sounds);
 
+        // The corner move captures two dice.
         await captureInTheCorner(tester);
 
-        expect(sounds.played, ['capture']);
+        expect(sounds.played, ['capture', 'capture']);
       });
 
       testWidgets('keeps quiet when the settings turn sound off', (
