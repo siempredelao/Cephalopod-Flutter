@@ -118,6 +118,16 @@ finish together instead of one after the other.
 Run the same checks locally with `dart run melos run verify`. Optional git
 hooks: install [lefthook](https://lefthook.dev) and run `lefthook install`.
 
+### The on-device test
+
+One test runs the real app on an Android emulator or phone, with its real
+storage: it plays a move, closes the app, starts it again and continues the
+game. CI does not run it, so run it before a release, with a device connected:
+
+```sh
+cd app && flutter test integration_test
+```
+
 ### Golden images
 
 Some screens are kept as images in `app/test/goldens/images/`, and the app

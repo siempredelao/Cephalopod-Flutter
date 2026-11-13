@@ -105,7 +105,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] I1. feat(app): use the Cephalopod icon on the launcher (S)
 - [x] I2. feat(app): show the icon on the splash screen (S)
 - [x] P1. build(android): sign release builds (S)
-- [ ] E1. test(app): play, save and resume a game on a device (S)
+- [x] E1. test(app): play, save and resume a game on a device (S)
 - [ ] E2. test(app): take the store screenshots (S)
 - [ ] docs: the store listing in English and Spanish (S)
 - [ ] By hand in Play Console: listing, Data safety (no data collected), content rating, internal testing
