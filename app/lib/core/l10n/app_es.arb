@@ -33,6 +33,7 @@
   "aboutDesignedBy": "Cephalopod fue diseñado por Mark Steere.",
   "aboutMoreGames": "Más juegos de Mark Steere: {website}",
   "aboutOfficialRules": "Reglas oficiales (PDF)",
+  "aboutLicenses": "Licencias de código abierto",
   "aboutVersion": "Versión {version} (compilación {build})",
   "aboutLinkFailed": "No se pudo abrir el enlace. Aquí está la dirección, para copiarla:",
 

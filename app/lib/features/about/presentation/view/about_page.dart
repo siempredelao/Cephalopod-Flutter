@@ -6,8 +6,8 @@ import 'package:material_ui/material_ui.dart';
 
 /// Shows the app's version, and credits the game's designer, as his rule
 /// sheet asks of anyone who programs the game, with links to his website and
-/// the official rules. The credits are laid out as in Dipole, the app of
-/// another of his games.
+/// the official rules, and a link to the licenses of the packages it uses.
+/// The credits are laid out as in Dipole, the app of another of his games.
 ///
 /// It gets an `AboutCubit` from [createCubit] for as long as it is on
 /// screen, and draws its [AboutViewState].
@@ -31,6 +31,12 @@ class _AboutView extends StatelessWidget {
   const _AboutView();
 
   static const double _gap = 4;
+
+  /// Opens Flutter's page of licenses, which lists those of every package
+  /// the app uses: the packages register their own.
+  void _showLicenses(BuildContext context) {
+    showLicensePage(context: context, applicationName: context.l10n.appTitle);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +78,10 @@ class _AboutView extends StatelessWidget {
               _Link(
                 label: l10n.aboutOfficialRules,
                 onPressed: cubit.openRuleSheet,
+              ),
+              _Link(
+                label: l10n.aboutLicenses,
+                onPressed: () => _showLicenses(context),
               ),
               if (failedLinkAddress != null) ...[
                 const SizedBox(height: 8),

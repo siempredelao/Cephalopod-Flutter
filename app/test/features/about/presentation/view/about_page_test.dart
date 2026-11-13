@@ -9,6 +9,7 @@ void main() {
   const copyright = 'Copyright © February 2006 by Mark Steere';
   const moreGames = 'More games by Mark Steere: marksteeregames.com';
   const officialRules = 'Official rules (PDF)';
+  const licenses = 'Open-source licenses';
   final opened = <Uri>[];
 
   setUp(opened.clear);
@@ -71,6 +72,28 @@ void main() {
       expect(find.textContaining('could not be opened'), findsNothing);
     });
 
+    testWidgets('opens the list of licenses from its link', (tester) async {
+      await pumpApp(tester, location: '/about');
+
+      await tester.tap(link(licenses));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(LicensePage), findsOne);
+      expect(find.text('Cephalopod'), findsWidgets);
+    });
+
+    testWidgets('goes back to About from the licenses', (tester) async {
+      await pumpApp(tester, location: '/about');
+      await tester.tap(link(licenses));
+      await tester.pumpAndSettle();
+
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+
+      expect(find.byType(LicensePage), findsNothing);
+      expect(find.text(copyright), findsOne);
+    });
+
     testWidgets('says so, and shows the address to copy, when it cannot', (
       tester,
     ) async {
@@ -108,6 +131,7 @@ void main() {
         link('Más juegos de Mark Steere: marksteeregames.com'),
         findsOne,
       );
+      expect(link('Licencias de código abierto'), findsOne);
 
       await tester.tap(link('Reglas oficiales (PDF)'));
       await tester.pumpAndSettle();
