@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The splash icon on Android 12 and later, for about a second: the die pops
-     in, the four arrows slide into it, and the die gives one small pulse, as
-     a capture does in the game. It ends as the still icon looks. The system
-     ends it early if the app is ready sooner. -->
+<!-- The splash icon on Android 12 and later, for about a second: the die
+     waits small for 450 ms, since the first moments of a launch are not seen,
+     then pops in while the four arrows slide into it, and gives one small
+     pulse, as a capture does in the game. It ends as the still icon looks.
+     The system ends it early if the app is ready sooner. -->
 <animated-vector
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
@@ -14,16 +15,30 @@
                     <objectAnimator
                         android:propertyName="scaleX"
                         android:valueFrom="0.6"
+                        android:valueTo="0.6"
+                        android:valueType="floatType"
+                        android:duration="450" />
+                    <objectAnimator
+                        android:propertyName="scaleY"
+                        android:valueFrom="0.6"
+                        android:valueTo="0.6"
+                        android:valueType="floatType"
+                        android:duration="450" />
+                </set>
+                <set android:ordering="together">
+                    <objectAnimator
+                        android:propertyName="scaleX"
+                        android:valueFrom="0.6"
                         android:valueTo="1"
                         android:valueType="floatType"
-                        android:duration="450"
+                        android:duration="350"
                         android:interpolator="@android:interpolator/overshoot" />
                     <objectAnimator
                         android:propertyName="scaleY"
                         android:valueFrom="0.6"
                         android:valueTo="1"
                         android:valueType="floatType"
-                        android:duration="450"
+                        android:duration="350"
                         android:interpolator="@android:interpolator/overshoot" />
                 </set>
                 <set android:ordering="together">
@@ -32,14 +47,14 @@
                         android:valueFrom="1"
                         android:valueTo="1.1"
                         android:valueType="floatType"
-                        android:duration="150"
+                        android:duration="100"
                         android:interpolator="@android:interpolator/fast_out_slow_in" />
                     <objectAnimator
                         android:propertyName="scaleY"
                         android:valueFrom="1"
                         android:valueTo="1.1"
                         android:valueType="floatType"
-                        android:duration="150"
+                        android:duration="100"
                         android:interpolator="@android:interpolator/fast_out_slow_in" />
                 </set>
                 <set android:ordering="together">
@@ -48,14 +63,14 @@
                         android:valueFrom="1.1"
                         android:valueTo="1"
                         android:valueType="floatType"
-                        android:duration="200"
+                        android:duration="150"
                         android:interpolator="@android:interpolator/fast_out_slow_in" />
                     <objectAnimator
                         android:propertyName="scaleY"
                         android:valueFrom="1.1"
                         android:valueTo="1"
                         android:valueType="floatType"
-                        android:duration="200"
+                        android:duration="150"
                         android:interpolator="@android:interpolator/fast_out_slow_in" />
                 </set>
             </set>
@@ -63,52 +78,80 @@
     </target>
     <target android:name="arrowTop">
         <aapt:attr name="android:animation">
-            <set>
+            <set android:ordering="sequentially">
+                <objectAnimator
+                    android:propertyName="translateY"
+                    android:valueFrom="-10"
+                    android:valueTo="-10"
+                    android:valueType="floatType"
+                    android:duration="350" />
+
                 <objectAnimator
                     android:propertyName="translateY"
                     android:valueFrom="-10"
                     android:valueTo="0"
                     android:valueType="floatType"
-                    android:duration="450"
+                    android:duration="350"
                     android:interpolator="@android:interpolator/decelerate_cubic" />
             </set>
         </aapt:attr>
     </target>
     <target android:name="arrowRight">
         <aapt:attr name="android:animation">
-            <set>
+            <set android:ordering="sequentially">
+                <objectAnimator
+                    android:propertyName="translateX"
+                    android:valueFrom="10"
+                    android:valueTo="10"
+                    android:valueType="floatType"
+                    android:duration="350" />
+
                 <objectAnimator
                     android:propertyName="translateX"
                     android:valueFrom="10"
                     android:valueTo="0"
                     android:valueType="floatType"
-                    android:duration="450"
+                    android:duration="350"
                     android:interpolator="@android:interpolator/decelerate_cubic" />
             </set>
         </aapt:attr>
     </target>
     <target android:name="arrowBottom">
         <aapt:attr name="android:animation">
-            <set>
+            <set android:ordering="sequentially">
+                <objectAnimator
+                    android:propertyName="translateY"
+                    android:valueFrom="10"
+                    android:valueTo="10"
+                    android:valueType="floatType"
+                    android:duration="350" />
+
                 <objectAnimator
                     android:propertyName="translateY"
                     android:valueFrom="10"
                     android:valueTo="0"
                     android:valueType="floatType"
-                    android:duration="450"
+                    android:duration="350"
                     android:interpolator="@android:interpolator/decelerate_cubic" />
             </set>
         </aapt:attr>
     </target>
     <target android:name="arrowLeft">
         <aapt:attr name="android:animation">
-            <set>
+            <set android:ordering="sequentially">
+                <objectAnimator
+                    android:propertyName="translateX"
+                    android:valueFrom="-10"
+                    android:valueTo="-10"
+                    android:valueType="floatType"
+                    android:duration="350" />
+
                 <objectAnimator
                     android:propertyName="translateX"
                     android:valueFrom="-10"
                     android:valueTo="0"
                     android:valueType="floatType"
-                    android:duration="450"
+                    android:duration="350"
                     android:interpolator="@android:interpolator/decelerate_cubic" />
             </set>
         </aapt:attr>
