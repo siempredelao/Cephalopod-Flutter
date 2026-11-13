@@ -1,0 +1,1 @@
+Jeu de stratégie à deux avec des dés : placez, additionnez, capturez.

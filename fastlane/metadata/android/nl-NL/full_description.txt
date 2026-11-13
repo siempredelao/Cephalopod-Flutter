@@ -1,0 +1,20 @@
+Cephalopod is een kort strategiespel voor twee spelers dat je snel leert, met dobbelstenen op een bord van 5×5. Plaats een dobbelsteen, tel de buren op en sla ze.
+
+ZO WERKT HET
+• Plaats om de beurt één dobbelsteen op een leeg vakje.
+• Als twee of meer naastgelegen dobbelstenen samen 6 of minder zijn, sla je ze en toont je nieuwe dobbelsteen hun som.
+• Anders toont je dobbelsteen een 1.
+• Als het bord vol is, wint wie de meeste dobbelstenen heeft. Gelijkspel bestaat niet.
+
+FUNCTIES
+• Speel tegen een vriend op één apparaat, of tegen de computer op drie niveaus: makkelijk, gemiddeld en moeilijk
+• Een korte stap-voor-stap-uitleg en tips als je vastzit
+• Ongedaan maken en opnieuw doen
+• Stop met een spel en ga later verder
+• Licht en donker thema, en geluidseffecten die je kunt uitzetten
+• Werkt met schermlezers
+• Geen advertenties, geen account en geen internet nodig
+• Beschikbaar in 12 talen
+
+OVER HET SPEL
+Cephalopod is in 2006 bedacht door Mark Steere. Deze onafhankelijke app laat de naam en de regels van het spel ongewijzigd, zoals Mark Steere vraagt. Meer spellen van Mark Steere: www.marksteeregames.com

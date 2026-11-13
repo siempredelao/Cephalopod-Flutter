@@ -107,7 +107,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] P1. build(android): sign release builds (S)
 - [x] E1. test(app): play, save and resume a game on a device (S)
 - [x] E2. test(app): take the store screenshots (S)
-- [ ] docs: the store listing in English and Spanish (S)
+- [x] docs: the store listing in all twelve languages (S)
 - [ ] By hand in Play Console: listing, Data safety (no data collected), content rating, internal testing
 - [ ] Checkpoint: verify; E1 on an emulator; a signed bundle installed from internal testing
 - Not in the first release: crash reporting (decided 2026-11-12; Play Console's vitals instead)

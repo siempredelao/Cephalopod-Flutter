@@ -1,0 +1,20 @@
+Cephalopod ist ein kurzes, leicht zu lernendes Strategiespiel für zwei Personen. Gespielt wird mit Würfeln auf einem 5×5-Spielfeld. Setze einen Würfel, zähle die Nachbarn zusammen und schlage sie.
+
+SO FUNKTIONIERT’S
+• Setzt abwechselnd je einen Würfel auf ein leeres Feld.
+• Ergeben zwei oder mehr benachbarte Würfel zusammen höchstens 6, schlägst du sie, und dein neuer Würfel zeigt ihre Summe.
+• Andernfalls zeigt dein Würfel eine 1.
+• Ist das Spielfeld voll, gewinnt, wer mehr Würfel hat. Ein Unentschieden gibt es nicht.
+
+FUNKTIONEN
+• Spiele gegen einen Freund auf einem Gerät oder gegen den Computer in drei Stufen: leicht, mittel und schwer
+• Eine kurze Schritt-für-Schritt-Anleitung und Tipps, wenn du nicht weiterkommst
+• Rückgängig und Wiederholen
+• Spiel unterbrechen und später fortsetzen
+• Helles und dunkles Design, Soundeffekte lassen sich ausschalten
+• Unterstützt Screenreader
+• Ohne Werbung, ohne Konto und ohne Internetverbindung
+• In 12 Sprachen verfügbar
+
+ÜBER DAS SPIEL
+Cephalopod wurde 2006 von Mark Steere erfunden. Diese unabhängige App lässt Name und Regeln des Spiels unverändert, wie es Mark Steere verlangt. Weitere Spiele von Mark Steere: www.marksteeregames.com

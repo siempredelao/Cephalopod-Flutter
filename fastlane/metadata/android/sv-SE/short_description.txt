@@ -1,0 +1,1 @@
+Strategispel för två med tärningar: placera, addera och slå.

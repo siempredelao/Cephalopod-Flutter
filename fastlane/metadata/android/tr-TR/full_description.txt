@@ -1,0 +1,20 @@
+Cephalopod, iki kişilik, kısa ve öğrenmesi kolay bir strateji oyunudur. 5×5’lik bir tahtada zarlarla oynanır. Bir zar yerleştir, komşularını topla ve yakala.
+
+NASIL OYNANIR
+• Sırayla boş bir kareye bir zar yerleştirin.
+• Yan yana iki veya daha fazla zarın toplamı 6 veya daha azsa onları yakalarsınız ve yeni zarınız toplamı gösterir.
+• Aksi halde zarınız 1 gösterir.
+• Tahta dolunca daha çok zarı olan kazanır. Beraberlik yoktur.
+
+ÖZELLİKLER
+• Aynı cihazda bir arkadaşınla ya da bilgisayara karşı üç seviyede oyna: kolay, orta ve zor
+• Kısa, adım adım bir anlatım ve takıldığında ipuçları
+• Geri al ve yinele
+• Oyunu bırak, sonra devam et
+• Açık ve koyu tema, kapatabileceğin ses efektleri
+• Ekran okuyucu desteği
+• Reklam yok, hesap yok, internet gerekmez
+• 12 dilde
+
+OYUN HAKKINDA
+Cephalopod’u 2006’da Mark Steere icat etti. Bu bağımsız uygulama, Mark Steere’in istediği gibi oyunun adını ve kurallarını değiştirmeden korur. Mark Steere’in diğer oyunları: www.marksteeregames.com

@@ -1,0 +1,20 @@
+Cephalopod er et kort strategispil for to spillere, som er let at lære. Man spiller med terninger på et 5×5-bræt. Placér en terning, læg naboerne sammen og slå dem.
+
+SÅDAN SPILLER DU
+• Placér på skift én terning på et tomt felt.
+• Hvis to eller flere nabo-terninger tilsammen giver 6 eller mindre, slår du dem, og din nye terning viser summen.
+• Ellers viser din terning 1.
+• Når brættet er fuldt, vinder den, der har flest terninger. Der er ingen uafgjorte kampe.
+
+FUNKTIONER
+• Spil mod en ven på én enhed, eller mod computeren på tre niveauer: let, mellem og svær
+• En kort trin-for-trin-vejledning og tip, når du sidder fast
+• Fortryd og gentag
+• Forlad et spil og fortsæt senere
+• Lyst og mørkt tema og lydeffekter, du kan slå fra
+• Understøtter skærmlæsere
+• Ingen reklamer, ingen konto og ingen internetforbindelse nødvendig
+• Findes på 12 sprog
+
+OM SPILLET
+Cephalopod blev opfundet af Mark Steere i 2006. Denne uafhængige app bevarer spillets navn og regler uændrede, sådan som Mark Steere ønsker. Flere spil af Mark Steere: www.marksteeregames.com

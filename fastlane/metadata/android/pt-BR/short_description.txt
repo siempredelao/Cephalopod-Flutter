@@ -1,0 +1,1 @@
+Estratégia para dois com dados: coloque, some e capture.

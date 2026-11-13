@@ -1,0 +1,20 @@
+Cephalopod to krótka gra strategiczna dla dwóch osób, łatwa do nauczenia. Gra się kośćmi na planszy 5×5. Połóż kość, dodaj sąsiednie i zbij je.
+
+JAK GRAĆ
+• Gracze na zmianę kładą jedną kość na pustym polu.
+• Jeśli dwie lub więcej sąsiednich kości daje w sumie 6 lub mniej, zbijasz je, a Twoja nowa kość pokazuje ich sumę.
+• W przeciwnym razie Twoja kość pokazuje 1.
+• Gdy plansza jest pełna, wygrywa ten, kto ma więcej kości. Remisów nie ma.
+
+FUNKCJE
+• Graj z przyjacielem na jednym urządzeniu albo z komputerem na trzech poziomach: łatwym, średnim i trudnym
+• Krótki samouczek krok po kroku i podpowiedzi, gdy utkniesz
+• Cofanie i ponawianie ruchów
+• Przerwij grę i wróć do niej później
+• Jasny i ciemny motyw oraz efekty dźwiękowe, które możesz wyłączyć
+• Obsługa czytników ekranu
+• Bez reklam, bez konta i bez potrzeby połączenia z internetem
+• Dostępna w 12 językach
+
+O GRZE
+Cephalopod wymyślił Mark Steere w 2006 roku. Ta niezależna aplikacja nie zmienia nazwy ani zasad gry, o co prosi Mark Steere. Więcej gier Marka Steere’a: www.marksteeregames.com
