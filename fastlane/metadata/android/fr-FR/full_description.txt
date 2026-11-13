@@ -1,0 +1,20 @@
+Cephalopod est un jeu de stratégie court et facile à apprendre, pour deux joueurs, avec des dés sur un plateau de 5×5. Placez un dé, additionnez ses voisins et capturez-les.
+
+LES RÈGLES
+• À tour de rôle, placez un dé sur une case vide.
+• Si deux dés voisins ou plus font au total 6 ou moins, vous les capturez et votre nouveau dé affiche leur somme.
+• Sinon, votre dé affiche 1.
+• Quand le plateau est plein, celui qui a le plus de dés gagne. Il n’y a pas de match nul.
+
+FONCTIONNALITÉS
+• Jouez contre un ami sur le même appareil, ou contre l’ordinateur à trois niveaux : facile, moyen et difficile
+• Un court tutoriel pas à pas, et des indices quand vous êtes bloqué
+• Annuler et rétablir
+• Quittez une partie et reprenez-la plus tard
+• Thèmes clair et sombre, et effets sonores que vous pouvez couper
+• Compatible avec les lecteurs d’écran
+• Sans publicité, sans compte et sans connexion internet
+• Disponible en 12 langues
+
+À PROPOS DU JEU
+Cephalopod a été inventé par Mark Steere en 2006. Cette application indépendante garde le nom et les règles du jeu inchangés, comme le demande Mark Steere. Plus de jeux de Mark Steere : www.marksteeregames.com

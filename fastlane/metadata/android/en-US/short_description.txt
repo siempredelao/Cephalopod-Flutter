@@ -1,0 +1,1 @@
+A quick two-player dice strategy game: place dice, add them up, capture.

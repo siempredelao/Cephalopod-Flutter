@@ -1,0 +1,1 @@
+Juego de estrategia para dos con dados: coloca, suma y captura.

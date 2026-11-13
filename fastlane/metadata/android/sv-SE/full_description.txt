@@ -1,0 +1,20 @@
+Cephalopod är ett kort strategispel för två spelare som är lätt att lära sig. Man spelar med tärningar på en 5×5-spelplan. Placera en tärning, addera grannarna och slå dem.
+
+SÅ SPELAR DU
+• Placera en tärning i taget på en tom ruta, på varsin tur.
+• Om två eller fler angränsande tärningar tillsammans blir 6 eller mindre slår du dem, och din nya tärning visar summan.
+• Annars visar din tärning 1.
+• När spelplanen är full vinner den som har flest tärningar. Det finns ingen oavgjord.
+
+FUNKTIONER
+• Spela mot en vän på en enhet, eller mot datorn på tre nivåer: lätt, medel och svår
+• En kort steg-för-steg-guide och tips när du kör fast
+• Ångra och gör om
+• Lämna ett spel och fortsätt senare
+• Ljust och mörkt tema, och ljudeffekter som du kan stänga av
+• Fungerar med skärmläsare
+• Inga annonser, inget konto och ingen internetanslutning behövs
+• Finns på 12 språk
+
+OM SPELET
+Cephalopod uppfanns av Mark Steere 2006. Den här oberoende appen behåller spelets namn och regler oförändrade, som Mark Steere ber om. Fler spel av Mark Steere: www.marksteeregames.com

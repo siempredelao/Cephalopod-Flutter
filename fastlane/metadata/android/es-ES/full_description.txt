@@ -1,0 +1,20 @@
+Cephalopod es un juego de estrategia corto y fácil de aprender para dos jugadores, con dados sobre un tablero de 5×5. Coloca un dado, suma los que tiene al lado y captúralos.
+
+CÓMO SE JUEGA
+• Por turnos, coloca un dado en una casilla vacía.
+• Si dos o más dados vecinos suman 6 o menos, los capturas y tu dado nuevo muestra su suma.
+• Si no, tu dado muestra un 1.
+• Cuando el tablero está lleno, gana quien tenga más dados. No hay empates.
+
+CARACTERÍSTICAS
+• Juega contra un amigo en un mismo dispositivo, o contra el ordenador en tres niveles: fácil, medio y difícil
+• Un tutorial breve paso a paso y pistas cuando te atascas
+• Deshacer y rehacer
+• Deja una partida y continúa más tarde
+• Tema claro y oscuro, y efectos de sonido que puedes desactivar
+• Compatible con lectores de pantalla
+• Sin anuncios, sin cuenta y sin necesidad de internet
+• Disponible en 12 idiomas
+
+SOBRE EL JUEGO
+Cephalopod fue inventado por Mark Steere en 2006. Esta aplicación independiente mantiene sin cambios el nombre y las reglas del juego, como pide Mark Steere. Más juegos de Mark Steere: www.marksteeregames.com

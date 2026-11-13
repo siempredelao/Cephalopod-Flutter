@@ -1,0 +1,20 @@
+Cephalopod is a short, easy-to-learn strategy game for two players, played with dice on a 5×5 board. Place a die, add up its neighbours and capture them.
+
+HOW IT WORKS
+• Take turns placing one die on an empty square.
+• If two or more neighbouring dice add up to 6 or less, you capture them, and your new die shows their sum.
+• Otherwise your die shows 1.
+• When the board is full, the player with more dice wins. There are no draws.
+
+FEATURES
+• Play a friend on one device, or the computer at three levels: Easy, Medium and Hard
+• A short step-by-step tutorial, and a hint when you are stuck
+• Undo and redo
+• Leave a game and continue later
+• Light and dark themes, and sound effects you can turn off
+• Screen reader support
+• No ads, no account and no internet needed
+• Available in 12 languages
+
+ABOUT THE GAME
+Cephalopod was invented by Mark Steere in 2006. This independent app keeps the game's name and rules unchanged, as Mark Steere asks. More games by Mark Steere: www.marksteeregames.com
