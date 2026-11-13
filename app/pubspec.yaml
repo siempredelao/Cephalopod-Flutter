@@ -22,6 +22,7 @@ dependencies:
   freezed_annotation: ^3.1.0
   go_router: ^18.1.0
   # flutter_localizations pins the exact intl it works with; this follows it.
+  in_app_review: ^2.0.12
   intl: ^0.20.3
   material_ui: ^1.7.0
   meta: ^1.16.0
@@ -37,6 +38,7 @@ dev_dependencies:
   # freezed 4.0.2+ needs analyzer 14, but the `test` version that Flutter
   # 3.47's flutter_test allows caps analyzer below 14, so pub picks 4.0.1.
   freezed: ^4.0.0
+  in_app_review_platform_interface: ^2.0.5
   plugin_platform_interface: ^2.1.8
   shared_preferences_platform_interface: ^2.4.1
   url_launcher_platform_interface: ^2.3.2
