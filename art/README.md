@@ -89,7 +89,9 @@ listing, numbered in the order the store should show them:
 
 A test makes them: it runs the real app on an emulator or phone, tells the app
 to use each language, plays the same moves and saves what the screen shows, so
-the text is drawn in the real font. To make them again, after a change to how
+the text is drawn in the real font. The pictures are 1080 × 1920: Play rejects
+a screenshot whose long side is more than twice its short side, so the script
+sets the screen to that size for the run. To make them again, after a change to how
 the screens look, connect an emulator with a phone-sized screen and run, from
 the repository root:
 
