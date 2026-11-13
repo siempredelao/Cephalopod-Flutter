@@ -97,7 +97,7 @@ void main() {
     testWidgets('speaks English on a device in any other language', (
       tester,
     ) async {
-      tester.platformDispatcher.localesTestValue = [const Locale('fr', 'FR')];
+      tester.platformDispatcher.localesTestValue = [const Locale('ja', 'JP')];
       addTearDown(tester.platformDispatcher.clearLocalesTestValue);
 
       await pumpApp(tester);
