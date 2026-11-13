@@ -60,3 +60,26 @@ Flutter's own tool, `gen-l10n`, turns one `.arb` file per language into an
 - **A language choice in Settings.** Not needed while the app speaks two
   languages, and easy to add later: the settings store would hold it, and
   `App` would pass it as `locale`.
+
+## Update, 2026-11-13: ready for ten more languages
+
+M7 adds French, Italian, Portuguese (Brazil), German, Dutch, Danish,
+Norwegian (Bokmål), Swedish, Polish and Turkish. The decision above stands:
+one `.arb` file for each, English first, the app following the phone. What
+changes is what protects the languages that come after Spanish:
+
+- **Counts use `plural`.** A message that counts things uses an ICU `plural`,
+  never a number joined to a word, because languages count differently:
+  Polish has `one`, `few` and `many`. A test checks that every language counts
+  with a plural wherever English does, and that every language has the same
+  placeholders as English.
+- **Norwegian.** Phones report it as `no`, `nn` or `nb`. The app has one
+  translation, Bokmål (`nb`), so `resolveAppLocale` maps `no` and `nn` to it
+  before Flutter picks a language. Until `nb` exists, they get English.
+- **No case changes in code.** Dart's `toUpperCase()` and `toLowerCase()`
+  ignore the language, and break Turkish (the capital of `i` is `İ`). A test
+  fails if the app's code calls either. A word in capitals is written that
+  way in the `.arb` file.
+- **Screen tests loop over the supported languages**, at 360 dp and at twice
+  the text size, so a language that wraps or overflows fails when its file is
+  added.

@@ -1,6 +1,7 @@
 import 'package:cephalopod/app/flavor.dart';
 import 'package:cephalopod/app/theme.dart';
 import 'package:cephalopod/core/l10n/l10n.dart';
+import 'package:cephalopod/core/l10n/locale_resolution.dart';
 import 'package:cephalopod/features/settings/domain/models/app_settings.dart';
 import 'package:cephalopod/features/settings/domain/models/theme_preference.dart';
 import 'package:cephalopod/features/settings/domain/settings_store.dart';
@@ -30,9 +31,10 @@ class App extends StatelessWidget {
       initialData: settings.current,
       builder: (context, snapshot) => MaterialApp.router(
         onGenerateTitle: (context) => context.l10n.appTitle,
-        // English first, so any language but Spanish gets English.
+        // English first, so a phone in a language the app lacks gets English.
         localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
+        localeListResolutionCallback: resolveAppLocale,
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         themeMode: _modeOf((snapshot.data ?? settings.current).theme),
