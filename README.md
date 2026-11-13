@@ -154,7 +154,7 @@ keytool -genkey -v -keystore ~/.keys/cephalopod-upload.jks \
   -keyalg RSA -keysize 2048 -validity 10000 -alias upload
 ```
 
-Then create `app/android/key.properties`, which git ignores:
+Then create `app/android/keystore.properties`, which git ignores:
 
 ```properties
 storeFile=/home/you/.keys/cephalopod-upload.jks

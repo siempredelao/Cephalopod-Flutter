@@ -7,14 +7,15 @@ plugins {
 }
 
 /**
- * The upload key's details, from `android/key.properties`. The file is not in
- * git, so without it this is empty and the release build uses the debug key.
+ * The upload key's details, from `android/keystore.properties`. The file is
+ * not in git, so without it this is empty and the release build uses the
+ * debug key.
  */
-val uploadKeyProperties = Properties().apply {
-    val file = rootProject.file("key.properties")
+val keystoreProperties = Properties().apply {
+    val file = rootProject.file("keystore.properties")
     if (file.exists()) file.inputStream().use { load(it) }
 }
-val hasUploadKey = !uploadKeyProperties.isEmpty
+val hasKeystore = !keystoreProperties.isEmpty
 
 android {
     namespace = "gc.david.cephalopod"
@@ -41,12 +42,12 @@ android {
     }
 
     signingConfigs {
-        if (hasUploadKey) {
-            create("upload") {
-                keyAlias = uploadKeyProperties.getProperty("keyAlias")
-                keyPassword = uploadKeyProperties.getProperty("keyPassword")
-                storeFile = file(uploadKeyProperties.getProperty("storeFile"))
-                storePassword = uploadKeyProperties.getProperty("storePassword")
+        if (hasKeystore) {
+            create("release") {
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
             }
         }
     }
@@ -55,7 +56,7 @@ android {
         release {
             // Without the upload key (CI, a fresh clone) the release build is
             // signed with the debug key: it installs, but Play rejects it.
-            signingConfig = signingConfigs.getByName(if (hasUploadKey) "upload" else "debug")
+            signingConfig = signingConfigs.getByName(if (hasKeystore) "release" else "debug")
         }
     }
 }

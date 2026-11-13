@@ -1059,7 +1059,7 @@ language.
   light and dark, with the icon's foreground. The older `launch_background`
   matches it.
 - **P1. `build(android): sign release builds`** (S).
-  - The build reads an upload key from `android/key.properties`, which git
+  - The build reads an upload key from `android/keystore.properties`, which git
     ignores, and falls back to debug signing without it, so CI still
     builds.
   - The README says how to make the key and back it up.
