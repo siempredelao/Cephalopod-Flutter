@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The launcher icon's foreground (art/app-icon-foreground.svg) as a vector,
+     in groups that splash_icon_animated.xml moves: the die, and the four
+     arrows. Its soft glow is two faint rounded squares, as a vector has no
+     blur. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:name="die"
+        android:pivotX="54"
+        android:pivotY="54">
+        <path
+            android:fillColor="#5EEAD4"
+            android:fillAlpha="0.12"
+            android:pathData="M45,33 H63 A12,12 0 0 1 75,45 V65 A12,12 0 0 1 63,77 H45 A12,12 0 0 1 33,65 V45 A12,12 0 0 1 45,33 Z" />
+        <path
+            android:fillColor="#5EEAD4"
+            android:fillAlpha="0.2"
+            android:pathData="M46,36 H62 A10,10 0 0 1 72,46 V64 A10,10 0 0 1 62,74 H46 A10,10 0 0 1 36,64 V46 A10,10 0 0 1 46,36 Z" />
+        <path
+            android:fillColor="#C24A30"
+            android:pathData="M46,41.4 H62 A7,7 0 0 1 69,48.4 V64.4 A7,7 0 0 1 62,71.4 H46 A7,7 0 0 1 39,64.4 V48.4 A7,7 0 0 1 46,41.4 Z" />
+        <path
+            android:fillColor="#FF7A5C"
+            android:pathData="M46,39 H62 A7,7 0 0 1 69,46 V62 A7,7 0 0 1 62,69 H46 A7,7 0 0 1 39,62 V46 A7,7 0 0 1 46,39 Z" />
+        <path
+            android:fillColor="#3A1208"
+            android:pathData="M44.2,47.1 a2.9,2.9 0 1,0 5.8,0 a2.9,2.9 0 1,0 -5.8,0" />
+        <path
+            android:fillColor="#3A1208"
+            android:pathData="M58.0,47.1 a2.9,2.9 0 1,0 5.8,0 a2.9,2.9 0 1,0 -5.8,0" />
+        <path
+            android:fillColor="#3A1208"
+            android:pathData="M51.1,54 a2.9,2.9 0 1,0 5.8,0 a2.9,2.9 0 1,0 -5.8,0" />
+        <path
+            android:fillColor="#3A1208"
+            android:pathData="M44.2,60.9 a2.9,2.9 0 1,0 5.8,0 a2.9,2.9 0 1,0 -5.8,0" />
+        <path
+            android:fillColor="#3A1208"
+            android:pathData="M58.0,60.9 a2.9,2.9 0 1,0 5.8,0 a2.9,2.9 0 1,0 -5.8,0" />
+        <path
+            android:pathData="M45.7,37.1 H62.300000000000004 A8.6,8.6 0 0 1 70.9,45.7 V64.70000000000002 A8.6,8.6 0 0 1 62.300000000000004,73.30000000000001 H45.7 A8.6,8.6 0 0 1 37.1,64.70000000000002 V45.7 A8.6,8.6 0 0 1 45.7,37.1 Z"
+            android:strokeColor="#5EEAD4"
+            android:strokeWidth="1.1" />
+    </group>
+    <group android:name="arrowTop">
+        <path
+            android:pathData="M58,30.6 L54,34.8 L50,30.6"
+            android:strokeColor="#5EEAD4"
+            android:strokeWidth="2.4"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+    </group>
+    <group android:name="arrowRight">
+        <path
+            android:pathData="M77.4,58 L73.2,54 L77.4,50"
+            android:strokeColor="#5EEAD4"
+            android:strokeWidth="2.4"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+    </group>
+    <group android:name="arrowBottom">
+        <path
+            android:pathData="M50,77.4 L54,73.2 L58,77.4"
+            android:strokeColor="#5EEAD4"
+            android:strokeWidth="2.4"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+    </group>
+    <group android:name="arrowLeft">
+        <path
+            android:pathData="M30.6,50 L34.8,54 L30.6,58"
+            android:strokeColor="#5EEAD4"
+            android:strokeWidth="2.4"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+    </group>
+</vector>

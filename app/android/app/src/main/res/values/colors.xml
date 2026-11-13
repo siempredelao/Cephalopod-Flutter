@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The app's background in the light theme (Flutter's surface colour from
+         the teal seed), so the splash screen and the first screen match. -->
+    <color name="splash_background">#F4FBF8</color>
+    <!-- The dark teal of the icon's background, behind the die on the splash
+         screen, as on the launcher. The icon's arrows are light, so they
+         need a dark ground, in the light theme as in the dark one. -->
+    <color name="splash_icon_background">#06352F</color>
+</resources>
