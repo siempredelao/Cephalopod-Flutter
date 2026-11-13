@@ -24,26 +24,26 @@ void main() {
     test('draws the dice as two people playing, black as Player 1', () {
       final board = demo.frames[2].board;
 
-      expect(board.rows[1][1].die, const DieUi(pips: 6, owner: player1));
-      expect(board.rows[0][1].die, const DieUi(pips: 2, owner: player2));
+      expect(board.rows[2][2].die, const DieUi(pips: 6, owner: player1));
+      expect(board.rows[1][2].die, const DieUi(pips: 2, owner: player2));
     });
 
     test("draws each frame's marks", () {
       final board = demo.frames[2].board;
 
-      expect(board.rows[1][1].mark, SquareMark.captureTarget);
-      expect(board.rows[0][1].mark, SquareMark.captureSelected);
-      expect(board.rows[2][2].mark, SquareMark.none);
+      expect(board.rows[2][2].mark, SquareMark.captureTarget);
+      expect(board.rows[1][2].mark, SquareMark.captureSelected);
+      expect(board.rows[4][4].mark, SquareMark.none);
     });
 
     test('keeps the frame to stand still on', () {
       expect(demo.still, demo.frames[2]);
     });
 
-    test('draws a 3 × 3 board in every frame', () {
+    test('draws a 5 × 5 board in every frame', () {
       for (final frame in demo.frames) {
-        expect(frame.board.rows, hasLength(3));
-        expect(frame.board.rows, everyElement(hasLength(3)));
+        expect(frame.board.rows, hasLength(5));
+        expect(frame.board.rows, everyElement(hasLength(5)));
       }
     });
   });
