@@ -32,6 +32,9 @@ final class FailingSharedPreferences extends InMemorySharedPreferencesAsync {
       _fail();
 
   @override
+  Future<int?> getInt(String key, SharedPreferencesOptions options) => _fail();
+
+  @override
   Future<bool> setString(
     String key,
     String value,
@@ -42,6 +45,13 @@ final class FailingSharedPreferences extends InMemorySharedPreferencesAsync {
   Future<bool> setBool(
     String key,
     bool value,
+    SharedPreferencesOptions options,
+  ) => _fail();
+
+  @override
+  Future<bool> setInt(
+    String key,
+    int value,
     SharedPreferencesOptions options,
   ) => _fail();
 
