@@ -73,3 +73,31 @@ opaque and remove the alpha channel from the iOS master.
 `social-preview.png` (1280 × 640) is the repository's social preview and the banner
 at the top of the main README. To use it as the preview, upload it under the
 repository's **Settings → General → Social preview**.
+
+## Play Store screenshots
+
+`play-store/<language>/` holds the phone screenshots for each language of the
+listing, numbered in the order the store should show them:
+
+| File | The screen |
+| --- | --- |
+| `1-how-to-play.png` | How to play, as a first launch shows it |
+| `2-home.png` | Home, with the demo board |
+| `3-new-game.png` | The new-game dialog, with the computer chosen |
+| `4-game.png` | A game with a capture to choose, three dice selected |
+| `5-game-dark.png` | The same game in the dark theme |
+
+A test makes them: it runs the real app on an emulator or phone, tells the app
+to use each language, plays the same moves and saves what the screen shows, so
+the text is drawn in the real font. To make them again, after a change to how
+the screens look, connect an emulator with a phone-sized screen and run, from
+the repository root:
+
+```sh
+tool/take_store_screenshots.sh        # every language
+tool/take_store_screenshots.sh es fr  # only these
+```
+
+The test is `app/integration_test/store_screenshots_test.dart`, and
+`app/test_driver/screenshots.dart` saves the images. Each language takes about
+a minute once the app is built.
