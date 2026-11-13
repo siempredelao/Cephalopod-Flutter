@@ -187,7 +187,7 @@ flutter build appbundle
 ```
 
 The signed bundle is `build/app/outputs/bundle/release/app-release.aab`. The
-version comes from `pubspec.yaml`: in `0.1.0+1`, `0.1.0` is what people see
+version comes from `pubspec.yaml`: in `1.0.0+1`, `1.0.0` is what people see
 and `1` is the build number. Play wants a higher build number for every
 upload, so raise it each time.
 
