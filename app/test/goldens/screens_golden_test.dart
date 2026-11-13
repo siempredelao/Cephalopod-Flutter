@@ -46,6 +46,8 @@ void main() {
     const Locale('da'),
     const Locale('nb'),
     const Locale('sv'),
+    const Locale('pl'),
+    const Locale('tr'),
   ]) {
     defineGoldens(locale, Brightness.light, listedScreens);
   }
