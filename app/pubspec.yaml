@@ -39,6 +39,8 @@ dev_dependencies:
   # 3.47's flutter_test allows caps analyzer below 14, so pub picks 4.0.1.
   freezed: ^4.0.0
   in_app_review_platform_interface: ^2.0.5
+  integration_test:
+    sdk: flutter
   plugin_platform_interface: ^2.1.8
   shared_preferences_platform_interface: ^2.4.1
   url_launcher_platform_interface: ^2.3.2
