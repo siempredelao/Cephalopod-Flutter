@@ -21,6 +21,49 @@ Set<String> _keysOf(String path) {
   };
 }
 
+/// The messages in the .arb file at [path], by key: the text with its
+/// placeholders, not the descriptions.
+Map<String, String> _messagesOf(String path) {
+  final json =
+      jsonDecode(File(path).readAsStringSync()) as Map<String, Object?>;
+  return {
+    for (final MapEntry(:key, :value) in json.entries)
+      if (!key.startsWith('@')) key: value! as String,
+  };
+}
+
+/// Every placeholder in a message, plural counts included: `{name}` and
+/// `{name, plural, ...}`.
+final RegExp _placeholder = RegExp(r'\{(\w+)[,}]');
+
+/// The placeholder a plural in a message counts with: `count` in
+/// `{count, plural, one{...} other{...}}`.
+final RegExp _pluralCount = RegExp(r'\{(\w+),\s*plural,');
+
+Set<String> _placeholdersOf(String message) {
+  return {for (final match in _placeholder.allMatches(message)) match[1]!};
+}
+
+Set<String> _pluralCountsOf(String message) {
+  return {for (final match in _pluralCount.allMatches(message)) match[1]!};
+}
+
+/// Calls [check] for each message of [translations], with where it is
+/// (its key and file), its English text and its text in that language. A
+/// message the language lacks is an empty text.
+void _eachTranslation(
+  List<String> translations,
+  void Function(String where, String english, String translated) check,
+) {
+  final english = _messagesOf('$_arbFolder/$_template');
+  for (final path in translations) {
+    final messages = _messagesOf(path);
+    for (final MapEntry(:key, value: englishText) in english.entries) {
+      check('$key in $path', englishText, messages[key] ?? '');
+    }
+  }
+}
+
 /// What every message key starts with: the name of the screen it belongs
 /// to, as its route is named, or `app` for words shared across screens.
 /// A new screen gets its prefix with its route.
@@ -80,6 +123,30 @@ void main() {
           reason: '$translation has messages that English does not',
         );
       }
+    });
+
+    test('use the same placeholders as English in every message', () {
+      _eachTranslation(translations, (where, english, translated) {
+        expect(
+          _placeholdersOf(translated),
+          _placeholdersOf(english),
+          reason: where,
+        );
+      });
+    });
+
+    // Languages count differently (Polish has `few` and `many`), so a message
+    // that counts in English must count with a plural in every language. A
+    // language may use one where English has none: Spanish says "con 3
+    // puntos" where English says "showing 3".
+    test('count with a plural wherever English does', () {
+      _eachTranslation(translations, (where, english, translated) {
+        expect(
+          _pluralCountsOf(translated),
+          containsAll(_pluralCountsOf(english)),
+          reason: where,
+        );
+      });
     });
   });
 }

@@ -90,7 +90,9 @@ The numbers are the ones first planned, so they are not in order here.
 
 ## M7: Google Play, in this order
 - [ ] feat(about): show the open-source licenses (S)
-- [ ] L1. feat(app): get ready for more languages (S)
+- [x] L1a. test(l10n): check placeholders and plurals in every language (S)
+- [ ] L1b. test(app): check every screen in every supported language (S)
+- [ ] L1c. feat(app): map Norwegian phones to Bokmål, and keep Turkish letters safe (S)
 - [ ] L2. feat(app): translate into French, Italian and Portuguese (M)
 - [ ] L3. feat(app): translate into German, Dutch, Danish, Norwegian and Swedish (M)
 - [ ] L4. feat(app): translate into Polish and Turkish (S)
