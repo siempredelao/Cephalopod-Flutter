@@ -34,12 +34,14 @@ final class GameModule implements FeatureModule {
   /// `highlightLastMove` and `soundOn` are plain functions rather than the
   /// settings feature's cubit, because features may not import each other.
   /// The composition root wires them to the settings module.
+  /// `onGameFinished` is one too, wired to the review feature.
   GameModule({
     required this._cephalopodRules,
     required this._gameRepository,
     required this._soundEffects,
     required this._highlightLastMove,
     required this._soundOn,
+    required this._onGameFinished,
   });
 
   final CephalopodRules _cephalopodRules;
@@ -47,6 +49,11 @@ final class GameModule implements FeatureModule {
   final SoundEffects _soundEffects;
   final bool Function() _highlightLastMove;
   final bool Function() _soundOn;
+
+  /// Called when a move just played ends a game, so the app can count it.
+  /// A plain function for the same reason: the composition root wires it to
+  /// the review feature.
+  final void Function() _onGameFinished;
 
   /// The game's sounds, heard only while the Sound switch is on.
   late final SoundEffects _soundEffectsProxy = SoundEffectsProxy(
@@ -145,6 +152,7 @@ final class GameModule implements FeatureModule {
       soundEffects: _soundEffectsProxy,
       moveCountdown: CountdownTimer(),
       settleDurationFor: settleDurationFor,
+      onGameFinished: _onGameFinished,
     );
   }
 

@@ -203,6 +203,26 @@ void main() {
       expect(find.byType(HomePage), findsOneWidget);
     });
 
+    testWidgets('tells the review feature when a game ends', (tester) async {
+      var finishedGames = 0;
+      // A game on a board of one square, which one move fills.
+      final oneSquareGame = (
+        record: GameRecord(config: const GameConfig(boardSize: 1)),
+        opponent: const FriendOpponent(),
+      );
+      await pumpApp(
+        tester,
+        location: '/game?resume=true',
+        savedGame: oneSquareGame,
+        onGameFinished: () => finishedGames++,
+      );
+
+      await tester.tap(find.byType(BoardSquare));
+      await tester.pumpAndSettle();
+
+      expect(finishedGames, 1);
+    });
+
     testWidgets('opens how to play from home', (tester) async {
       await pumpApp(tester);
 

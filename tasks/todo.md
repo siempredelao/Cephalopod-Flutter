@@ -100,7 +100,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] L4. feat(app): translate into Polish and Turkish (S)
 - [x] R1a. feat(review): ask the store for a review with in_app_review (S)
 - [x] R1b. feat(review): count finished games and decide when to ask (S)
-- [ ] R2. feat(app): ask for a review after a finished game (S)
+- [x] R2. feat(app): ask for a review after a finished game (S)
 - [ ] R3. feat(about): add a "Rate the app" link (XS)
 - [ ] I1. feat(app): use the Cephalopod icon on the launcher (S)
 - [ ] I2. feat(app): show the icon on the splash screen (S)
