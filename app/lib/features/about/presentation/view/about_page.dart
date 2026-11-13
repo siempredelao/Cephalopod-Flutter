@@ -6,7 +6,8 @@ import 'package:material_ui/material_ui.dart';
 
 /// Shows the app's version, and credits the game's designer, as his rule
 /// sheet asks of anyone who programs the game, with links to his website and
-/// the official rules, and a link to the licenses of the packages it uses.
+/// the official rules, and links to rate the app and to the licenses of the
+/// packages it uses.
 /// The credits are laid out as in Dipole, the app of another of his games.
 ///
 /// It gets an `AboutCubit` from [createCubit] for as long as it is on
@@ -78,6 +79,10 @@ class _AboutView extends StatelessWidget {
               _Link(
                 label: l10n.aboutOfficialRules,
                 onPressed: cubit.openRuleSheet,
+              ),
+              _Link(
+                label: l10n.aboutRateApp,
+                onPressed: cubit.openStoreListing,
               ),
               _Link(
                 label: l10n.aboutLicenses,

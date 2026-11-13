@@ -5,12 +5,13 @@ import 'package:cephalopod/features/about/domain/models/credits.dart';
 import 'package:cephalopod/features/about/presentation/models/about_view_state.dart';
 
 /// The About page's view model: it shows the game's [Credits], looks up the
-/// app's version, and opens the designer's website and the official rule
-/// sheet in the browser when asked.
+/// app's version, and opens the designer's website, the official rule sheet
+/// and the app's page on the store when asked.
 class AboutCubit extends Cubit<AboutViewState> {
   AboutCubit({
     required this._appVersionSource,
     required this._linkOpener,
+    required this._storeListing,
     required Credits credits,
   }) : _credits = credits,
        super(
@@ -23,6 +24,7 @@ class AboutCubit extends Cubit<AboutViewState> {
   final AppVersionSource _appVersionSource;
   final LinkOpener _linkOpener;
   final Credits _credits;
+  final Uri _storeListing;
 
   /// The website's name, as a link to it shows it: its host, without `www.`.
   static String _nameOf(Uri website) {
@@ -46,6 +48,9 @@ class AboutCubit extends Cubit<AboutViewState> {
 
   /// Opens the official rule sheet.
   Future<void> openRuleSheet() => _open(_credits.ruleSheet);
+
+  /// Opens the app's page on the store, where the person can rate it.
+  Future<void> openStoreListing() => _open(_storeListing);
 
   /// Opens [address]. When it does not open, the page says so and shows the
   /// address; when it does, that note goes away.

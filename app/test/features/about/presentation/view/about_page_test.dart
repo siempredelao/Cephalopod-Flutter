@@ -1,4 +1,5 @@
 import 'package:cephalopod/features/about/domain/models/credits.dart';
+import 'package:cephalopod/features/about/domain/models/store_listing.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -10,6 +11,7 @@ void main() {
   const moreGames = 'More games by Mark Steere: marksteeregames.com';
   const officialRules = 'Official rules (PDF)';
   const licenses = 'Open-source licenses';
+  const rateApp = 'Rate the app';
   final opened = <Uri>[];
 
   setUp(opened.clear);
@@ -72,6 +74,24 @@ void main() {
       expect(find.textContaining('could not be opened'), findsNothing);
     });
 
+    testWidgets("opens the app's page on the store from its link", (
+      tester,
+    ) async {
+      await pumpApp(
+        tester,
+        location: '/about',
+        linkOpener: (address) async {
+          opened.add(address);
+          return true;
+        },
+      );
+
+      await tester.tap(link(rateApp));
+      await tester.pumpAndSettle();
+
+      expect(opened, [cephalopodStoreListing]);
+    });
+
     testWidgets('opens the list of licenses from its link', (tester) async {
       await pumpApp(tester, location: '/about');
 
@@ -131,6 +151,7 @@ void main() {
         link('Más juegos de Mark Steere: marksteeregames.com'),
         findsOne,
       );
+      expect(link('Valorar la app'), findsOne);
       expect(link('Licencias de código abierto'), findsOne);
 
       await tester.tap(link('Reglas oficiales (PDF)'));
