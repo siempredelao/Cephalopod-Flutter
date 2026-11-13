@@ -138,6 +138,49 @@ The images are drawn on Linux, as CI is, with the Flutter version above and
 its Roboto font. Another system or Flutter version can draw text a pixel
 differently, and fail every golden.
 
+## Releasing to Google Play
+
+Play only accepts a release signed with your own upload key. Without one,
+a release build still finishes, but its APK or bundle is unsigned: a phone
+will not install it and Play rejects it. Debug builds, which CI makes, are
+signed by Android's own debug key and need nothing.
+
+### Make the upload key (once)
+
+Keep the key outside the repository, for example in `~/.keys/`:
+
+```sh
+mkdir -p ~/.keys
+keytool -genkey -v -keystore ~/.keys/cephalopod-upload.jks \
+  -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+```
+
+Then create `app/android/keystore.properties`, which git ignores:
+
+```properties
+storeFile=/home/you/.keys/cephalopod-upload.jks
+storePassword=the password you chose
+keyAlias=upload
+keyPassword=the password you chose
+```
+
+**Back up the `.jks` file and both passwords** in a password manager, and
+somewhere else too. With Play App Signing, Google holds the key that signs
+what people install, so a lost upload key can be reset by Google's support.
+Still, it takes days, so keep the backup.
+
+### Build the bundle
+
+```sh
+cd app
+flutter build appbundle
+```
+
+The signed bundle is `build/app/outputs/bundle/release/app-release.aab`. The
+version comes from `pubspec.yaml`: in `0.1.0+1`, `0.1.0` is what people see
+and `1` is the build number. Play wants a higher build number for every
+upload, so raise it each time.
+
 ## Roadmap
 
 - [x] **M0 · Foundations**: workspace, lints, CI, ADRs, app shell
