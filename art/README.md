@@ -28,29 +28,29 @@ sRGB, full square with no rounded corners or drop shadow (Play adds both).
 
 ### Launcher icons
 
-Once the platform folders exist, [`flutter_launcher_icons`](https://pub.dev/packages/flutter_launcher_icons)
-can generate every Android, iOS and web size from these files. Add to `app/pubspec.yaml`:
+The Android launcher icons in `app/android/app/src/main/res/` are made from
+these files by [`flutter_launcher_icons`](https://pub.dev/packages/flutter_launcher_icons),
+with the settings in `app/flutter_launcher_icons.yaml`: the legacy square icons
+for every density, the adaptive icon (background and foreground) and the
+monochrome layer Android 13 uses for themed icons. The generated files are
+committed, so building the app needs nothing from the tool.
 
-```yaml
-dev_dependencies:
-  flutter_launcher_icons: ^0.14.4
+To make them again, after changing the art or the settings, from `app/`:
 
-flutter_launcher_icons:
-  image_path: ../art/app-icon-1024.png
-  android: true
-  ios: true
-  remove_alpha_ios: true
-  adaptive_icon_background: ../art/app-icon-background-1024.png
-  adaptive_icon_foreground: ../art/app-icon-foreground-1024.png
-  adaptive_icon_monochrome: ../art/app-icon-monochrome-1024.png
-  web:
-    generate: true
-    image_path: ../art/app-icon-1024.png
-    background_color: "#03201C"
-    theme_color: "#00897B"
+```sh
+dart pub global activate flutter_launcher_icons
+dart pub global run flutter_launcher_icons
 ```
 
-Then run `dart run flutter_launcher_icons` from `app/`.
+The tool is run on its own and is not a dependency of the app: its newest
+version needs `cli_util` 0.4, and the engine's coverage tool needs 0.6, so the
+two cannot be solved together. Its default inset for the adaptive layers is
+turned off (`adaptive_icon_foreground_inset: 0`), because the art's layers
+already keep their content inside the adaptive icon's safe zone.
+
+iOS icons are not made yet, as the first release is on Google Play. Set
+`ios: true` (and `remove_alpha_ios: true`, so the iOS master has no alpha
+channel) when an iOS release is planned.
 
 ### Re-exporting
 

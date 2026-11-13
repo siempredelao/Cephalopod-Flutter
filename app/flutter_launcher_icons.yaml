@@ -1,0 +1,14 @@
+# The launcher icons, made from the art in ../art by flutter_launcher_icons
+# (see ../art/README.md, "Launcher icons"). Android only: the app is first
+# released on Google Play, and the tool is run on its own, not as a
+# dependency of the app.
+flutter_launcher_icons:
+  image_path: ../art/app-icon-1024.png
+  android: true
+  ios: false
+  adaptive_icon_background: ../art/app-icon-background-1024.png
+  adaptive_icon_foreground: ../art/app-icon-foreground-1024.png
+  adaptive_icon_monochrome: ../art/app-icon-monochrome-1024.png
+  # The art's layers already fit the adaptive-icon grid (content inside the
+  # 66-unit safe zone of 108), so the tool must not shrink them again.
+  adaptive_icon_foreground_inset: 0
