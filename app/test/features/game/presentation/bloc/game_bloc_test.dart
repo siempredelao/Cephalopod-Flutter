@@ -840,9 +840,9 @@ void main() {
 
     /// A little longer than one `captureStagger`, in real time.
     Future<void> waitForAPop() =>
-        Future<void>.delayed(const Duration(milliseconds: 200));
+        Future<void>.delayed(const Duration(milliseconds: 350));
 
-    test('pops once for each captured die, 150 ms apart', () async {
+    test('pops once for each captured die, 300 ms apart', () async {
       final bloc = createTestGameBloc(
         position: beforeCapture,
         soundEffects: sounds,

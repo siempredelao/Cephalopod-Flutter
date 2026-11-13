@@ -13,8 +13,8 @@ void main() {
     });
 
     test('adds one stagger for each die after the first', () {
-      expect(settleDurationFor(2), const Duration(milliseconds: 650));
-      expect(settleDurationFor(4), const Duration(milliseconds: 950));
+      expect(settleDurationFor(2), const Duration(milliseconds: 800));
+      expect(settleDurationFor(4), const Duration(milliseconds: 1400));
     });
 
     test('always lasts at least as long as the dice move', () {

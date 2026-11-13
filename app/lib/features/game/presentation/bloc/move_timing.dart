@@ -2,7 +2,7 @@ import 'package:cephalopod/core/board/board_durations.dart';
 
 /// How much later each captured die starts than the one before it, in
 /// reading order, so the dice go one at a time rather than all at once.
-const Duration captureStagger = Duration(milliseconds: 150);
+const Duration captureStagger = Duration(milliseconds: 300);
 
 /// How long the game waits after a move that captured [captures] dice before
 /// the next one starts: taps are ignored, and the computer does not reply,

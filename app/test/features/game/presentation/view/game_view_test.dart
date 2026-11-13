@@ -418,7 +418,7 @@ void main() {
         // A die that stays does not move.
         expect(dieScale(tester, const Position(1, 2)), 1);
 
-        await tester.pump(const Duration(milliseconds: 150));
+        await tester.pump(const Duration(milliseconds: 200));
         await tester.pump(const Duration(milliseconds: 100));
         expect(
           dieScale(tester, captured.last),
