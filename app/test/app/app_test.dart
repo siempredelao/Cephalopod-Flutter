@@ -1,6 +1,7 @@
 import 'package:cephalopod/app/flavor.dart';
 import 'package:cephalopod/core/board/board_square.dart';
 import 'package:cephalopod/core/board/models/square_mark.dart';
+import 'package:cephalopod/core/l10n/locale_resolution.dart';
 import 'package:cephalopod/features/about/presentation/view/about_page.dart';
 import 'package:cephalopod/features/game/domain/models/difficulty.dart';
 import 'package:cephalopod/features/game/domain/models/opponent.dart';
@@ -79,6 +80,19 @@ void main() {
 
       expect(find.text('Nueva partida'), findsOneWidget);
     });
+
+    testWidgets(
+      'picks its language with the rule that maps Norwegian to Bokmål',
+      (
+        tester,
+      ) async {
+        await pumpApp(tester);
+
+        final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
+
+        expect(app.localeListResolutionCallback, same(resolveAppLocale));
+      },
+    );
 
     testWidgets('speaks English on a device in any other language', (
       tester,
