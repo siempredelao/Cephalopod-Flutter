@@ -2,6 +2,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:cephalopod/features/about/domain/app_version_source.dart';
 import 'package:cephalopod/features/about/domain/link_opener.dart';
 import 'package:cephalopod/features/about/domain/models/credits.dart';
+import 'package:cephalopod/features/about/domain/models/store_listing.dart';
 import 'package:cephalopod/features/about/presentation/bloc/about_cubit.dart';
 import 'package:cephalopod/features/about/presentation/models/about_view_state.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   final website = Uri.parse('https://www.example.org');
   final ruleSheet = Uri.parse('https://www.example.org/rules.pdf');
+  final storeListing = Uri.parse('https://store.example.org/app');
   const start = AboutViewState(
     copyright: 'Copyright © 1999 by Someone',
     websiteName: 'example.org',
@@ -34,6 +36,7 @@ void main() {
         website: websiteAddress ?? website,
         ruleSheet: ruleSheet,
       ),
+      storeListing: storeListing,
     );
   }
 
@@ -55,6 +58,7 @@ void main() {
         appVersionSource: () async => null,
         linkOpener: (_) async => true,
         credits: cephalopodCredits,
+        storeListing: cephalopodStoreListing,
       );
 
       expect(
@@ -106,6 +110,23 @@ void main() {
       expect(opened, [website, ruleSheet]);
       expect(cubit.state.failedLinkAddress, isNull);
       await cubit.close();
+    });
+
+    test('opens the app\'s page on the store', () async {
+      final cubit = build();
+
+      await cubit.openStoreListing();
+
+      expect(opened, [storeListing]);
+      expect(cubit.state.failedLinkAddress, isNull);
+      await cubit.close();
+    });
+
+    test('gives Cephalopod the Play Store page of its app id', () {
+      expect(
+        '$cephalopodStoreListing',
+        'https://play.google.com/store/apps/details?id=gc.david.cephalopod',
+      );
     });
 
     blocTest<AboutCubit, AboutViewState>(

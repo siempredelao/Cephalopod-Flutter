@@ -188,6 +188,10 @@
   "@aboutLicenses": {
     "description": "About: link that opens the list of the licenses of the packages the app uses."
   },
+  "aboutRateApp": "Rate the app",
+  "@aboutRateApp": {
+    "description": "About: link that opens the app's page on the store, where it can be rated."
+  },
   "aboutVersion": "Version {version} (build {build})",
   "@aboutVersion": {
     "description": "About: under the game's name, the app's version and its build number.",

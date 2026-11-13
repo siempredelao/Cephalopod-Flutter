@@ -5,6 +5,7 @@ import 'package:cephalopod/core/navigation/feature_module.dart';
 import 'package:cephalopod/features/about/domain/app_version_source.dart';
 import 'package:cephalopod/features/about/domain/link_opener.dart';
 import 'package:cephalopod/features/about/domain/models/credits.dart';
+import 'package:cephalopod/features/about/domain/models/store_listing.dart';
 import 'package:cephalopod/features/about/presentation/bloc/about_cubit.dart';
 import 'package:cephalopod/features/about/presentation/view/about_page.dart';
 import 'package:go_router/go_router.dart';
@@ -32,6 +33,7 @@ final class AboutModule implements FeatureModule {
       appVersionSource: _appVersionSource,
       linkOpener: _linkOpener,
       credits: cephalopodCredits,
+      storeListing: cephalopodStoreListing,
     );
     // The version shows when it arrives; the page does not wait for it.
     unawaited(cubit.load());
