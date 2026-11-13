@@ -25,7 +25,8 @@ import 'fake_sound_effects.dart';
 /// [moveCountdown] for [settleDurationFor] the dice the move captured, which
 /// is no wait by default. The bloc starts from a
 /// new game under [config], or from [position] when given. It plays its
-/// sounds on [soundEffects], or on a fake that only records them.
+/// sounds on [soundEffects], or on a fake that only records them. It tells
+/// [onGameFinished], by default no one, when a move ends the game.
 GameBloc createTestGameBloc({
   GameRepository? repository,
   GameConfig config = GameConfig.standard,
@@ -35,6 +36,7 @@ GameBloc createTestGameBloc({
   CountdownTimer? moveCountdown,
   Duration Function(int captures)? settleDurationFor,
   SoundEffects? soundEffects,
+  void Function()? onGameFinished,
 }) {
   final rules = CephalopodRules();
   final games = repository ?? InMemoryGameRepository();
@@ -65,6 +67,7 @@ GameBloc createTestGameBloc({
     moveCountdown: moveCountdown,
     settleDurationFor: settleDurationFor ?? (_) => Duration.zero,
     soundEffects: soundEffects ?? FakeSoundEffects(),
+    onGameFinished: onGameFinished ?? () {},
     config: config,
     position: position,
   );

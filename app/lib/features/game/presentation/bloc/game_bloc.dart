@@ -44,6 +44,11 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// before anything else moves: taps are ignored, and the computer does not
   /// reply, until it ends. By default [settleDurationFor] gives no wait.
   ///
+  /// [onGameFinished] is called once when a move just played ends the game,
+  /// by either side, so the app can count it. It is not called for a game
+  /// that was already over when it was picked up, nor for a move taken back
+  /// and played again.
+  ///
   /// A factory, so that it builds the starting game once and hands it to
   /// `GameBloc._`, which both keeps it and maps the first screen from it.
   /// One constructor could not: `super(...)` runs before the body, and sees
@@ -61,6 +66,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     bool highlightLastMove = true,
     CountdownTimer? moveCountdown,
     Duration Function(int captures) settleDurationFor = _noWait,
+    void Function() onGameFinished = _doNothing,
     GameConfig config = GameConfig.standard,
     @visibleForTesting GameState? position,
   }) {
@@ -77,6 +83,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
       soundEffects: soundEffects,
       moveCountdown: moveCountdown ?? CountdownTimer(),
       settleDurationFor: settleDurationFor,
+      onGameFinished: onGameFinished,
       currentGame: (
         record: GameRecord(config: config),
         opponent: const FriendOpponent(),
@@ -100,6 +107,7 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     required this._soundEffects,
     required this._moveCountdown,
     required this._settleDurationFor,
+    required this._onGameFinished,
     required this._currentGame,
   }) : super(
          _gameViewStateMapper.map(
@@ -138,6 +146,9 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
   /// How long [_moveCountdown] runs after a move that captured the given
   /// number of dice.
   final Duration Function(int captures) _settleDurationFor;
+
+  /// Told when a move just played ends the game.
+  final void Function() _onGameFinished;
 
   /// The pops of a capture's dice after the first, still waiting for their
   /// turn.
@@ -371,6 +382,8 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
 
   static Duration _noWait(int captures) => Duration.zero;
 
+  static void _doNothing() {}
+
   /// The dice [move] captures in [before], the game it is played in, and
   /// where they were. They are gone from the board once it is played.
   static Map<Position, Die> _capturedBy(Move move, GameState before) => {
@@ -428,6 +441,15 @@ class GameBloc extends Bloc<GameEvent, GameViewState> {
     }
     _emitScreen(emit);
     _playSoundOfPlayedMove();
+    _reportFinishedGame(game, playedMove);
+  }
+
+  /// Tells [_onGameFinished] when [playedMove], a move just played, left
+  /// [game] over.
+  void _reportFinishedGame(CurrentGame game, PlayedMove? playedMove) {
+    if (playedMove != null && game.state.status is Finished) {
+      _onGameFinished();
+    }
   }
 
   /// Plays the sound of the move just shown, from what the screen shows of

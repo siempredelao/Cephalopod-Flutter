@@ -31,6 +31,8 @@ import 'fake_sound_effects.dart';
 /// [firstLaunch] to start as a fresh install does.
 ///
 /// Pass [savedGame] to start with that game saved, as after leaving a game.
+/// [onGameFinished] hears of each game that a move ends, which by default
+/// no one does.
 Future<void> pumpApp(
   WidgetTester tester, {
   Flavor flavor = Flavor.prod,
@@ -40,6 +42,7 @@ Future<void> pumpApp(
   SoundEffects? soundEffects,
   bool firstLaunch = false,
   SavedGame? savedGame,
+  void Function()? onGameFinished,
 }) async {
   final settings = SettingsModule(
     settingsRepository: InMemorySettingsRepository(),
@@ -52,6 +55,7 @@ Future<void> pumpApp(
     soundEffects: soundEffects ?? FakeSoundEffects(),
     highlightLastMove: settings.highlightLastMove,
     soundOn: settings.soundOn,
+    onGameFinished: onGameFinished ?? () {},
   );
   final howToPlay = HowToPlayModule(
     howToPlayRepository: InMemoryHowToPlayRepository(

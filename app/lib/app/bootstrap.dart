@@ -15,6 +15,9 @@ import 'package:cephalopod/features/game/game_module.dart';
 import 'package:cephalopod/features/home/home_module.dart';
 import 'package:cephalopod/features/how_to_play/data/shared_preferences_how_to_play_repository.dart';
 import 'package:cephalopod/features/how_to_play/how_to_play_module.dart';
+import 'package:cephalopod/features/review/data/in_app_review_requester.dart';
+import 'package:cephalopod/features/review/data/shared_preferences_finished_game_recorder.dart';
+import 'package:cephalopod/features/review/domain/review_prompt.dart';
 import 'package:cephalopod/features/settings/data/shared_preferences_settings_repository.dart';
 import 'package:cephalopod/features/settings/settings_module.dart';
 import 'package:cephalopod_engine/cephalopod_engine.dart';
@@ -42,6 +45,16 @@ void bootstrap(Flavor flavor) {
   // Shows the defaults for the moment the saved settings take to load.
   unawaited(settings.store.load());
 
+  final reviewPrompt = ReviewPrompt(
+    recordFinishedGame: sharedPreferencesFinishedGameRecorder(
+      sharedPreferencesAsync: preferences,
+      errorReporter: logError,
+    ),
+    // A review sheet that cannot show is reported, and nothing happens
+    // (docs/adr/0022).
+    requestReview: inAppReviewRequester(errorReporter: logError),
+  );
+
   final game = GameModule(
     cephalopodRules: CephalopodRules(),
     gameRepository: SharedPreferencesGameRepository(
@@ -56,6 +69,7 @@ void bootstrap(Flavor flavor) {
     soundEffects: AudioplayersSoundEffects(errorReporter: logError),
     highlightLastMove: settings.highlightLastMove,
     soundOn: settings.soundOn,
+    onGameFinished: () => unawaited(reviewPrompt.afterFinishedGame()),
   );
   final howToPlay = HowToPlayModule(
     howToPlayRepository: SharedPreferencesHowToPlayRepository(

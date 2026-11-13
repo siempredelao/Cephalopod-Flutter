@@ -1053,6 +1053,79 @@ void main() {
     });
   });
 
+  group('GameBloc when a game ends', () {
+    const oneSquare = GameConfig(boardSize: 1);
+    late InMemoryGameRepository repository;
+    late int finishedGames;
+
+    setUp(() {
+      repository = InMemoryGameRepository();
+      finishedGames = 0;
+    });
+
+    GameBloc buildOnOneSquare() => createTestGameBloc(
+      config: oneSquare,
+      repository: repository,
+      onGameFinished: () => finishedGames++,
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      'tells that the game finished, once, when the player fills the board',
+      build: buildOnOneSquare,
+      act: (bloc) => bloc.add(tap(const Position(0, 0))),
+      verify: (_) => expect(finishedGames, 1),
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      'tells nothing while the game goes on',
+      build: () => createTestGameBloc(
+        repository: repository,
+        onGameFinished: () => finishedGames++,
+      ),
+      act: (bloc) => bloc.add(tap(const Position(2, 2))),
+      verify: (_) => expect(finishedGames, 0),
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      'tells that the game finished when the computer fills the board',
+      // The computer plays Black, which moves first, and fills the board.
+      setUp: () => repository.save((
+        record: GameRecord(config: oneSquare),
+        opponent: const ComputerOpponent(
+          difficulty: Difficulty.easy,
+          player: Player.black,
+        ),
+      )),
+      build: buildOnOneSquare,
+      act: (bloc) => bloc.add(const GameResumed()),
+      verify: (_) => expect(finishedGames, 1),
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      'tells nothing when a game that was over is picked up again',
+      setUp: () => repository.save((
+        record: GameRecord(
+          config: oneSquare,
+          moves: [Move(const Position(0, 0))],
+        ),
+        opponent: const FriendOpponent(),
+      )),
+      build: buildOnOneSquare,
+      act: (bloc) => bloc.add(const GameResumed()),
+      verify: (_) => expect(finishedGames, 0),
+    );
+
+    blocTest<GameBloc, GameViewState>(
+      'tells nothing again when the last move is taken back and replayed',
+      build: buildOnOneSquare,
+      act: (bloc) => bloc
+        ..add(tap(const Position(0, 0)))
+        ..add(const UndoRequested())
+        ..add(const RedoRequested()),
+      verify: (_) => expect(finishedGames, 1),
+    );
+  });
+
   group('GameBloc hints', () {
     final newGame = rules.newGame();
     // The test agents play, and suggest, the first legal move.
