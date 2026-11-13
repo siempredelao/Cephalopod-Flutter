@@ -1,11 +1,11 @@
 import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:material_ui/material_ui.dart';
 
 import '../helpers/phone.dart';
 import '../helpers/screens.dart';
 
-/// Flutter's accessibility guidelines on every screen, in both languages.
+/// Flutter's accessibility guidelines on every screen, in every language the
+/// app speaks.
 ///
 /// Text is drawn in the test font, Ahem, on purpose. The contrast guideline
 /// reads colours from a screenshot, and a real font's soft edges make it
@@ -13,7 +13,7 @@ import '../helpers/screens.dart';
 /// give the colours the theme chose. `large_text_test.dart` uses a real font,
 /// because it needs real widths.
 void main() {
-  for (final locale in [const Locale('en'), const Locale('es', 'ES')]) {
+  for (final locale in AppLocalizations.supportedLocales) {
     final words = lookupAppLocalizations(locale);
     group('In ${locale.languageCode}', () {
       for (final screen in screens) {

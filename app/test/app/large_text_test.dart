@@ -1,12 +1,12 @@
 import 'package:cephalopod/core/l10n/l10n.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:material_ui/material_ui.dart';
 
 import '../helpers/phone.dart';
 import '../helpers/real_fonts.dart';
 import '../helpers/screens.dart';
 
-/// Every screen at twice the text size, in both languages, on a small phone.
+/// Every screen at twice the text size, in every language the app speaks, on
+/// a small phone.
 /// Anything that does not fit throws an overflow error.
 ///
 /// Text is drawn in Roboto, the font a phone uses. The test font, Ahem, is
@@ -14,7 +14,7 @@ import '../helpers/screens.dart';
 void main() {
   setUpAll(loadRealFonts);
 
-  for (final locale in [const Locale('en'), const Locale('es', 'ES')]) {
+  for (final locale in AppLocalizations.supportedLocales) {
     final words = lookupAppLocalizations(locale);
     group('In ${locale.languageCode}', () {
       for (final screen in screens) {
