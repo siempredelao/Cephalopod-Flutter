@@ -163,3 +163,10 @@ differently, and fail every golden.
 
 Conventional Commits, short-lived branches, squash merges into `main`. The pull
 request template lists what a change needs before review.
+
+## License
+
+The code is under the [PolyForm Strict License 1.0.0](LICENSE): you may read
+it and run it for noncommercial purposes, but not change it, share it or use
+it commercially. The license covers only the code in this repository. The game,
+Cephalopod, was invented by [Mark Steere](https://www.marksteeregames.com).
