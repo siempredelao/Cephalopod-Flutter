@@ -94,7 +94,7 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] L1b. test(app): check every screen in every supported language (S)
 - [x] L1c. feat(app): map Norwegian phones to Bokmål, and keep Turkish letters safe (S)
 - [x] L2a. feat(app): translate into French (S)
-- [ ] L2b. feat(app): translate into Italian (S)
+- [x] L2b. feat(app): translate into Italian (S)
 - [ ] L2c. feat(app): translate into Portuguese (Brazil) (S)
 - [ ] L3. feat(app): translate into German, Dutch, Danish, Norwegian and Swedish (M)
 - [ ] L4. feat(app): translate into Polish and Turkish (S)
