@@ -89,9 +89,9 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] Checkpoint: verify; by hand on Android: How to play on first launch and from the game, the new Home (demo board, Continue card), a 3- or 4-die capture one die at a time with a pop each
 
 ## M7: Google Play, in this order
-- [ ] feat(about): show the open-source licenses (S)
+- [x] feat(about): show the open-source licenses (S)
 - [x] L1a. test(l10n): check placeholders and plurals in every language (S)
-- [ ] L1b. test(app): check every screen in every supported language (S)
+- [x] L1b. test(app): check every screen in every supported language (S)
 - [ ] L1c. feat(app): map Norwegian phones to Bokmål, and keep Turkish letters safe (S)
 - [ ] L2. feat(app): translate into French, Italian and Portuguese (M)
 - [ ] L3. feat(app): translate into German, Dutch, Danish, Norwegian and Swedish (M)

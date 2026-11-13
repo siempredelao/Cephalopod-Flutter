@@ -6,8 +6,9 @@ import '../helpers/phone.dart';
 import '../helpers/pump_app.dart';
 import '../helpers/real_fonts.dart';
 
-/// The new-game dialog's choices stay on one line each, in both languages, on
-/// a small phone. A label that wraps inside a segment looks broken.
+/// The new-game dialog's choices stay on one line each, in every language the
+/// app speaks, on a small phone. A label that wraps inside a segment looks
+/// broken.
 ///
 /// Text is drawn in Roboto, the font a phone uses: the test font, Ahem, is
 /// about twice as wide and would wrap labels that do not wrap on a phone.
@@ -28,7 +29,7 @@ void main() {
     };
   }
 
-  for (final locale in [const Locale('en'), const Locale('es', 'ES')]) {
+  for (final locale in AppLocalizations.supportedLocales) {
     testWidgets('keeps each choice on one line in ${locale.languageCode}', (
       tester,
     ) async {
