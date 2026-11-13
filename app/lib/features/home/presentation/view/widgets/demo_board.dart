@@ -6,7 +6,7 @@ import 'package:cephalopod/features/home/presentation/models/demo_ui.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// A small board that plays [demo] on a loop: dice grow in, one captures
-/// three others, and its sum shows.
+/// three others and its sum shows, then the other player captures two.
 ///
 /// It is for looking at. Screen readers skip it, it takes no taps, and when
 /// the device asks for less motion it stays on one frame. It also stops

@@ -13,7 +13,8 @@ import '../../../../../helpers/localized_app.dart';
 
 void main() {
   final demo = const DemoUiMapper().map(homeDemoScript);
-  final [empty, position, capture, after] = homeDemoScript.frames;
+  final [empty, position, capture1, after1, capture2, after2] =
+      homeDemoScript.frames;
 
   Widget app({bool tickersEnabled = true}) {
     return localizedApp(
@@ -52,26 +53,36 @@ void main() {
       expect(dice(), 0);
     });
 
-    testWidgets('plays the capture, one frame after another', (tester) async {
+    testWidgets('plays both captures, one frame after another', (
+      tester,
+    ) async {
       await tester.pumpWidget(app());
 
       await showNextFrame(tester, empty.hold);
       expect(dice(), position.board.dice.length);
 
       await showNextFrame(tester, restOf(position.hold));
-      expect(dice(), capture.board.dice.length);
+      expect(dice(), capture1.board.dice.length);
 
-      await showNextFrame(tester, restOf(capture.hold));
-      expect(dice(), after.board.dice.length);
+      await showNextFrame(tester, restOf(capture1.hold));
+      expect(dice(), after1.board.dice.length);
+
+      await showNextFrame(tester, restOf(after1.hold));
+      expect(dice(), capture2.board.dice.length);
+
+      await showNextFrame(tester, restOf(capture2.hold));
+      expect(dice(), after2.board.dice.length);
     });
 
     testWidgets('goes round again, to the empty board', (tester) async {
       await tester.pumpWidget(app());
       await showNextFrame(tester, empty.hold);
       await showNextFrame(tester, restOf(position.hold));
-      await showNextFrame(tester, restOf(capture.hold));
+      await showNextFrame(tester, restOf(capture1.hold));
+      await showNextFrame(tester, restOf(after1.hold));
+      await showNextFrame(tester, restOf(capture2.hold));
 
-      await showNextFrame(tester, restOf(after.hold));
+      await showNextFrame(tester, restOf(after2.hold));
 
       expect(dice(), 0);
     });
@@ -103,22 +114,25 @@ void main() {
       );
     });
 
-    testWidgets('stands still on the capture when asked for less motion', (
-      tester,
-    ) async {
-      tester.platformDispatcher.accessibilityFeaturesTestValue =
-          const FakeAccessibilityFeatures(disableAnimations: true);
-      addTearDown(
-        tester.platformDispatcher.clearAccessibilityFeaturesTestValue,
-      );
+    testWidgets(
+      'stands still on the first capture when asked for less motion',
+      (
+        tester,
+      ) async {
+        tester.platformDispatcher.accessibilityFeaturesTestValue =
+            const FakeAccessibilityFeatures(disableAnimations: true);
+        addTearDown(
+          tester.platformDispatcher.clearAccessibilityFeaturesTestValue,
+        );
 
-      await tester.pumpWidget(app());
-      expect(dice(), capture.board.dice.length);
+        await tester.pumpWidget(app());
+        expect(dice(), capture1.board.dice.length);
 
-      await tester.pump(const Duration(seconds: 30));
+        await tester.pump(const Duration(seconds: 30));
 
-      expect(dice(), capture.board.dice.length);
-    });
+        expect(dice(), capture1.board.dice.length);
+      },
+    );
 
     testWidgets('waits while another screen covers it, then goes on', (
       tester,
@@ -138,7 +152,7 @@ void main() {
       await tester.pumpWidget(app());
 
       expect(find.bySemanticsLabel(RegExp('Row')), findsNothing);
-      expect(find.byType(BoardSquare), findsNWidgets(9));
+      expect(find.byType(BoardSquare), findsNWidgets(25));
       semantics.dispose();
     });
 
