@@ -191,6 +191,14 @@ version comes from `pubspec.yaml`: in `1.0.0+1`, `1.0.0` is what people see
 and `1` is the build number. Play wants a higher build number for every
 upload, so raise it each time.
 
+### Privacy policy
+
+The policy is [docs/privacy-policy.md](docs/privacy-policy.md). Play Console asks for
+a web address, and this is the one to give it:
+`https://github.com/siempredelao/Cephalopod-Flutter/blob/main/docs/privacy-policy.md`.
+If the app ever collects or sends data, change the policy first, and the Data
+safety form in Play Console with it.
+
 ## Roadmap
 
 - [x] **M0 · Foundations**: workspace, lints, CI, ADRs, app shell
