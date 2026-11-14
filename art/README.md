@@ -74,6 +74,25 @@ opaque and remove the alpha channel from the iOS master.
 at the top of the main README. To use it as the preview, upload it under the
 repository's **Settings → General → Social preview**.
 
+## Play Store feature graphic
+
+`play-store/feature-graphic.png` (1024 × 500) is the banner at the top of the app's
+Play Store page. It shows the icon, the name and a tilted board with a capture
+about to happen. It has no other text, so the same picture is used for every
+language.
+
+A script draws it, so it can be made again when the icon or the look of the board
+changes. From the repository root:
+
+```sh
+python3 -m pip install pillow
+python3 tool/make_feature_graphic.py
+```
+
+The name is set in Fredoka SemiBold, kept in `fonts/` with its license (SIL Open
+Font License, which allows using and sharing the font). The script is not part of
+`melos` or CI: it is run by hand, and the picture it makes is committed.
+
 ## Play Store screenshots
 
 `play-store/<language>/` holds the phone screenshots for each language of the
