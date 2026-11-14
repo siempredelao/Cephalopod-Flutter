@@ -1,0 +1,5 @@
+Første versjon av Cephalopod, et raskt strategispill med terninger for to spillere!
+
+Spill mot en venn på samme enhet eller mot datamaskinen, og lær reglene med den korte veiledningen. Du kan avbryte et spill og fortsette senere.
+
+Du kan lese mer om spillet og funksjonene i appbeskrivelsen.

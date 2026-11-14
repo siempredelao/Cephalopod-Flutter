@@ -9,6 +9,7 @@ fastlane/metadata/android/<locale>/
   title.txt              up to 30 characters
   short_description.txt  up to 80 characters
   full_description.txt   up to 4000 characters
+  changelogs/<versionCode>.txt  release notes, up to 500 characters
 ```
 
 The folder names are the locale codes Play Console uses, which differ from the
@@ -47,7 +48,8 @@ The screenshots are in `art/play-store/<language>/` (see `art/README.md`).
 `tool/upload_store_listing.sh` sends the texts, the screenshots and the app
 icon to Play Console for every language, with fastlane's
 [`supply`](https://docs.fastlane.tools/actions/upload_to_play_store/). It does
-not upload an app bundle or release notes. The screenshots stay in
+not upload an app bundle, and the release notes have their own script (see
+[Release notes](#release-notes)). The screenshots stay in
 `art/play-store/<language>/`: the script copies them next to the texts in a
 temporary folder, which is what `supply` reads.
 
@@ -80,3 +82,34 @@ Pictures Play already has are not sent again. The 1024 × 500 feature graphic,
 `art/play-store/feature-graphic.png`, is sent with the rest, the same one for every
 language. Play wants one before the listing can be published. The graphic is made
 by `tool/make_feature_graphic.py`; see [art/README.md](../art/README.md).
+
+## Release notes
+
+The notes of each version are in `changelogs/<versionCode>.txt` inside every
+language folder: `changelogs/1.txt` for 1.0.0+1, where the version code is the
+number after the `+` in `app/pubspec.yaml`. Each language has up to 500
+characters. For a new version, add a new file in every language (do not edit the
+old ones), and write the English one first, as with the listing.
+
+`tool/upload_release_notes.sh` sends the notes of one version for every language.
+It does not upload an app bundle: Play keeps the notes inside a release, so the
+version must already be on the track. Upload the bundle first (by hand in Play
+Console, or in another step), then:
+
+```sh
+# Ask Play to check everything, changing nothing:
+PLAY_JSON_KEY=~/keys/play.json tool/upload_release_notes.sh --validate-only
+
+# Upload to the internal track (the default):
+PLAY_JSON_KEY=~/keys/play.json tool/upload_release_notes.sh
+
+# Another track, or another version code than the one in pubspec.yaml:
+PLAY_JSON_KEY=~/keys/play.json tool/upload_release_notes.sh --track production --version-code 2
+
+# See what would be uploaded, with no key:
+tool/upload_release_notes.sh --stage-only /tmp/notes
+```
+
+It stops, before sending anything, if a language has no file for the version or
+if a text is over 500 characters. If the version is not on the track, `supply`
+stops with "Could not find release for version code".

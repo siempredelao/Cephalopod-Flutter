@@ -1,0 +1,5 @@
+Prima versione di Cephalopod, un rapido gioco di strategia con i dadi per due giocatori!
+
+Gioca contro un amico sullo stesso dispositivo o sfida il computer, e impara le regole con il breve tutorial. Puoi lasciare una partita e riprenderla più tardi.
+
+Per saperne di più sul gioco e sulle sue funzioni, leggi la descrizione dell'app.
