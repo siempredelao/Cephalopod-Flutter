@@ -76,6 +76,7 @@ PLAY_JSON_KEY=~/keys/play.json tool/upload_store_listing.sh
 tool/upload_store_listing.sh --stage-only /tmp/listing
 ```
 
-Pictures Play already has are not sent again. The 1024 × 500 feature graphic is
-made by hand: put it in `art/play-store/feature-graphic.png` and the script
-sends it with the rest. Play wants one before the listing can be published.
+Pictures Play already has are not sent again. The 1024 × 500 feature graphic,
+`art/play-store/feature-graphic.png`, is sent with the rest, the same one for every
+language. Play wants one before the listing can be published. The graphic is made
+by `tool/make_feature_graphic.py`; see [art/README.md](../art/README.md).
