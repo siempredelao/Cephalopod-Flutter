@@ -1,0 +1,5 @@
+Pierwsza wersja Cephalopod, szybkiej gry strategicznej z kośćmi dla dwóch graczy!
+
+Zagraj z przyjacielem na jednym urządzeniu albo zmierz się z komputerem, a zasad nauczysz się z krótkiego samouczka. Możesz przerwać grę i wrócić do niej później.
+
+Więcej o grze i jej funkcjach przeczytasz w opisie aplikacji.

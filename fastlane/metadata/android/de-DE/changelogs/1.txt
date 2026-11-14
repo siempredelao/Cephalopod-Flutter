@@ -1,0 +1,5 @@
+Die erste Version von Cephalopod, einem schnellen Würfel-Strategiespiel für zwei Spieler!
+
+Spiele gegen einen Freund auf demselben Gerät oder tritt gegen den Computer an, und lerne die Regeln mit der kurzen Anleitung. Du kannst ein Spiel unterbrechen und später fortsetzen.
+
+Mehr über das Spiel und seine Funktionen erfährst du in der App-Beschreibung.

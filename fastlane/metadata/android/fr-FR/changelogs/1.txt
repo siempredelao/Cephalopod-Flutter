@@ -1,0 +1,5 @@
+Première version de Cephalopod, un jeu de stratégie rapide avec des dés, pour deux joueurs !
+
+Jouez contre un ami sur le même appareil ou affrontez l'ordinateur, et apprenez les règles avec le court tutoriel. Vous pouvez quitter une partie et la reprendre plus tard.
+
+Pour en savoir plus sur le jeu et ses fonctionnalités, lisez la description de l'application.

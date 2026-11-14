@@ -1,0 +1,5 @@
+Primeira versão do Cephalopod, um jogo de estratégia rápido com dados para dois jogadores!
+
+Jogue contra um amigo no mesmo aparelho ou enfrente o computador, e aprenda as regras com o tutorial curto. Você pode sair de uma partida e continuar depois.
+
+Para saber mais sobre o jogo e seus recursos, leia a descrição do app.

@@ -1,0 +1,5 @@
+First release of Cephalopod, a quick dice strategy game for two players!
+
+Play a friend on the same device or take on the computer, and learn the rules with the short tutorial. You can leave a game and continue it later.
+
+To learn more about the game and its features, read the app description.
