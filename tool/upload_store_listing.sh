@@ -6,11 +6,18 @@
 #
 #   PLAY_JSON_KEY=~/keys/play.json tool/upload_store_listing.sh
 #   PLAY_JSON_KEY=~/keys/play.json tool/upload_store_listing.sh --validate-only
+#   PLAY_JSON_KEY=~/keys/play.json tool/upload_store_listing.sh --track production
 #   tool/upload_store_listing.sh --stage-only /tmp/listing
 #
-# --validate-only  asks Play to check everything and changes nothing.
-# --stage-only DIR builds the folder that would be uploaded in DIR, and stops.
-#                  It needs no key, so you can look at what would go up.
+# --track TRACK     the track whose release supply looks for (default: internal).
+# --version-code N  the version of that release (default: the number after the
+#                   "+" in the version of app/pubspec.yaml).
+# --validate-only   asks Play to check everything and changes nothing.
+# --stage-only DIR  builds the folder that would be uploaded in DIR, and stops.
+#                   It needs no key, so you can look at what would go up.
+#
+# supply looks for a release even when it uploads no bundle, so the version must
+# already be on the track: upload its app bundle first. See fastlane/README.md.
 #
 # PLAY_JSON_KEY is the service account's key file; keep it outside the
 # repository. It uploads with fastlane's `supply` (https://docs.fastlane.tools),
@@ -20,11 +27,21 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 package_name=gc.david.cephalopod
+track=internal
+version_code=''
 validate_only=false
 stage_only=''
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --track)
+      track="${2:?--track needs a track name}"
+      shift
+      ;;
+    --version-code)
+      version_code="${2:?--version-code needs a number}"
+      shift
+      ;;
     --validate-only) validate_only=true ;;
     --stage-only)
       stage_only="${2:?--stage-only needs a folder}"
@@ -37,6 +54,12 @@ while [[ $# -gt 0 ]]; do
   esac
   shift
 done
+
+# The version code is the number after the "+" in `version: 1.0.0+1`.
+if [[ -z "$version_code" ]]; then
+  version_code=$(sed -n 's/^version: .*+\([0-9][0-9]*\)$/\1/p' app/pubspec.yaml)
+  : "${version_code:?Could not read the version code from app/pubspec.yaml.}"
+fi
 
 # The app's language folders in art/play-store, and the locale of each in
 # Play Console (the folders in fastlane/metadata/android).
@@ -79,11 +102,15 @@ trap 'rm -rf "$stage"' EXIT
 stage_listing "$stage"
 
 # No app bundle and no release notes: this only changes the listing. With
-# sync_image_upload, pictures Play already has are not sent again.
+# sync_image_upload, pictures Play already has are not sent again. Even so,
+# supply looks for the release of --version_code on --track and stops with
+# "Could not find release" if there is none, so both are given.
 fastlane supply \
   --package_name "$package_name" \
   --json_key "$PLAY_JSON_KEY" \
   --metadata_path "$stage" \
+  --track "$track" \
+  --version_code "$version_code" \
   --skip_upload_apk \
   --skip_upload_aab \
   --skip_upload_changelogs \
