@@ -58,7 +58,18 @@ app.
 
 ## Children
 
-The app collects nothing from anyone, children included.
+Cephalopod is a game for everyone from about 6 years old, so children are
+welcome to play it.
+
+The app collects no personal information from anyone, children included. It has
+no accounts, no ads, no chat and no purchases, and nothing a child does in the
+app leaves the phone.
+
+A few buttons open another app or website, only when pressed (see "Links that
+leave the app" above). A parent may want to know that those links exist.
+
+A parent can remove everything the app has saved by clearing its storage in
+Android's settings or by uninstalling the app.
 
 ## Changes to this policy
 
