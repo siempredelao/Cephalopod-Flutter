@@ -67,12 +67,20 @@ temporary folder, which is what `supply` reads.
 
 ### Each time
 
+The version must already be on a track, because `supply` looks for its release
+even when it uploads no bundle, and stops with "Could not find release" if there
+is none. Upload the app bundle first, by hand in Play Console. The script looks
+on the internal track, for the version code in `app/pubspec.yaml`.
+
 ```sh
 # Ask Play to check everything, changing nothing:
 PLAY_JSON_KEY=~/keys/play.json tool/upload_store_listing.sh --validate-only
 
 # Upload:
 PLAY_JSON_KEY=~/keys/play.json tool/upload_store_listing.sh
+
+# Another track, or another version code than the one in pubspec.yaml:
+PLAY_JSON_KEY=~/keys/play.json tool/upload_store_listing.sh --track production --version-code 2
 
 # See what would be uploaded, with no key:
 tool/upload_store_listing.sh --stage-only /tmp/listing
