@@ -111,5 +111,5 @@ The numbers are the ones first planned, so they are not in order here.
 - [x] build: upload the store listing to Play Console with fastlane (S)
 - [x] docs: draw the store feature graphic (S)
 - [x] By hand in Play Console: listing, Data safety (no data collected), content rating, internal testing
-- [ ] Checkpoint: verify; E1 on an emulator; a signed bundle installed from internal testing
+- [x] Checkpoint: verify; E1 on an emulator; a signed bundle installed from internal testing
 - Not in the first release: crash reporting (decided 2026-11-12; Play Console's vitals instead)

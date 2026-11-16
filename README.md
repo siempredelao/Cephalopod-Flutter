@@ -157,27 +157,45 @@ signed by Android's own debug key and need nothing.
 
 ### Make the upload key (once)
 
-Keep the key outside the repository, for example in `~/.keys/`:
+Keep the key outside the repository, for example in `~/.android/cephalopod/`.
+From the root of the repository, this makes the key with a random password,
+asks nothing, and writes `app/android/keystore.properties`, which git ignores:
 
 ```sh
-mkdir -p ~/.keys
-keytool -genkey -v -keystore ~/.keys/cephalopod-upload.jks \
-  -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+dir=$HOME/.android/cephalopod
+jks=$dir/cephalopod-release.jks
+mkdir -p "$dir"
+[ -e "$jks" ] && { echo "Already exists: $jks"; false; } || {
+  pw=$(openssl rand -base64 24 | tr -d '/+=' | cut -c1-24)
+  keytool -genkeypair -storetype PKCS12 -keyalg RSA -keysize 2048 -validity 10000 \
+    -keystore "$jks" -alias cephalopod-release \
+    -dname "CN=Cephalopod, O=Cephalopod" \
+    -storepass "$pw" -keypass "$pw"
+  printf 'storeFile=%s\nstorePassword=%s\nkeyAlias=cephalopod-release\nkeyPassword=%s\n' \
+    "$jks" "$pw" "$pw" > app/android/keystore.properties
+  chmod 600 app/android/keystore.properties "$jks"
+}
 ```
 
-Then create `app/android/keystore.properties`, which git ignores:
+The properties file looks like this (the store and key passwords are the same):
 
 ```properties
-storeFile=/home/you/.keys/cephalopod-upload.jks
-storePassword=the password you chose
-keyAlias=upload
-keyPassword=the password you chose
+storeFile=/home/you/.android/cephalopod/cephalopod-release.jks
+storePassword=the random password
+keyAlias=cephalopod-release
+keyPassword=the random password
 ```
 
-**Back up the `.jks` file and both passwords** in a password manager, and
-somewhere else too. With Play App Signing, Google holds the key that signs
-what people install, so a lost upload key can be reset by Google's support.
-Still, it takes days, so keep the backup.
+**Back up the `.jks` file and the password** (it is in that file) in a password
+manager, and somewhere else too. With Play App Signing, Google holds the key
+that signs what people install, so a lost upload key can be reset by Google's
+support. Still, it takes days, so keep the backup.
+
+When you upload the first bundle, Play Console asks how the app is signed. Keep
+Google's own key, the default: your `.jks` is then only the upload key. The
+choice cannot be changed after the first upload. Bringing your own app signing
+key needs Google's `pepk.jar` tool, and you would have to keep that key secret
+for ever.
 
 ### Build the bundle
 
@@ -190,6 +208,31 @@ The signed bundle is `build/app/outputs/bundle/release/app-release.aab`. The
 version comes from `pubspec.yaml`: in `1.0.0+1`, `1.0.0` is what people see
 and `1` is the build number. Play wants a higher build number for every
 upload, so raise it each time.
+
+To check that the bundle is signed with your upload key, and not unsigned:
+
+```sh
+keytool -J-Duser.language=en -printcert -jarfile build/app/outputs/bundle/release/app-release.aab
+```
+
+It prints the owner and the fingerprints of the key. If it says the file is not
+signed, the bundle is unsigned: check `keystore.properties`. (`-J-Duser.language=en`
+only makes `keytool` answer in English, whatever the language of the system.)
+
+### Each release, in order
+
+1. In `app/pubspec.yaml`, raise the number after the `+` (the build number), and
+   the version too if people should see a new one.
+2. Add the release notes for that number in every language, as
+   `fastlane/metadata/android/<locale>/changelogs/<number>.txt`.
+3. Build the bundle and upload it to a track in Play Console, by hand.
+4. If the listing changed, run `tool/upload_store_listing.sh`.
+5. Run `tool/upload_release_notes.sh`. It must come after step 3: Play keeps the
+   notes inside a release, so the version has to be on the track already.
+
+Both scripts, and the key they need, are explained in
+[fastlane/README.md](fastlane/README.md). Add `--track` and `--version-code` when
+the release is not on the internal track, or is not the one in `pubspec.yaml`.
 
 ### Privacy policy
 
