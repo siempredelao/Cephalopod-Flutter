@@ -7,13 +7,13 @@ A Flutter implementation of **Cephalopod**, the two-player dice game invented by
 reference for clean architecture, SOLID and testing in Flutter: the rules live in
 a pure-Dart package, the app sits on top, and CI enforces the boundaries.
 
-**Status:** M5, polish. Play a friend on one device or the computer at three
-levels (Easy, Medium, Hard), undo and redo moves, leave and continue later,
-in English or Spanish, with a system, light or dark theme. Dice animate as
-they are placed and captured, screen readers announce each move, and the
-About page links the rule sheet. Underneath is a rules engine tested with
-1,000 seeded random games checked move by move, and golden images lock in
-how the main screens look. Next is M6: UX, then M7: Google Play.
+**Status:** M7, Google Play. The app is in internal testing on Google Play. You
+can play a friend on one device or the computer at three levels (Easy, Medium,
+Hard), undo and redo moves, get a hint, and leave and continue later from the
+Home screen. It speaks twelve languages, has a system, light or dark theme,
+sounds and capture effects, and screen readers announce each move. Underneath is
+a rules engine tested with 1,000 seeded random games checked move by move, and
+golden images lock in how the main screens look.
 
 ## The game
 
@@ -213,17 +213,18 @@ safety form in Play Console with it.
 - [x] **M6 · UX**: How to play on first launch, a simpler game app bar, a dice
   count, a hint, effects and sounds for captures and wins. (The first M6, a web
   release, was dropped with the web build.)
-- [ ] **M6 follow-ups**: a new Home screen with a board that plays a capture,
+- [x] **M6 follow-ups**: a new Home screen with a board that plays a capture,
   How to play as a feature of its own, and captured dice that burst one at
   a time with a pop each
-- [ ] **M7 · Google Play**: twelve languages, an open-source licenses screen,
+- [x] **M7 · Google Play**: twelve languages, an open-source licenses screen,
   launcher icons and splash screen, a rating prompt, release signing, store
-  listing and screenshots
+  listing and screenshots, a privacy policy, and a first release in internal
+  testing
 
 ## Contributing
 
-Conventional Commits, short-lived branches, squash merges into `main`. The pull
-request template lists what a change needs before review.
+Contributions are welcome. Please read the [contributing guide](CONTRIBUTING.md)
+first.
 
 ## License
 
