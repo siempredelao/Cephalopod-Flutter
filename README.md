@@ -33,14 +33,40 @@ name and rules stay unchanged and he is credited. This app does both.
 
 ## Architecture
 
-```text
-  presentation ──────────▶ domain ◀────────── data
-  views, blocs        use cases,         repositories,
-       │              repo interfaces    services
-       │                   │                  │
-       └───────────────────┼──────────────────┘
-                           ▼
-     cephalopod_engine: pure Dart, no Flutter, no I/O
+An arrow points from the code that imports to the code it imports. Every arrow
+ends at the engine in the end, and none points back up.
+
+```mermaid
+flowchart TB
+    boot["<b>app/</b><br>composition root (bootstrap), router, theme<br>picks the implementations and connects the features"]
+
+    subgraph feature["features/&lt;name&gt;: about, game, home, how_to_play, review, settings. A feature never imports another feature."]
+        direction LR
+        module["<b>&lt;name&gt;_module</b><br>builds the feature<br>and its routes"]
+        subgraph presentation["presentation/"]
+            direction TB
+            view["<b>view</b><br>widgets"]
+            bloc["<b>bloc</b><br>view model"]
+            models["<b>models</b><br>UI models"]
+            view --> bloc
+            view --> models
+            bloc --> models
+        end
+        domain["<b>domain/</b><br>use cases, repository<br>interfaces. No Flutter"]
+        data["<b>data/</b><br>repositories, services"]
+        module --> presentation
+        module --> data
+        bloc --> domain
+        data -->|implements| domain
+    end
+
+    core["<b>core/</b><br>board models and drawing, navigation, l10n, theme, shared widgets<br>never imports a feature"]
+    engine["<b>cephalopod_engine</b> (packages/)<br>pure Dart: the rules and the AI agents. No Flutter, no I/O"]
+
+    boot -->|builds every module| feature
+    feature --> core
+    feature --> engine
+    core --> engine
 ```
 
 - **`packages/cephalopod_engine`** holds the rules. It has no Flutter
