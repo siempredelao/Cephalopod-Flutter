@@ -119,9 +119,9 @@ being imported across features; screens navigate by route name
 - Generated files (`*.g.dart`, `*.freezed.dart`) are never committed.
 - Widget previews (`@Preview`, shown by the IDE's Flutter Widget Preview tab
   or `flutter widget-preview start`) live in a `previews/` folder (in
-  `presentation/view/` or `core/board/`) next to the widgets they show. They build positions from engine types, not
-  from `cephalopod_engine/testing.dart`, and a test builds every preview so a
-  broken one fails CI.
+  `presentation/view/` or `core/board/`) next to the widgets they show. They
+  build positions from engine types, not from `cephalopod_engine/testing.dart`,
+  and a test builds every preview so a broken one fails CI.
 
 ## Testing
 
