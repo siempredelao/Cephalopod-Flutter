@@ -148,11 +148,6 @@ The images are drawn on Linux, as CI is, with the Flutter version above and
 its Roboto font. Another system or Flutter version can draw text a pixel
 differently, and fail every golden.
 
-## Releasing to Google Play
-
-The upload key, the signed bundle, the steps of each release and the privacy
-policy are in [RELEASING.md](RELEASING.md).
-
 ## Roadmap
 
 - [x] **M0 · Foundations**: workspace, lints, CI, ADRs, app shell
@@ -174,6 +169,11 @@ policy are in [RELEASING.md](RELEASING.md).
   launcher icons and splash screen, a rating prompt, release signing, store
   listing and screenshots, a privacy policy, and a first release in internal
   testing
+
+## Releasing to Google Play
+
+The upload key, the signed bundle, the steps of each release and the privacy
+policy are in [RELEASING.md](RELEASING.md).
 
 ## Contributing
 
