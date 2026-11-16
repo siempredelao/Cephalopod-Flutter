@@ -39,28 +39,30 @@ and data both depend on `domain/`, never the other way round. Nothing imports
 
 ```mermaid
 flowchart TB
+    %% The <br> lines only make the module box as tall as the layers beside it.
     boot["<b>app/</b><br>composition root (bootstrap), router, theme<br>picks the implementations and connects the features"]
 
     subgraph feature["features/&lt;name&gt;: about, game, home, how_to_play, review, settings. A feature never imports another feature."]
         direction LR
-        module["<b>&lt;name&gt;_module</b><br>builds the feature<br>and its routes"]
-        subgraph presentation["presentation/"]
+        module["<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><b>&lt;name&gt;_module</b><br>wires the three<br>layers and<br>exposes the<br>feature's routes<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>"]
+        subgraph layers[" "]
             direction TB
-            view["<b>view</b><br>widgets"]
-            bloc["<b>bloc</b><br>view model"]
-            models["<b>models</b><br>UI models"]
-            view --> bloc
-            view --> models
-            bloc --> models
+            subgraph presentation["presentation/"]
+                direction TB
+                view["<b>view</b><br>widgets"]
+                bloc["<b>bloc</b><br>view model"]
+                models["<b>models</b><br>UI models"]
+                view --> bloc
+                view --> models
+                bloc --> models
+            end
+            domain["<b>domain/</b><br>use cases, repository<br>interfaces. No Flutter"]
+            data["<b>data/</b><br>repositories, services"]
+            bloc --> domain
+            domain ~~~ data
+            data -->|implements| domain
         end
-        domain["<b>domain/</b><br>use cases, repository<br>interfaces. No Flutter"]
-        data["<b>data/</b><br>repositories, services"]
-        module --> presentation
-        module --> data
-        module --> domain
-        bloc --> domain
-        domain ~~~ data
-        data -->|implements| domain
+        module ~~~ layers
     end
 
     core["<b>core/</b><br>board models and drawing, navigation, l10n, theme, shared widgets<br>never imports a feature"]
@@ -70,6 +72,7 @@ flowchart TB
     feature --> core
     feature -->|"all but view and models"| engine
     core --> engine
+    style layers fill:none,stroke:none
 ```
 
 - **`packages/cephalopod_engine`** holds the rules. It has no Flutter
