@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/siempredelao/Cephalopod-Flutter/actions/workflows/ci.yaml/badge.svg)](https://github.com/siempredelao/Cephalopod-Flutter/actions/workflows/ci.yaml)
 
+[![Get it on Google Play](https://developer.android.com/images/brand/en_generic_rgb_wo_60.png)](https://play.google.com/store/apps/details?id=gc.david.cephalopod)
+
 A Flutter implementation of **Cephalopod**, the two-player dice game invented by
 [Mark Steere](https://www.marksteeregames.com) in 2006. The project doubles as a
 reference for clean architecture, SOLID and testing in Flutter: the rules live in
@@ -61,16 +63,22 @@ trade-offs: [docs/adr](docs/adr/README.md).
 │   │   ├── app/                 App widget, router, theme, composition root
 │   │   ├── core/                Code shared by features
 │   │   └── features/<name>/     domain/ · data/ · presentation/
-│   └── test/                    Mirrors lib/
+│   ├── test/                    Mirrors lib/
+│   ├── integration_test/        Tests that run on a device
+│   └── android/, ios/           Platform projects
 ├── packages/cephalopod_engine/  Rules engine, pure Dart
-├── tool/                        Architecture and coverage checks
-├── docs/                        Architecture notes and ADRs
+├── tool/                        Checks, scripts for the sounds, the store
+│                                screenshots and the Play uploads
+├── art/                         App icon, store graphics and screenshots
+├── fastlane/                    Texts of the Google Play listing
+├── docs/                        Architecture notes, ADRs, privacy policy
 └── pubspec.yaml                 Pub workspace root and Melos scripts
 ```
 
 ## Getting started
 
-Requirements: Flutter 3.47.9 (Dart 3.13.7).
+Requirements: Flutter 3.47.9 (Dart 3.13.7). The app targets Android and iOS; the
+web is not a target, so there is no `web/` folder.
 
 ```sh
 flutter pub get                      # resolves the whole workspace
@@ -83,23 +91,6 @@ UI states are [freezed](https://pub.dev/packages/freezed) classes. Run
 `generate` again after changing one, or keep `dart run melos run generate:watch`
 running. Why the generated files stay out of git:
 [ADR 0011](docs/adr/0011-freezed-for-ui-states.md).
-
-### One-time: generate the platform folders
-
-The repository holds only Dart code until platform folders are committed.
-Generate them once from `app/`:
-
-```sh
-cd app
-flutter create --platforms=android,ios --org gc.david --project-name cephalopod .
-rm -f test/widget_test.dart          # sample test from the template; not used here
-```
-
-`--org gc.david` plus the project name gives the application ID and bundle
-identifier `gc.david.cephalopod`.
-
-Commit the new `android/` and `ios/` folders and `.metadata`. CI then also runs
-an Android smoke build. The web is not a target, so there is no `web/` folder.
 
 ## Quality gates
 
@@ -125,8 +116,12 @@ storage: it plays a move, closes the app, starts it again and continues the
 game. CI does not run it, so run it before a release, with a device connected:
 
 ```sh
-cd app && flutter test integration_test
+cd app && flutter test integration_test/play_save_resume_test.dart
 ```
+
+The other test in `app/integration_test/` takes the Play Store screenshots. It
+has its own script, `tool/take_store_screenshots.sh` (see
+[art/README.md](art/README.md)).
 
 ### Golden images
 
@@ -173,12 +168,18 @@ differently, and fail every golden.
 ## Releasing to Google Play
 
 The upload key, the signed bundle, the steps of each release and the privacy
-policy are in [RELEASING.md](RELEASING.md).
+policy are in the [releasing guide](RELEASING.md).
 
 ## Contributing
 
 Contributions are welcome. Please read the [contributing guide](CONTRIBUTING.md)
 first.
+
+## More documents
+
+- [docs/privacy-policy.md](docs/privacy-policy.md): what the app does with your data.
+- [fastlane/README.md](fastlane/README.md): the store listing and the upload scripts.
+- [art/README.md](art/README.md): the icon, the store graphics and the screenshots.
 
 ## License
 
