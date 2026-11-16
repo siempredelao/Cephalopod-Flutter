@@ -33,8 +33,9 @@ name and rules stay unchanged and he is credited. This app does both.
 
 ## Architecture
 
-An arrow points from the code that imports to the code it imports. None points
-back up: nothing imports `app/`, and the engine imports nothing of ours.
+An arrow points from the code that imports to the code it imports. Presentation
+and data both depend on `domain/`, never the other way round. Nothing imports
+`app/`, and the engine imports nothing of ours.
 
 ```mermaid
 flowchart TB
@@ -58,6 +59,7 @@ flowchart TB
         module --> data
         module --> domain
         bloc --> domain
+        domain ~~~ data
         data -->|implements| domain
     end
 
