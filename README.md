@@ -33,8 +33,8 @@ name and rules stay unchanged and he is credited. This app does both.
 
 ## Architecture
 
-An arrow points from the code that imports to the code it imports. Every arrow
-ends at the engine in the end, and none points back up.
+An arrow points from the code that imports to the code it imports. None points
+back up: nothing imports `app/`, and the engine imports nothing of ours.
 
 ```mermaid
 flowchart TB
@@ -56,6 +56,7 @@ flowchart TB
         data["<b>data/</b><br>repositories, services"]
         module --> presentation
         module --> data
+        module --> domain
         bloc --> domain
         data -->|implements| domain
     end
@@ -65,7 +66,7 @@ flowchart TB
 
     boot -->|builds every module| feature
     feature --> core
-    feature --> engine
+    feature -->|"all but view and models"| engine
     core --> engine
 ```
 
@@ -77,8 +78,9 @@ flowchart TB
 - **`tool/check_architecture.dart`** fails CI when an import breaks the
   dependency rule.
 
-Details: [docs/architecture.md](docs/architecture.md). Decisions and their
-trade-offs: [docs/adr](docs/adr/README.md).
+The full list of dependency rules, how CI enforces them and the testing levels:
+[docs/architecture.md](docs/architecture.md). Decisions and their trade-offs:
+[docs/adr](docs/adr/README.md).
 
 ## Repository layout
 
