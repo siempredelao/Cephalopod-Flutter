@@ -57,13 +57,29 @@ temporary folder, which is what `supply` reads.
 
 1. Create the app in Play Console and save its listing once (the API cannot
    create an app).
-2. Create a service account in Google Cloud and give it access in Play Console
-   (Users and permissions, then invite it, with the permission to manage the
-   store listing). Download its JSON key. Play can take a few minutes, and
-   sometimes longer, to accept a new service account. The steps are in
+2. Create a service account in Google Cloud and give it access in Play Console:
+   - In Google Cloud, enable the "Google Play Android Developer API" for the
+     project, create the service account and download its JSON key.
+   - In Play Console, open Users and permissions, invite the service account's
+     email and give it these account permissions: **Create, edit, and delete
+     draft apps** (while the app is still a draft, Play refuses every upload
+     without it), **Manage store presence** and **Release apps to testing
+     tracks**.
+
+   Play can take a few minutes, and sometimes longer, to accept a new service
+   account. The steps are in
    [fastlane's guide](https://docs.fastlane.tools/getting-started/android/setup/).
 3. Keep the key outside the repository.
 4. Install fastlane (`gem install fastlane`, or Homebrew).
+5. Check the key, which changes nothing:
+
+   ```sh
+   fastlane run validate_play_store_json_key json_key:~/keys/play.json
+   ```
+
+   If a later upload stops with "The caller does not have permission", a
+   permission from step 2 is missing: add it in Users and permissions and try
+   again.
 
 ### Each time
 

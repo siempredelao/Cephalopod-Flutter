@@ -9,7 +9,7 @@ engine moves and renders the result. Every dependency points toward the engine.
 | Package | Path | Depends on | Purpose |
 | --- | --- | --- | --- |
 | `cephalopod_engine` | `packages/cephalopod_engine` | Dart SDK, `meta`, `collection` | Game rules, AI agents |
-| `cephalopod` | `app` | engine, Flutter, go_router, material_ui, bloc, freezed, shared_preferences, package_info_plus, url_launcher | The app |
+| `cephalopod` | `app` | engine, Flutter, go_router, material_ui, bloc and flutter_bloc, freezed, intl, shared_preferences, package_info_plus, url_launcher, audioplayers, in_app_review | The app |
 | `cephalopod_workspace` | repo root | Melos, lints | Workspace, scripts, `tool/` checks |
 
 The packages form a [pub workspace](https://dart.dev/tools/pub/workspaces):
@@ -28,7 +28,7 @@ by feature first and by layer second.
 | Domain | `features/<f>/domain` | Use cases, repository interfaces | `core`, engine. **No Flutter** |
 | Data | `features/<f>/data` | Repository implementations, DTOs, services | Own `domain`, `core`, engine |
 | Module | `features/<f>/<f>_module.dart` | The feature's wiring and its routes | Own feature, `core`, engine, Flutter |
-| Core | `core` | Code shared by features: route names, the `FeatureModule` interface, theme, the board's models and drawing, shared widgets | `core`, engine, Flutter |
+| Core | `core` | Code shared by features: route names, the `FeatureModule` interface, the translations, theme, the board's models and drawing, the saved-game summary Home shows, the error reporter | `core`, engine, Flutter |
 | App | `app` | `App` widget, router, theme, composition root | Anything |
 
 Inside presentation, views render UI models
@@ -86,8 +86,6 @@ being imported across features; screens navigate by route name
 | Interface segregation | Agents depend on a narrow move-generator interface; games and settings have separate repositories |
 | Dependency inversion | Domain owns the interfaces, data implements them, the composition root picks the implementation and the feature's module wires it |
 
-Classes named above arrive in M1–M4; the table records how they will fit.
-
 ## Conventions
 
 - Files in `snake_case`, one public type per file, named after the type.
@@ -120,10 +118,10 @@ Classes named above arrive in M1–M4; the table records how they will fit.
   `package:flutter/material.dart`. See [ADR 0007](adr/0007-material-ui-package.md).
 - Generated files (`*.g.dart`, `*.freezed.dart`) are never committed.
 - Widget previews (`@Preview`, shown by the IDE's Flutter Widget Preview tab
-  or `flutter widget-preview start`) live in `presentation/view/previews/`,
-  next to the widgets they show. They build positions from engine types, not
-  from `cephalopod_engine/testing.dart`, and a test builds every preview so a
-  broken one fails CI.
+  or `flutter widget-preview start`) live in a `previews/` folder (in
+  `presentation/view/` or `core/board/`) next to the widgets they show. They
+  build positions from engine types, not from `cephalopod_engine/testing.dart`,
+  and a test builds every preview so a broken one fails CI.
 
 ## Testing
 
@@ -135,16 +133,18 @@ Classes named above arrive in M1–M4; the table records how they will fit.
 | Repository contract | Every implementation behaves the same | `app/test/features/*/data` |
 | Bloc | Event to state sequences | `app/test/features/*/presentation` |
 | Widget | Rendering, taps, semantics, light and dark | `app/test` |
-| Golden | How the four main screens look, pixel by pixel, in both languages and both themes | `app/test/goldens` |
-| Accessibility | Tap targets, labels and contrast on every screen; twice the text size; one-line choices, in both languages | `app/test/app` |
+| Golden | How the main screens look, pixel by pixel: Home, Home with a saved game, the new game dialog, the game and How to play, in English and Spanish and in both themes. The other ten languages have only the game and How to play, in the light theme | `app/test/goldens` |
+| Accessibility | Tap targets, labels and contrast on every screen; twice the text size; one-line choices, in every language | `app/test/app` |
+| On device | A game is played, saved and resumed after the app restarts, with real storage | `app/integration_test` |
 
 Coverage gates: engine 100% of lines, app 85% of lines, generated files excluded.
 
-There is no on-device integration test yet. The tests above cover the
-storage format, the app's wiring (`app/test/app/app_test.dart`) and every
-flow, and the agent contract covers the one thing only a device did: running
-an agent on another isolate. A full game on a real device is to be
-reconsidered for the Google Play release (M7).
+The on-device test is run by hand before a release, not by CI (see the
+README). The other tests cover the storage format, the app's wiring
+(`app/test/app/app_test.dart`) and every flow, and the agent contract covers
+running an agent on another isolate. `app/integration_test` also holds a test
+that takes the Play Store screenshots, with its own script,
+`tool/take_store_screenshots.sh`.
 
 ## Decisions
 

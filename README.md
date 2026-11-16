@@ -2,18 +2,20 @@
 
 [![CI](https://github.com/siempredelao/Cephalopod-Flutter/actions/workflows/ci.yaml/badge.svg)](https://github.com/siempredelao/Cephalopod-Flutter/actions/workflows/ci.yaml)
 
+[![Get it on Google Play](https://developer.android.com/images/brand/en_generic_rgb_wo_60.png)](https://play.google.com/store/apps/details?id=gc.david.cephalopod)
+
 A Flutter implementation of **Cephalopod**, the two-player dice game invented by
 [Mark Steere](https://www.marksteeregames.com) in 2006. The project doubles as a
 reference for clean architecture, SOLID and testing in Flutter: the rules live in
 a pure-Dart package, the app sits on top, and CI enforces the boundaries.
 
-**Status:** M5, polish. Play a friend on one device or the computer at three
-levels (Easy, Medium, Hard), undo and redo moves, leave and continue later,
-in English or Spanish, with a system, light or dark theme. Dice animate as
-they are placed and captured, screen readers announce each move, and the
-About page links the rule sheet. Underneath is a rules engine tested with
-1,000 seeded random games checked move by move, and golden images lock in
-how the main screens look. Next is M6: UX, then M7: Google Play.
+**Status:** M7, Google Play. The app is in internal testing on Google Play. You
+can play a friend on one device or the computer at three levels (Easy, Medium,
+Hard), undo and redo moves, get a hint, and leave and continue later from the
+Home screen. It speaks twelve languages, has a system, light or dark theme,
+sounds and capture effects, and screen readers announce each move. Underneath is
+a rules engine tested with 1,000 seeded random games checked move by move, and
+golden images lock in how the main screens look.
 
 ## The game
 
@@ -31,14 +33,46 @@ name and rules stay unchanged and he is credited. This app does both.
 
 ## Architecture
 
-```text
-  presentation ──────────▶ domain ◀────────── data
-  views, blocs        use cases,         repositories,
-       │              repo interfaces    services
-       │                   │                  │
-       └───────────────────┼──────────────────┘
-                           ▼
-     cephalopod_engine: pure Dart, no Flutter, no I/O
+An arrow points from the code that imports to the code it imports. Presentation
+and data both depend on `domain/`, never the other way round. Nothing imports
+`app/`, and the engine imports nothing of ours.
+
+```mermaid
+flowchart TB
+    %% The <br> lines only make the module box as tall as the layers beside it.
+    boot["<b>app/</b><br>composition root (bootstrap), router, theme<br>picks the implementations and connects the features"]
+
+    subgraph feature["features/&lt;name&gt;: about, game, home, how_to_play, review, settings. A feature never imports another feature."]
+        direction LR
+        module["<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><b>&lt;name&gt;_module</b><br>wires the three<br>layers and<br>exposes the<br>feature's routes<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>"]
+        subgraph layers[" "]
+            direction TB
+            subgraph presentation["presentation/"]
+                direction TB
+                view["<b>view</b><br>widgets"]
+                bloc["<b>bloc</b><br>view model"]
+                models["<b>models</b><br>UI models"]
+                view --> bloc
+                view --> models
+                bloc --> models
+            end
+            domain["<b>domain/</b><br>use cases, repository<br>interfaces. No Flutter"]
+            data["<b>data/</b><br>repositories, services"]
+            bloc --> domain
+            domain ~~~ data
+            data -->|implements| domain
+        end
+        module ~~~ layers
+    end
+
+    core["<b>core/</b><br>board models and drawing, navigation, l10n, theme, shared widgets<br>never imports a feature"]
+    engine["<b>cephalopod_engine</b> (packages/)<br>pure Dart: the rules and the AI agents. No Flutter, no I/O"]
+
+    boot -->|builds every module| feature
+    feature --> core
+    feature -->|"all but view and models"| engine
+    core --> engine
+    style layers fill:none,stroke:none
 ```
 
 - **`packages/cephalopod_engine`** holds the rules. It has no Flutter
@@ -49,8 +83,9 @@ name and rules stay unchanged and he is credited. This app does both.
 - **`tool/check_architecture.dart`** fails CI when an import breaks the
   dependency rule.
 
-Details: [docs/architecture.md](docs/architecture.md). Decisions and their
-trade-offs: [docs/adr](docs/adr/README.md).
+The full list of dependency rules, how CI enforces them and the testing levels:
+[docs/architecture.md](docs/architecture.md). Decisions and their trade-offs:
+[docs/adr](docs/adr/README.md).
 
 ## Repository layout
 
@@ -61,16 +96,22 @@ trade-offs: [docs/adr](docs/adr/README.md).
 │   │   ├── app/                 App widget, router, theme, composition root
 │   │   ├── core/                Code shared by features
 │   │   └── features/<name>/     domain/ · data/ · presentation/
-│   └── test/                    Mirrors lib/
+│   ├── test/                    Mirrors lib/
+│   ├── integration_test/        Tests that run on a device
+│   └── android/, ios/           Platform projects
 ├── packages/cephalopod_engine/  Rules engine, pure Dart
-├── tool/                        Architecture and coverage checks
-├── docs/                        Architecture notes and ADRs
+├── tool/                        Checks, scripts for the sounds, the store
+│                                screenshots and the Play uploads
+├── art/                         App icon, store graphics and screenshots
+├── fastlane/                    Texts of the Google Play listing
+├── docs/                        Architecture notes, ADRs, privacy policy
 └── pubspec.yaml                 Pub workspace root and Melos scripts
 ```
 
 ## Getting started
 
-Requirements: Flutter 3.47.9 (Dart 3.13.7).
+Requirements: Flutter 3.47.9 (Dart 3.13.7). The app targets Android and iOS; the
+web is not a target, so there is no `web/` folder.
 
 ```sh
 flutter pub get                      # resolves the whole workspace
@@ -83,23 +124,6 @@ UI states are [freezed](https://pub.dev/packages/freezed) classes. Run
 `generate` again after changing one, or keep `dart run melos run generate:watch`
 running. Why the generated files stay out of git:
 [ADR 0011](docs/adr/0011-freezed-for-ui-states.md).
-
-### One-time: generate the platform folders
-
-The repository holds only Dart code until platform folders are committed.
-Generate them once from `app/`:
-
-```sh
-cd app
-flutter create --platforms=android,ios --org gc.david --project-name cephalopod .
-rm -f test/widget_test.dart          # sample test from the template; not used here
-```
-
-`--org gc.david` plus the project name gives the application ID and bundle
-identifier `gc.david.cephalopod`.
-
-Commit the new `android/` and `ios/` folders and `.metadata`. CI then also runs
-an Android smoke build. The web is not a target, so there is no `web/` folder.
 
 ## Quality gates
 
@@ -125,8 +149,12 @@ storage: it plays a move, closes the app, starts it again and continues the
 game. CI does not run it, so run it before a release, with a device connected:
 
 ```sh
-cd app && flutter test integration_test
+cd app && flutter test integration_test/play_save_resume_test.dart
 ```
+
+The other test in `app/integration_test/` takes the Play Store screenshots. It
+has its own script, `tool/take_store_screenshots.sh` (see
+[art/README.md](art/README.md)).
 
 ### Golden images
 
@@ -148,57 +176,6 @@ The images are drawn on Linux, as CI is, with the Flutter version above and
 its Roboto font. Another system or Flutter version can draw text a pixel
 differently, and fail every golden.
 
-## Releasing to Google Play
-
-Play only accepts a release signed with your own upload key. Without one,
-a release build still finishes, but its APK or bundle is unsigned: a phone
-will not install it and Play rejects it. Debug builds, which CI makes, are
-signed by Android's own debug key and need nothing.
-
-### Make the upload key (once)
-
-Keep the key outside the repository, for example in `~/.keys/`:
-
-```sh
-mkdir -p ~/.keys
-keytool -genkey -v -keystore ~/.keys/cephalopod-upload.jks \
-  -keyalg RSA -keysize 2048 -validity 10000 -alias upload
-```
-
-Then create `app/android/keystore.properties`, which git ignores:
-
-```properties
-storeFile=/home/you/.keys/cephalopod-upload.jks
-storePassword=the password you chose
-keyAlias=upload
-keyPassword=the password you chose
-```
-
-**Back up the `.jks` file and both passwords** in a password manager, and
-somewhere else too. With Play App Signing, Google holds the key that signs
-what people install, so a lost upload key can be reset by Google's support.
-Still, it takes days, so keep the backup.
-
-### Build the bundle
-
-```sh
-cd app
-flutter build appbundle
-```
-
-The signed bundle is `build/app/outputs/bundle/release/app-release.aab`. The
-version comes from `pubspec.yaml`: in `1.0.0+1`, `1.0.0` is what people see
-and `1` is the build number. Play wants a higher build number for every
-upload, so raise it each time.
-
-### Privacy policy
-
-The policy is [docs/privacy-policy.md](docs/privacy-policy.md). Play Console asks for
-a web address, and this is the one to give it:
-`https://github.com/siempredelao/Cephalopod-Flutter/blob/main/docs/privacy-policy.md`.
-If the app ever collects or sends data, change the policy first, and the Data
-safety form in Play Console with it.
-
 ## Roadmap
 
 - [x] **M0 · Foundations**: workspace, lints, CI, ADRs, app shell
@@ -213,17 +190,29 @@ safety form in Play Console with it.
 - [x] **M6 · UX**: How to play on first launch, a simpler game app bar, a dice
   count, a hint, effects and sounds for captures and wins. (The first M6, a web
   release, was dropped with the web build.)
-- [ ] **M6 follow-ups**: a new Home screen with a board that plays a capture,
+- [x] **M6 follow-ups**: a new Home screen with a board that plays a capture,
   How to play as a feature of its own, and captured dice that burst one at
   a time with a pop each
-- [ ] **M7 · Google Play**: twelve languages, an open-source licenses screen,
+- [x] **M7 · Google Play**: twelve languages, an open-source licenses screen,
   launcher icons and splash screen, a rating prompt, release signing, store
-  listing and screenshots
+  listing and screenshots, a privacy policy, and a first release in internal
+  testing
+
+## Releasing to Google Play
+
+The upload key, the signed bundle, the steps of each release and the privacy
+policy are in the [releasing guide](RELEASING.md).
 
 ## Contributing
 
-Conventional Commits, short-lived branches, squash merges into `main`. The pull
-request template lists what a change needs before review.
+Contributions are welcome. Please read the [contributing guide](CONTRIBUTING.md)
+first.
+
+## More documents
+
+- [docs/privacy-policy.md](docs/privacy-policy.md): what the app does with your data.
+- [fastlane/README.md](fastlane/README.md): the store listing and the upload scripts.
+- [art/README.md](art/README.md): the icon, the store graphics and the screenshots.
 
 ## License
 
